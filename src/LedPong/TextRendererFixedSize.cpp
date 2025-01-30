@@ -1,6 +1,13 @@
 #include "VectorArith.h"
 #include "TextRendererFixedSize.h"
 
+TextRendererFixedSize::TextRendererFixedSize()
+{
+	mCharDefs = LedTexture();
+	mCharWidth = 0;
+	mCharSpacing = 0;
+}
+
 TextRendererFixedSize::TextRendererFixedSize(string fn, int charWidth, int charSpacing, string indexToChar)
 {
 	mCharDefs = LedTexture(fn);

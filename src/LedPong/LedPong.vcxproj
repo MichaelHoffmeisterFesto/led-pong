@@ -73,8 +73,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)..\SDL2\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)..\SDL2\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)..\SDL2\include;$(ProjectDir)..\SDL2_mixer-2.8.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)..\SDL2\lib\x86;$(ProjectDir)..\SDL2_mixer-2.8.0\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -100,7 +100,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_ttf.lib;SDL2_mixer.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -160,6 +160,7 @@
   <ItemGroup>
     <ClCompile Include="Actor.cpp" />
     <ClCompile Include="CQueueDynGeneric.cpp" />
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="LedAnimation.cpp" />
     <ClCompile Include="LedColor.cpp" />
     <ClCompile Include="LedColors.cpp" />
@@ -168,6 +169,7 @@
     <ClCompile Include="SDL_Application.cpp" />
     <ClCompile Include="SDL_Helper.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="SDL_SoundSample.cpp" />
     <ClCompile Include="TextRendererAbstractBase.cpp" />
     <ClCompile Include="TextRendererFixedSize.cpp" />
     <ClCompile Include="TextRendererProportionalText.cpp" />
@@ -180,6 +182,7 @@
     <ClInclude Include="Actor.h" />
     <ClInclude Include="basic.h" />
     <ClInclude Include="CQueueDynGeneric.h" />
+    <ClInclude Include="Game.h" />
     <ClInclude Include="LedAnimation.h" />
     <ClInclude Include="LedColor.h" />
     <ClInclude Include="LedColors.h" />
@@ -187,6 +190,7 @@
     <ClInclude Include="SampleGen.h" />
     <ClInclude Include="SDL_Application.h" />
     <ClInclude Include="SDL_Helper.h" />
+    <ClInclude Include="SDL_SoundSample.h" />
     <ClInclude Include="TextRendererAbstractBase.h" />
     <ClInclude Include="TextRendererFixedSize.h" />
     <ClInclude Include="TextRendererProportionalText.h" />

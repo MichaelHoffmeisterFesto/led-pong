@@ -17,6 +17,7 @@ class TextRendererProportionalText :
     public TextRendererAbstractBase
 {
 public:
+    TextRendererProportionalText();
     TextRendererProportionalText(string fn, int numGlyphs, ProportionalTextGlyph* glyphDefs);
 
     // virtual methods which are implemented need to be repeated

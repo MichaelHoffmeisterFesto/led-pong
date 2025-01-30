@@ -10,6 +10,7 @@ class TextRendererFixedSize :
     public TextRendererAbstractBase
 {
 public:
+    TextRendererFixedSize();
     TextRendererFixedSize(string fn, int charWidth, int charSpacing, string mIndexToChar);
 
     // virtual methods which are implemented need to be repeated

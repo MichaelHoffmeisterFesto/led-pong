@@ -45,6 +45,15 @@ bool SDL_Application::init(int width, int height) {
 		return false;
 	}
 
+	// Audio
+	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024) < 0) {
+		// Error message if can't initialize
+	}
+
+	// Amount of channels (Max amount of sounds playing at the same time)
+	Mix_AllocateChannels(32);
+
+	// Rest
 	SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 255);
 	SDL_RenderClear(Renderer);
 	return true;

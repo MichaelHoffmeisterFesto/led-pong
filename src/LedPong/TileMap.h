@@ -24,7 +24,7 @@ public:
 	Vec2 FinalPosition;
 
 	// True, if it is a "jump" movement from one gate to another.
-	bool JumpMove;
+	bool JumpMove = false;
 
 	// provide some "rich" constructor
 	PossibleMove() {};
@@ -72,6 +72,7 @@ public:
 	// safe, access of single tiles
 	TileBase* Get(int x, int y);
 	Tile* GetAsTile(int x, int y);
+	inline Tile* GetAsTile(Vec2 pos) { return GetAsTile(pos.X, pos.Y); }
 	void Put(int x, int y, TileBase* preset);
 
 	// fill all tiles in the map
@@ -96,6 +97,9 @@ public:
 	Vec2 GhostStartPos[4];
 	Vec2 GateToLeft, GateToTop, GateToRight, GateToBottom;
 
+	// Total number of pills on the map
+	int PillsTotal = 0;
+	
 	// When initialized, remaining number (not points!) of pills.
 	// Note: If zero, subject to change to new level.
 	int PillsAvailable = 0;

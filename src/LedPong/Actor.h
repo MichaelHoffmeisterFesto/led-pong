@@ -90,4 +90,7 @@ public:
 
 public:
 	// Attributes
+
+	// Total achieved score in points, basically energy pills + bonus
+	int Score = 0;
 };

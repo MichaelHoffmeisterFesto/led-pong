@@ -94,7 +94,7 @@ void TileMap::UpdatePillsAvailable()
 			if (tile != nullptr && tile->IsEnergyPill())
 				count++;
 		}
-	PillsAvailable = count;
+	PillsTotal = count;
 }
 
 // destructor

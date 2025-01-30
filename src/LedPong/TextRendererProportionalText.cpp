@@ -1,5 +1,13 @@
 #include "TextRendererProportionalText.h"
 
+TextRendererProportionalText::TextRendererProportionalText()
+{
+	mCharDefs = LedTexture();
+	mNumGlyphs = 0;
+	mGlyphDefs = nullptr;
+}
+
+
 TextRendererProportionalText::TextRendererProportionalText(
 	string fn, 
 	int numGlyphs,
