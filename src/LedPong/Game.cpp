@@ -13,7 +13,7 @@ Game::Game()
 	// renderers
 	TrFs = TextRendererFixedSize(
 		"media/pacman-kacheln5x5.bmp", 5, 1,
-		"QWERTZUIABCD.-|HJKLtb=lr#jhokasdf uvwx");
+		"QWERTZUIABCD.-|HJKLtb=lr#jhokasdf uvwx*ceg");
 
 	ProportionalTextGlyph glyphs[] = {
 		{ 'A', 0, 5 },
@@ -66,27 +66,27 @@ Game::Game()
 	string x1[] = {
 		"L-----------------H",
 		"|.................|",
-		"|.LH.L-H.L------H.|",
-		"|.||.| |.|      |.|",
-		"|.KJ.K-J.K------J.|",
+		"|.L-H.L-H.L-----H.|",
+		"|.| |.| |.|     |.|",
+		"|.K-J.K-J.K-----J.|",
+		"|..*...........*..|",
+		"|.L-H.L-----H.L-H.|",
+		"|.K-J.K-----J.K-J.|",
 		"|.................|",
-		"|.LH.L-------H.LH.|",
-		"|.KJ.K-------J.KJ.|",
-		"|.................|",
-		"K--H.L--H.L--H.L--J",
-		"   |.| LJ.KH |.|   ",
-		"---J.| |...| |.K---",
-		".....| |...| |.....",
-		"---H.| |...| |.L---",
-		"   |.| KH.LJ |.|   ",
-		"L--J.K--J.K--J.K--H",
-		"|.................|",
-		"|.LH.L--H.L--H.LH.|",
-		"|.||.u--J.u--J.||.|",
-		"|.KJ.|....|....||.|",
-		"|....|..--J.L--J|.|",
-		"|.LH.|......|   |.|",
-		"|.KJ.K------w---J.|",
+		"K---H.L-H.L-H.L---J",
+		"    |.|LJ.KH|.|    ",
+		"----J.||...||.K----",
+		"......||...||......",
+		"----H.||...||.L----",
+		"    |.|KH.LJ|.|    ",
+		"L---J.K-J.K-J.K---H",
+		"|*...............*|",
+		"|.L-H.L-H.L-H.L-H.|",
+		"|.| |.u-J.u-J.| |.|",
+		"|.K-J.|...|...| |.|",
+		"|.....|.--J.L-J |.|",
+		"|.L-H.|.....|   |.|",
+		"|.K-J.K-----w---J.|",
 		"|.................|",
 		"K-----------------J"
 	}; 
@@ -99,6 +99,11 @@ Game::Game()
 	tm1->GhostStartPos[1] = Vec2(10, 11);
 	tm1->GhostStartPos[2] = Vec2(8, 13);
 	tm1->GhostStartPos[3] = Vec2(10, 13);
+	tm1->PlayerTextScorePos[0] = Vec2(0, 10);
+	tm1->PlayerTextScorePos[1] = Vec2(0, 14);
+	tm1->PlayerTextExtraPos[0] = Vec2(15, 10);
+	tm1->PlayerTextExtraPos[1] = Vec2(15, 14);
+	tm1->MessagePos = Vec2(11, 3);
 	Levels[LevelNum++] = tm1;
 
 	string x2[] = {
@@ -145,7 +150,7 @@ void Game::LoadLevel(TileMap* level)
 
 	// reset various states
 	Player1.CurrentTilePosition = LevelCurr->PlayerStartPos[0];
-	LevelCurr->PillsAvailable = LevelCurr->PillsTotal;
+	Run.PillsAvailable = LevelCurr->PillsTotal;
 }
 
 Game::~Game()
@@ -209,20 +214,24 @@ void Game::Loop()
 	// test
 	if (true)
 	{
-		LevelCurr->DrawMap(Screen, Vec2(0, 0), TrFs, 5, 5);
+		// increment pure game level run state
+		Run.Animate();
 
-		bool openMouth = false;
-		if (openMouthTime > 0)
-		{
-			openMouth = (FrameCounter % 6) >= 3;
-			openMouthTime--;
-		}
+		// the basic map is drawn every frame!
+		LevelCurr->DrawMap(Run, Screen, Vec2(0, 0), TrFs, 5, 5);
 
-		char xx[] = { Player1.GetPlayerPhase(Player1.CurrentDirection, openMouth), '\0' };
+		//
+		// Player 1
+		//
+
+		// draw player itself
+		char xx[] = { Player1.GetPlayerAvatarChar(Run, Player1.CurrentDirection), '\0' };
 		TrFs.DrawTextTo(
 			Screen, Player1.GetCurrentPixelPos(Vec2(5, 5)),
 			xx
 		);
+
+		Player1.Animate();
 
 		// already moved?
 		bool alreadyMoved = false;
@@ -250,7 +259,8 @@ void Game::Loop()
 				else
 				{
 					Player1.CurrentDirection = tmpDirs[di];
-					Player1.Animate();
+					Player1.TriggerOpenMouth();
+					Player1.MakeStep();
 				}
 
 				// no automatic move anymore
@@ -268,7 +278,7 @@ void Game::Loop()
 		if (!alreadyMoved && !Player1.StandStill())
 		{
 			// move
-			Player1.Animate();
+			Player1.MakeStep();
 
 			if (Player1.StandStill())
 			{
@@ -282,21 +292,119 @@ void Game::Loop()
 			// finally arrived on NEW current position
 			// check ..
 			Tile* ct = LevelCurr->GetAsTile(Player1.CurrentTilePosition);
-			if (ct != nullptr && ct->IsEnergyPill())
+			if (ct != nullptr)
 			{
-				// change to empty
-				ct->mTileCode = ' ';
+				if (ct->IsEatablePosition())
+				{
+					// now differentiate
+					if (ct->IsEnergizer(Run))
+					{
+						// turn to ghosts!
+						// TODO!
+						SoundSampleToPlay = GameSoundSampleEnum::TurnToGhosts;
+						Run.SetMessage("SCARE");
+					}
+					else
+					if (ct->IsFruit())
+					{					
+						Player1.Score += 100;
+						SoundSampleToPlay = GameSoundSampleEnum::Fruit;
+						Run.SetMessage("100UP");
+					}
+					else
+					if (ct->IsEnergyPill())
+					{
+						Player1.Score += 1;
+						SoundSampleToPlay = GameSoundSampleEnum::EnergyPill;
+					}
+					
+					// pill consumed in any case
+					// change to empty
+					ct->mTileCode = ' ';
 
-				// count
-				if (LevelCurr->PillsAvailable > 0)
-					LevelCurr->PillsAvailable--;
+					// also count as consumed pill in any case
+					if (Run.PillsAvailable > 0)
+						Run.PillsAvailable--;
+				}
+				else
+				{
+					// empty place
+					// release a (smaller) sound
+					SoundSampleToPlay = GameSoundSampleEnum::EmptyTile;
+				}
+			}
+		}
 
-				printf("remaid %d\n", LevelCurr->PillsAvailable);
+		// player stats
+		char buffer[10];
+		if (LevelCurr->PlayerTextScorePos[0].IsValid)
+		{
+			if (Player1.Score <= 9999)
+				sprintf_s(buffer, "%04d", Player1.Score);
+			else
+			{
+				if (Run.TextSwitch == 0)
+					sprintf_s(buffer, "%03dK", Player1.Score / 1000);
+				else
+					sprintf_s(buffer, "K%03d", Player1.Score % 1000);
+			}
+			TrPt.DrawTextTo(Screen, LevelCurr->PlayerTextScorePos[0] * 5, buffer, 1, 0);
+		}
 
-				Player1.Score += 1;
+		if (LevelCurr->PlayerTextExtraPos[0].IsValid)
+		{
+			strcpy_s(buffer, "1");
+			TrPt.DrawTextTo(Screen, LevelCurr->PlayerTextExtraPos[0] * 5, buffer, 0, 0);
 
-				// release a sound
-				SoundSampleToPlay = GameSoundSampleEnum::EnergyPill;
+			strcpy_s(buffer, "\0\0\0\0");
+			for (int i = 0; i < 3; i++)
+				if (i < Player1.Lives)
+					buffer[i] = 'W';
+			TrFs.DrawTextTo(Screen, LevelCurr->PlayerTextExtraPos[0] * 5 + Vec2(5, 0), buffer, 0, 0);
+		}
+
+		//
+		// Further items
+		//
+
+		// message
+		if (Run.MsgLifeTime > 0 && LevelCurr->MessagePos.IsValid)
+		{
+			strcpy_s(buffer, Run.Message);
+			TrPt.DrawTextTo(Screen, LevelCurr->MessagePos * 5, buffer, 0, 0);
+		}
+
+		// monitor and remove spawned items
+		SpawnedItem* spiTop = SpawnedItems.top();
+		if (spiTop != nullptr)
+		{
+			if (spiTop->FrameCountdown > 0)
+				spiTop->FrameCountdown--;
+			else
+			{
+				Tile* tp = LevelCurr->GetAsTile(spiTop->Position);
+				if (tp != nullptr && tp->IsFruit())
+					tp->mTileCode = '.';
+				SpawnedItem dummy;
+				SpawnedItems.dequeue(dummy);
+			}
+		}
+
+		// at an arbitrary frame time, spawn a new goody ..
+		if (rand() % 1000 < GAME_Promille_to_spawn_fruit)
+		{
+			Vec2 pos = LevelCurr->FindRandomFreeEnergyPillPosition();
+			Tile* tp = LevelCurr->GetAsTile(pos);
+			if (pos.IsValid && tp != nullptr)
+			{
+				// we have three fruits to choose from
+				char fruits[] = { 'c', 'e', 'g' };
+				char fruit = fruits[rand() % 3];
+
+				// set and trace
+				tp->mTileCode = fruit;
+				SpawnedItem spi(pos, GAME_Spawned_item_base_frames + rand() % GAME_Spawned_item_frame_range);
+				SpawnedItems.enqueue(spi);
 			}
 		}
 	}

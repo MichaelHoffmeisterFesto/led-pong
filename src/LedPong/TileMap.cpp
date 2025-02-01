@@ -12,6 +12,7 @@ using namespace std;
 #include "TileFactory.h"
 #include "LedTexture.h"
 #include "TextRendererAbstractBase.h"
+#include "GameRun.h"
 
 // Empty constructor
 TileMap::TileMap()
@@ -151,7 +152,7 @@ void TileMap::Fill(TileBase* preset)
 }
 
 // draw the map
-bool TileMap::DrawMap(LedTexture& texture, Vec2 pixelPos,
+bool TileMap::DrawMap(GameRun& run, LedTexture& texture, Vec2 pixelPos,
 	TextRendererAbstractBase& textRenderer,
 	int charWidth, int charHeight)
 {
@@ -174,7 +175,7 @@ bool TileMap::DrawMap(LedTexture& texture, Vec2 pixelPos,
 			TileBase* tile = Get(ci, ri);
 			if (instanceof<Tile>(tile))
 			{
-				row += dynamic_cast<Tile*>(tile)->mTileCode;
+				row += dynamic_cast<Tile*>(tile)->GetTileAvatarChar(run);
 			}
 			else
 				row += ' ';
@@ -184,6 +185,8 @@ bool TileMap::DrawMap(LedTexture& texture, Vec2 pixelPos,
 		textRenderer.DrawTextTo(texture, workPos, row.c_str());
 		workPos.Y += charHeight;
 	}
+
+	return true;
 }
 
 PossibleMove* TileMap::GetPossibleMovesFor(Actor* actor, Vec2 checkPos, int& numMoves)
@@ -268,4 +271,38 @@ bool TileMap::FindPossibleMoveInDir(Actor* actor, Vec2 checkPos, Vec2 dir, Possi
 	}
 	delete moves;
 	return res;
+}
+
+Vec2 TileMap::FindRandomFreeEnergyPillPosition()
+{
+	// this is a job done in two passes over the free energy pills
+	int choosenIndex = 0;
+	for (int pass = 0; pass < 2; pass++)
+	{
+		int numIndex = 0;
+		for (int y = 0; y < mHeight; y++)
+			for (int x = 0; x < mWidth; x++)
+			{
+				// find
+				Tile* tile = GetAsTile(x, y);
+				if (tile == nullptr || !tile->IsEnergyPill())
+					continue;
+
+				// choose an index?
+				if (pass == 1 && numIndex == choosenIndex)
+					return Vec2(x, y);
+
+				// in any case, count the index up
+				numIndex++;
+			}
+
+		// after 1st pass, choose an index
+		// if no index, return with invalid
+		if (numIndex < 1)
+			return Vec2();
+		choosenIndex = rand() % numIndex;
+	}
+
+	// uups
+	return Vec2();
 }

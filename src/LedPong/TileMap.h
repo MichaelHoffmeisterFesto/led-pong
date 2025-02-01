@@ -7,6 +7,7 @@
 #include "Tiles.h"
 #include "VectorArith.h"
 #include "Actor.h"
+#include "GameRun.h"
 
 using namespace std;
 
@@ -72,14 +73,14 @@ public:
 	// safe, access of single tiles
 	TileBase* Get(int x, int y);
 	Tile* GetAsTile(int x, int y);
-	inline Tile* GetAsTile(Vec2 pos) { return GetAsTile(pos.X, pos.Y); }
+	inline Tile* GetAsTile(Vec2 pos) { return (pos.IsValid) ? GetAsTile(pos.X, pos.Y) : nullptr; }
 	void Put(int x, int y, TileBase* preset);
 
 	// fill all tiles in the map
 	void Fill(TileBase* preset);
 
 	// draw the map
-	bool DrawMap(LedTexture& texture, Vec2 pixelPos,
+	bool DrawMap(GameRun& run, LedTexture& texture, Vec2 pixelPos,
 		TextRendererAbstractBase &textRenderer,
 		int charWidth, int charHeight);
 
@@ -91,19 +92,21 @@ public:
 	// Checks if a move in a given direction is possible.
 	bool FindPossibleMoveInDir(Actor* actor, Vec2 checkPos, Vec2 dir, PossibleMove& move);
 
+	// Find a position, which is occupated by an energy pill and nothing else.
+	Vec2 FindRandomFreeEnergyPillPosition();
+
 public:
 	// some public attributes to the map (without getter/ setter/ constructor).
 	Vec2 PlayerStartPos[2];
 	Vec2 GhostStartPos[4];
 	Vec2 GateToLeft, GateToTop, GateToRight, GateToBottom;
+	Vec2 PlayerTextScorePos[2];
+	Vec2 PlayerTextExtraPos[2];
+	Vec2 MessagePos;
 
 	// Total number of pills on the map
 	int PillsTotal = 0;
 	
-	// When initialized, remaining number (not points!) of pills.
-	// Note: If zero, subject to change to new level.
-	int PillsAvailable = 0;
-
 private:
 	int mWidth = 0;
 	int mHeight = 0;

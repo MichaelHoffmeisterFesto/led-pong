@@ -72,6 +72,12 @@
     <ClCompile Include="SDL_SoundSample.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="GameRun.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="SpawnedItem.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SDL_Helper.h">
@@ -129,6 +135,15 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="SDL_SoundSample.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="GameRun.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="SpawnedItem.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="GameConst.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>

@@ -81,9 +81,14 @@ GameKeyEnum GameKeyToMap[] = {
 
 SDL_SoundSample* SoundSamples[GameSoundSampleEnum::SOUND_SAMPLE_MAX_NUM] = { nullptr };
 
+bool SoundOn = true;
+
 void LoadSoundSamples()
 {
-	SoundSamples[GameSoundSampleEnum::EnergyPill] = new SDL_SoundSample("media/arcade-fx-288597_shorted_fade_out.wav", MIX_MAX_VOLUME);
+	SoundSamples[GameSoundSampleEnum::EmptyTile] = new SDL_SoundSample("media/pop-268648-shortened-fade-out.wav", MIX_MAX_VOLUME / 4);
+	SoundSamples[GameSoundSampleEnum::EnergyPill] = new SDL_SoundSample("media/arcade-fx-288597_shorted_fade_out.wav", MIX_MAX_VOLUME / 2);
+	SoundSamples[GameSoundSampleEnum::TurnToGhosts] = new SDL_SoundSample("media/arcade-arped-145549-shortened.wav", MIX_MAX_VOLUME);
+	SoundSamples[GameSoundSampleEnum::Fruit] = new SDL_SoundSample("media/arcade-ui-28-229497-shortened.wav", MIX_MAX_VOLUME);
 }
 
 void PlaySoundSample(GameSoundSampleEnum ss)
@@ -127,8 +132,9 @@ bool loop() {
 		if (e.type == SDL_QUIT)
 			return false;
 
-		if (e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_P)
+		if (e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_M)
 		{
+			SoundOn = !SoundOn;
 		}
 
 		if (e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_E)
@@ -153,7 +159,8 @@ bool loop() {
 
 	TheGame.Loop();
 
-	PlaySoundSample(TheGame.SoundSampleToPlay);
+	if (SoundOn) 
+		PlaySoundSample(TheGame.SoundSampleToPlay);
 	TheGame.SoundSampleToPlay = GameSoundSampleEnum::None;
 
 	//
@@ -183,9 +190,8 @@ bool loop() {
 	int spY = 14;
 
 	char buffer[100];
-	sprintf_s(buffer, "Frame %02d", TheGame.FrameCounter);
-	SDL_RenderDrawText(Main->Renderer, Main->FontNormal, SDL_Color_From(LedColors.White), spX, spY, buffer);
-	TheGame.FrameCounter = (TheGame.FrameCounter + 1) % 60;
+	sprintf_s(buffer, "Frame %02d", TheGame.Run.FrameCounter % GAME_FrameRate);
+	SDL_RenderDrawText(Main->Renderer, Main->FontNormal, SDL_Color_From(LedColors.White), spX, spY, buffer);	
 
 	//
 	// End of loop

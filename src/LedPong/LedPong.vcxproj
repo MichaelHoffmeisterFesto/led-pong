@@ -161,6 +161,7 @@
     <ClCompile Include="Actor.cpp" />
     <ClCompile Include="CQueueDynGeneric.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GameRun.cpp" />
     <ClCompile Include="LedAnimation.cpp" />
     <ClCompile Include="LedColor.cpp" />
     <ClCompile Include="LedColors.cpp" />
@@ -170,6 +171,7 @@
     <ClCompile Include="SDL_Helper.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="SDL_SoundSample.cpp" />
+    <ClCompile Include="SpawnedItem.cpp" />
     <ClCompile Include="TextRendererAbstractBase.cpp" />
     <ClCompile Include="TextRendererFixedSize.cpp" />
     <ClCompile Include="TextRendererProportionalText.cpp" />
@@ -183,6 +185,8 @@
     <ClInclude Include="basic.h" />
     <ClInclude Include="CQueueDynGeneric.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GameConst.h" />
+    <ClInclude Include="GameRun.h" />
     <ClInclude Include="LedAnimation.h" />
     <ClInclude Include="LedColor.h" />
     <ClInclude Include="LedColors.h" />
@@ -191,6 +195,7 @@
     <ClInclude Include="SDL_Application.h" />
     <ClInclude Include="SDL_Helper.h" />
     <ClInclude Include="SDL_SoundSample.h" />
+    <ClInclude Include="SpawnedItem.h" />
     <ClInclude Include="TextRendererAbstractBase.h" />
     <ClInclude Include="TextRendererFixedSize.h" />
     <ClInclude Include="TextRendererProportionalText.h" />

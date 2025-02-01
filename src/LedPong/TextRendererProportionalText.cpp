@@ -15,7 +15,10 @@ TextRendererProportionalText::TextRendererProportionalText(
 {
 	mCharDefs = LedTexture(fn);
 	mNumGlyphs = numGlyphs;
-	mGlyphDefs = glyphDefs;
+
+	// copy defs (!), as might be on the stack ...
+	mGlyphDefs = new ProportionalTextGlyph[numGlyphs];
+	copy_n(glyphDefs, numGlyphs, mGlyphDefs);
 }
 
 void TextRendererProportionalText::DrawTextTo(

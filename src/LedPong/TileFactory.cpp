@@ -49,6 +49,11 @@ TileBase* TileFactory::GenerateTile(char code)
 		case 'v':
 		case 'w':
 		case 'x':
+		// special items
+		case '*':
+		case 'c':
+		case 'e':
+		case 'g':
 		{
 			Tile* res = new Tile;
 			res->mTileCode = code;

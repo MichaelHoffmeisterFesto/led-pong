@@ -18,6 +18,10 @@ using namespace std;
 
 #include "basic.h"
 
+#include "VectorArith.h"
+
+#include "SpawnedItem.h"
+
 #include "LedColor.h"
 #include "LedColors.h"
 #include "LedTexture.h"
@@ -34,23 +38,8 @@ using namespace std;
 #include "Tiles.h"
 #include "TileMap.h"
 
-// GAME
-
-const int GAME_FrameRate = 30;
-
-// dimensions
-
-// 96:128 = 3:4
-const int WALL_Xdim = 3 * 32;
-const int WALL_Ydim = 2 * 64;
-
-const int WALL_Xgap = 1;
-const int WALL_Ygap = 1;
-
-const int WALL_XpixSize = 4;
-const int WALL_YpixSize = 4;
-
-const int LEVEL_Max = 10;
+#include "GameRun.h"
+#include "GameConst.h"
 
 // enum for key input
 enum GameKeyEnum { 
@@ -60,8 +49,9 @@ enum GameKeyEnum {
 };
 
 enum GameSoundSampleEnum {
-	None, EnergyPill, SOUND_SAMPLE_MAX_NUM
+	None, EmptyTile, EnergyPill, TurnToGhosts, Fruit, SOUND_SAMPLE_MAX_NUM
 };
+
 
 // This class is the master / root class for the game application.
 // It holds the overall status and all important ressources
@@ -108,8 +98,13 @@ public:
 	// Sound sample played by main application at end of the loop cycle.
 	GameSoundSampleEnum SoundSampleToPlay = GameSoundSampleEnum::None;
 
+	// monitored items
+
+	// Several fruits are spawned concurrently and are removed one after each other again.
+	CQueueDynGeneric<SpawnedItem> SpawnedItems;
+
 	// state
-	int FrameCounter = 0;
+	GameRun Run;
 	int openMouthTime = 0;
 
 };

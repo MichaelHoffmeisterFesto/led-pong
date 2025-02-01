@@ -1,6 +1,7 @@
 #pragma once
 
 #include "VectorArith.h"
+#include "GameRun.h"
 
 // This class defines the base class for an actor, that is, an moving
 // object on a map, either controlled by a player (input) or by an
@@ -52,10 +53,14 @@ public:
 		return CurrentTilePosition * charDim + CurrentDirection * Phase;
 	}
 
+	// Care for (free-running) animation
+	inline virtual void Animate() { }
+
 	// take an animation step forward
-	inline void Animate()
+	inline virtual void MakeStep()
 	{
 		Phase++;
+		
 		if (Phase > FinalPhase)
 		{
 			Phase = 0;
@@ -86,11 +91,31 @@ public:
 		return res;
 	}
 
-	char GetPlayerPhase(Vec2 direction, bool openMouth);
+	// Set open mouth of player for a time
+	void TriggerOpenMouth() { OpenMouthTime = 6; }
+
+	// Get the character, which is to be rendered as avatar of the actor.
+	char GetPlayerAvatarChar(GameRun& run, Vec2 direction);
+
+	// take an animation step forward
+	inline virtual void Animate()
+	{
+		Actor::Animate();
+		if (OpenMouthTime > 0)
+		{
+			OpenMouthTime--;
+		}
+	}
 
 public:
 	// Attributes
 
+	// Count down frames for an open mouth
+	int OpenMouthTime = 0;
+
 	// Total achieved score in points, basically energy pills + bonus
-	int Score = 0;
+	int Score = 12345;
+
+	// Number of remaining lives for this player
+	int Lives = 3;
 };
