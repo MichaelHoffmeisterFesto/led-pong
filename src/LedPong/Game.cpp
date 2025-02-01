@@ -149,7 +149,10 @@ void Game::LoadLevel(TileMap* level)
 	LevelCurr = level;
 
 	// reset various states
-	Player1.CurrentTilePosition = LevelCurr->PlayerStartPos[0];
+	for (int pni = 0; pni < 2; pni++)
+	{
+		Players[pni]->CurrentTilePosition = LevelCurr->PlayerStartPos[pni];
+	}
 	Run.PillsAvailable = LevelCurr->PillsTotal;
 }
 
@@ -214,6 +217,9 @@ void Game::Loop()
 	// test
 	if (true)
 	{
+		// some runtime
+		char buffer[10];
+
 		// increment pure game level run state
 		Run.Animate();
 
@@ -221,147 +227,155 @@ void Game::Loop()
 		LevelCurr->DrawMap(Run, Screen, Vec2(0, 0), TrFs, 5, 5);
 
 		//
-		// Player 1
+		// Player 1/2
 		//
 
-		// draw player itself
-		char xx[] = { Player1.GetPlayerAvatarChar(Run, Player1.CurrentDirection), '\0' };
-		TrFs.DrawTextTo(
-			Screen, Player1.GetCurrentPixelPos(Vec2(5, 5)),
-			xx
-		);
-
-		Player1.Animate();
-
-		// already moved?
-		bool alreadyMoved = false;
-		bool newFinalPosition = false;
-
-		// Translate the keyboard into an direction in a way, that a keypress WITH a 
-		// possible direction wins
-		Vec2 tmpDirs[] = { Vec2(-1,0), Vec2(+1,0), Vec2(0,-1), Vec2(0,+1) };
-		GameKeyEnum tmpScans[] = { KEY_P1_LEFT, KEY_P1_RIGHT, KEY_P1_UP, KEY_P1_DOWN };
-
-		for (int di = 0; di < SIZE_OF_ARR(tmpDirs); di++)
+		for (int pni = 0; pni < std::max(1, std::min(2, Run.NumPlayer)); pni++)
 		{
-			PossibleMove pm;
-			if (LevelCurr->FindPossibleMoveInDir(&Player1, Player1.CurrentTilePosition, tmpDirs[di], pm)
-				&& Player1.StandStill()
-				&& GameKey[tmpScans[di]])
+			// more explicit
+			Player* pptr = Players[pni];
+
+			// draw player itself
+			char xx[] = { pptr->GetPlayerAvatarChar(Run, pptr->CurrentDirection), '\0' };
+			TrFs.DrawTextTo(
+				Screen, pptr->GetCurrentPixelPos(Vec2(5, 5)),
+				xx
+			);
+
+			pptr->Animate();
+
+			// already moved?
+			bool alreadyMoved = false;
+			bool newFinalPosition = false;
+
+			// Translate the keyboard into an direction in a way, that a keypress WITH a 
+			// possible direction wins
+			Vec2 tmpDirs[] = { Vec2(-1,0), Vec2(+1,0), Vec2(0,-1), Vec2(0,+1) };
+			GameKeyEnum tmpScans[] = { 
+				KEY_P1_LEFT, KEY_P1_RIGHT, KEY_P1_UP, KEY_P1_DOWN,
+				KEY_P2_LEFT, KEY_P2_RIGHT, KEY_P2_UP, KEY_P2_DOWN 
+			};
+
+			for (int di = 0; di < SIZE_OF_ARR(tmpDirs); di++)
 			{
-				// initiate new movement
-				if (pm.JumpMove)
+				PossibleMove pm;
+				if (LevelCurr->FindPossibleMoveInDir(&Player1, pptr->CurrentTilePosition, tmpDirs[di], pm)
+					&& pptr->StandStill()
+					&& GameKey[tmpScans[di + 4*pni]])
 				{
-					// jump to new final position
-					Player1.CurrentTilePosition = pm.FinalPosition;
+					// initiate new movement
+					if (pm.JumpMove)
+					{
+						// jump to new final position
+						pptr->CurrentTilePosition = pm.FinalPosition;
+						newFinalPosition = true;
+					}
+					else
+					{
+						pptr->CurrentDirection = tmpDirs[di];
+						pptr->TriggerOpenMouth();
+						pptr->MakeStep();
+					}
+
+					// no automatic move anymore
+					alreadyMoved = true;
+
+					// allow open mouth
+					openMouthTime = 6;
+
+					// no more direction
+					break;
+				}
+			}
+
+			// not already moved
+			if (!alreadyMoved && !pptr->StandStill())
+			{
+				// move
+				pptr->MakeStep();
+
+				if (pptr->StandStill())
+				{
 					newFinalPosition = true;
 				}
-				else
-				{
-					Player1.CurrentDirection = tmpDirs[di];
-					Player1.TriggerOpenMouth();
-					Player1.MakeStep();
-				}
-
-				// no automatic move anymore
-				alreadyMoved = true;
-
-				// allow open mouth
-				openMouthTime = 6;
-
-				// no more direction
-				break;
 			}
-		}
 
-		// not already moved
-		if (!alreadyMoved && !Player1.StandStill())
-		{
-			// move
-			Player1.MakeStep();
-
-			if (Player1.StandStill())
+			// NEW final position?
+			if (newFinalPosition)
 			{
-				newFinalPosition = true;
-			}
-		}
-
-		// NEW final position?
-		if (newFinalPosition)
-		{
-			// finally arrived on NEW current position
-			// check ..
-			Tile* ct = LevelCurr->GetAsTile(Player1.CurrentTilePosition);
-			if (ct != nullptr)
-			{
-				if (ct->IsEatablePosition())
+				// finally arrived on NEW current position
+				// check ..
+				Tile* ct = LevelCurr->GetAsTile(pptr->CurrentTilePosition);
+				if (ct != nullptr)
 				{
-					// now differentiate
-					if (ct->IsEnergizer(Run))
+					if (ct->IsEatablePosition())
 					{
-						// turn to ghosts!
-						// TODO!
-						SoundSampleToPlay = GameSoundSampleEnum::TurnToGhosts;
-						Run.SetMessage("SCARE");
+						// now differentiate
+						if (ct->IsEnergizer(Run))
+						{
+							// turn to ghosts!
+							// TODO!
+							SoundSampleToPlay = GameSoundSampleEnum::TurnToGhosts;
+							Run.SetMessage("SCARE");
+						}
+						else if (ct->IsFruit())
+						{
+							pptr->Score += 100;
+							SoundSampleToPlay = GameSoundSampleEnum::Fruit;
+							Run.SetMessage("100UP");
+						}
+						else if (ct->IsEnergyPill())
+						{
+							pptr->Score += 1;
+							SoundSampleToPlay = GameSoundSampleEnum::EnergyPill;
+						}
+
+						// pill consumed in any case
+						// change to empty
+						ct->mTileCode = ' ';
+
+						// also count as consumed pill in any case
+						if (Run.PillsAvailable > 0)
+							Run.PillsAvailable--;
 					}
 					else
-					if (ct->IsFruit())
-					{					
-						Player1.Score += 100;
-						SoundSampleToPlay = GameSoundSampleEnum::Fruit;
-						Run.SetMessage("100UP");
-					}
-					else
-					if (ct->IsEnergyPill())
 					{
-						Player1.Score += 1;
-						SoundSampleToPlay = GameSoundSampleEnum::EnergyPill;
+						// empty place
+						// release a (smaller) sound
+						SoundSampleToPlay = GameSoundSampleEnum::EmptyTile;
 					}
-					
-					// pill consumed in any case
-					// change to empty
-					ct->mTileCode = ' ';
-
-					// also count as consumed pill in any case
-					if (Run.PillsAvailable > 0)
-						Run.PillsAvailable--;
 				}
+			}
+
+			// player stats
+			if (LevelCurr->PlayerTextScorePos[pni].IsValid)
+			{
+				if (pptr->Score <= 9999)
+					sprintf_s(buffer, "%04d", pptr->Score);
 				else
 				{
-					// empty place
-					// release a (smaller) sound
-					SoundSampleToPlay = GameSoundSampleEnum::EmptyTile;
+					if (Run.TextSwitch == 0)
+						sprintf_s(buffer, "%03dK", pptr->Score / 1000);
+					else
+						sprintf_s(buffer, "K%03d", pptr->Score % 1000);
 				}
+				TrPt.DrawTextTo(Screen, LevelCurr->PlayerTextScorePos[pni] * 5, buffer, 1, 0);
 			}
-		}
 
-		// player stats
-		char buffer[10];
-		if (LevelCurr->PlayerTextScorePos[0].IsValid)
-		{
-			if (Player1.Score <= 9999)
-				sprintf_s(buffer, "%04d", Player1.Score);
-			else
+			if (LevelCurr->PlayerTextExtraPos[pni].IsValid)
 			{
-				if (Run.TextSwitch == 0)
-					sprintf_s(buffer, "%03dK", Player1.Score / 1000);
-				else
-					sprintf_s(buffer, "K%03d", Player1.Score % 1000);
+				sprintf_s(buffer, "%1d", 1 + pni);
+				TrPt.DrawTextTo(Screen, LevelCurr->PlayerTextExtraPos[pni] * 5, buffer, 0, 0);
+
+				strcpy_s(buffer, "\0\0\0\0");
+				for (int i = 0; i < 3; i++)
+					if (i < pptr->Lives)
+						buffer[i] = 'W';
+				TrFs.DrawTextTo(Screen, LevelCurr->PlayerTextExtraPos[pni] * 5 + Vec2(5, 0), buffer, 0, 0);
 			}
-			TrPt.DrawTextTo(Screen, LevelCurr->PlayerTextScorePos[0] * 5, buffer, 1, 0);
-		}
 
-		if (LevelCurr->PlayerTextExtraPos[0].IsValid)
-		{
-			strcpy_s(buffer, "1");
-			TrPt.DrawTextTo(Screen, LevelCurr->PlayerTextExtraPos[0] * 5, buffer, 0, 0);
-
-			strcpy_s(buffer, "\0\0\0\0");
-			for (int i = 0; i < 3; i++)
-				if (i < Player1.Lives)
-					buffer[i] = 'W';
-			TrFs.DrawTextTo(Screen, LevelCurr->PlayerTextExtraPos[0] * 5 + Vec2(5, 0), buffer, 0, 0);
 		}
+	
 
 		//
 		// Further items

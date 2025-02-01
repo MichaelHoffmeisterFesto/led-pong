@@ -50,4 +50,7 @@ public:
 	// Indicate a short message
 	char Message[GAME_Message_Max_Char + 1] = "";
 	int MsgLifeTime = 0;
+
+	// Number of players (either 1 or 2)
+	int NumPlayer = 1;
 };

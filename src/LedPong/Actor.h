@@ -114,7 +114,7 @@ public:
 	int OpenMouthTime = 0;
 
 	// Total achieved score in points, basically energy pills + bonus
-	int Score = 12345;
+	int Score = 0;
 
 	// Number of remaining lives for this player
 	int Lives = 3;
