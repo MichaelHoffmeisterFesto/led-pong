@@ -130,29 +130,89 @@ enum GhostMode {
 class Ghost : public Actor
 {
 public:
-	Ghost() {};
-
-	Ghost(Ghost& other)
-	{
-	};
-
-	virtual inline Actor* Clone() { return new Ghost(*this); }
-
 	// Mode of the ghost. Externally synchronized.
-	GhostMode Mode;
+	GhostMode Mode = GhostMode::Scatter;
 
 	// Tile (typically unreachable) representing the "home zone" of the ghost.
 	// This leads typically to an orbiting behaviour near to the home zone while scattering.
 	Vec2 HomeZone;
 
 	// Get the character, which is to be rendered as avatar of the actor.
+	inline virtual char GetGhostAvatarChar(GameRun& run, Vec2 direction) = 0;
+};
+
+// Individual ghost class
+class Blinky : public Ghost
+{
+public:
+	Blinky() {};
+
+	Blinky(Blinky& other)
+	{
+	};
+
+	virtual inline Actor* Clone() { return new Blinky(*this); }
+
+	// Get the character, which is to be rendered as avatar of the actor.
 	inline virtual char GetGhostAvatarChar(GameRun& run, Vec2 direction)
 	{
 		return 'A';
 	}
+};
 
-	inline virtual void Behaviour()
+// Individual ghost class
+class Pinky : public Ghost
+{
+public:
+	Pinky() {};
+
+	Pinky(Pinky& other)
 	{
-		
+	};
+
+	virtual inline Actor* Clone() { return new Pinky(*this); }
+
+	// Get the character, which is to be rendered as avatar of the actor.
+	inline virtual char GetGhostAvatarChar(GameRun& run, Vec2 direction)
+	{
+		return 'B';
+	}
+};
+
+// Individual ghost class
+class Inky : public Ghost
+{
+public:
+	Inky() {};
+
+	Inky(Inky& other)
+	{
+	};
+
+	virtual inline Actor* Clone() { return new Inky(*this); }
+
+	// Get the character, which is to be rendered as avatar of the actor.
+	inline virtual char GetGhostAvatarChar(GameRun& run, Vec2 direction)
+	{
+		return 'C';
+	}
+};
+
+// Individual ghost class
+class Clyde : public Ghost
+{
+public:
+	Clyde() {};
+
+	Clyde(Clyde& other)
+	{
+	};
+
+	virtual inline Actor* Clone() { return new Clyde(*this); }
+
+	// Get the character, which is to be rendered as avatar of the actor.
+	inline virtual char GetGhostAvatarChar(GameRun& run, Vec2 direction)
+	{
+		return 'D';
 	}
 };

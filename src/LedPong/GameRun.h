@@ -55,5 +55,5 @@ public:
 	int NumPlayer = 1;
 
 	// Number of ghosts (typically 4)
-	int NumGhost = 1;
+	int NumGhost = 4;
 };

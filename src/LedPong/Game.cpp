@@ -102,8 +102,8 @@ Game::Game()
 	tm1->GhostStartPos[2] = Vec2(8, 13);
 	tm1->GhostStartPos[3] = Vec2(10, 13);
 	tm1->GhostHomeZone[0] = Vec2(3, 3);
-	tm1->GhostHomeZone[1] = Vec2(13, 3);
-	tm1->GhostHomeZone[2] = Vec2(3, 18);
+	tm1->GhostHomeZone[1] = Vec2(3, 18);
+	tm1->GhostHomeZone[2] = Vec2(13, 3);
 	tm1->GhostHomeZone[3] = Vec2(14, 21);
 	tm1->PlayerTextScorePos[0] = Vec2(0, 10);
 	tm1->PlayerTextScorePos[1] = Vec2(0, 14);
@@ -450,19 +450,6 @@ void Game::Loop()
 					// store as best?
 					if (l < bestDirLen)
 					{
-						// DEBUG
-						if (bd->Y > 0)
-						{
-							auto c1 = gptr->CurrentDirection != Vec2(0, 0);
-							auto rd = gptr->CurrentDirection * (-1);
-							auto c2 = rd == *bd;
-							if (c1 && c2)
-							{
-								int a = 1;
-							}
-						}
-
-
 						bestDirLen = l;
 						bestDirIndex = di;
 					}
