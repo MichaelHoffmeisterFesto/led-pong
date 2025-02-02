@@ -22,8 +22,14 @@ public:
 	// Gets the theoretical directions an actor could move.
 	// Note: The methods allocates an array, which needs to be freed.
 	virtual inline Vec2* GetBasicDirections(int& numPos) {
-		numPos = 0;
-		return nullptr;
+		numPos = 4;
+		Vec2* res = new Vec2[4];
+		// up, left, down, right .. as described in the docu
+		res[0] = Vec2(0, -1);
+		res[1] = Vec2(-1, 0);
+		res[2] = Vec2(0, +1);
+		res[3] = Vec2(+1, 0);
+		return res;
 	}
 
 	// Current position on the tile map
@@ -53,10 +59,10 @@ public:
 		return CurrentTilePosition * charDim + CurrentDirection * Phase;
 	}
 
-	// Care for (free-running) animation
+	// Care for (free-running) animation.
 	inline virtual void Animate() { }
 
-	// take an animation step forward
+	// Take an animation step forward.
 	inline virtual void MakeStep()
 	{
 		Phase++;
@@ -81,16 +87,6 @@ public:
 
 	virtual inline Actor* Clone() { return new Player(*this); }
 
-	virtual inline Vec2* GetBasicDirections(int& numPos) {
-		numPos = 4;
-		Vec2* res = new Vec2[4];
-		res[0] = Vec2(-1, 0);
-		res[1] = Vec2(+1, 0);
-		res[2] = Vec2(0, -1);
-		res[3] = Vec2(0, +1);
-		return res;
-	}
-
 	// Set open mouth of player for a time
 	void TriggerOpenMouth() { OpenMouthTime = 6; }
 
@@ -113,9 +109,50 @@ public:
 	// Count down frames for an open mouth
 	int OpenMouthTime = 0;
 
-	// Total achieved score in points, basically energy pills + bonus
+	// Total achieved score in points, basically energy pills + special items + won levels
 	int Score = 0;
 
 	// Number of remaining lives for this player
 	int Lives = 3;
+};
+
+// The movement of the ghosts depends on this mode.
+enum GhostMode { 
+	// Ghost is supposed to head towards a target tile which is located in the "home corner" of the ghost.
+	Scatter,		
+	// Ghost tries to move accordingly / anticipating the Pac Man movements.
+	Chase,
+	// Ghost tries to flee from Pac Man.
+	Freightened 
+};
+
+// Ghost class. Underlying foundation for all 4 individual ghosts.
+class Ghost : public Actor
+{
+public:
+	Ghost() {};
+
+	Ghost(Ghost& other)
+	{
+	};
+
+	virtual inline Actor* Clone() { return new Ghost(*this); }
+
+	// Mode of the ghost. Externally synchronized.
+	GhostMode Mode;
+
+	// Tile (typically unreachable) representing the "home zone" of the ghost.
+	// This leads typically to an orbiting behaviour near to the home zone while scattering.
+	Vec2 HomeZone;
+
+	// Get the character, which is to be rendered as avatar of the actor.
+	inline virtual char GetGhostAvatarChar(GameRun& run, Vec2 direction)
+	{
+		return 'A';
+	}
+
+	inline virtual void Behaviour()
+	{
+		
+	}
 };

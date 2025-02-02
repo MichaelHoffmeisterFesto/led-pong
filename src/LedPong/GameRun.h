@@ -53,4 +53,7 @@ public:
 
 	// Number of players (either 1 or 2)
 	int NumPlayer = 1;
+
+	// Number of ghosts (typically 4)
+	int NumGhost = 1;
 };

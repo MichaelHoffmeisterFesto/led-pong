@@ -99,6 +99,7 @@ public:
 	// some public attributes to the map (without getter/ setter/ constructor).
 	Vec2 PlayerStartPos[2];
 	Vec2 GhostStartPos[4];
+	Vec2 GhostHomeZone[4];
 	Vec2 GateToLeft, GateToTop, GateToRight, GateToBottom;
 	Vec2 PlayerTextScorePos[2];
 	Vec2 PlayerTextExtraPos[2];

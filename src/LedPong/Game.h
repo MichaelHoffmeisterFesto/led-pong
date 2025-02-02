@@ -95,6 +95,10 @@ public:
 	Player Player1, Player2;
 	Player* Players[2] = { &Player1, &Player2 };
 
+	// ghosts
+	Ghost Blinky;
+	Ghost* Ghosts[4] = { &Blinky, nullptr, nullptr, nullptr };
+
 	// Sound sample played by main application at end of the loop cycle.
 	GameSoundSampleEnum SoundSampleToPlay = GameSoundSampleEnum::None;
 

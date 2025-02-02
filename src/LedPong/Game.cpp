@@ -1,5 +1,7 @@
 #include "Game.h"
 
+#include <float.h> // for DBL_MAX ..
+
 Game::Game()
 {
 	// Ressources
@@ -99,6 +101,10 @@ Game::Game()
 	tm1->GhostStartPos[1] = Vec2(10, 11);
 	tm1->GhostStartPos[2] = Vec2(8, 13);
 	tm1->GhostStartPos[3] = Vec2(10, 13);
+	tm1->GhostHomeZone[0] = Vec2(3, 3);
+	tm1->GhostHomeZone[1] = Vec2(13, 3);
+	tm1->GhostHomeZone[2] = Vec2(3, 18);
+	tm1->GhostHomeZone[3] = Vec2(14, 21);
 	tm1->PlayerTextScorePos[0] = Vec2(0, 10);
 	tm1->PlayerTextScorePos[1] = Vec2(0, 14);
 	tm1->PlayerTextExtraPos[0] = Vec2(15, 10);
@@ -149,11 +155,20 @@ void Game::LoadLevel(TileMap* level)
 	LevelCurr = level;
 
 	// reset various states
-	for (int pni = 0; pni < 2; pni++)
-	{
-		Players[pni]->CurrentTilePosition = LevelCurr->PlayerStartPos[pni];
-	}
 	Run.PillsAvailable = LevelCurr->PillsTotal;
+	
+	for (int i = 0; i < SIZE_OF_ARR(Players); i++)
+	{
+		Players[i]->CurrentTilePosition = LevelCurr->PlayerStartPos[i];
+	}
+
+	for (int i = 0; i < SIZE_OF_ARR(Ghosts); i++)
+	{
+		if (Ghosts[i] == nullptr)
+			continue;
+		Ghosts[i]->CurrentTilePosition = LevelCurr->GhostStartPos[i];
+		Ghosts[i]->HomeZone = LevelCurr->GhostHomeZone[i];
+	}
 }
 
 Game::~Game()
@@ -373,9 +388,126 @@ void Game::Loop()
 						buffer[i] = 'W';
 				TrFs.DrawTextTo(Screen, LevelCurr->PlayerTextExtraPos[pni] * 5 + Vec2(5, 0), buffer, 0, 0);
 			}
-
 		}
 	
+		//
+		// Ghost 1..4
+		//
+
+		for (int gni = 0; gni < std::max(1, std::min(4, Run.NumGhost)); gni++)
+		{
+			// more explicit
+			Ghost* gptr = Ghosts[gni];
+			if (gptr == nullptr)
+				continue;
+
+			// draw player itself
+			char xx[] = { gptr->GetGhostAvatarChar(Run, gptr->CurrentDirection), '\0' };
+			TrFs.DrawTextTo(
+				Screen, gptr->GetCurrentPixelPos(Vec2(5, 5)),
+				xx
+			);
+
+			gptr->Animate();
+
+			// already moved?
+			bool alreadyMoved = false;
+
+			// initiate a new step; basically when the ghost stands still
+			if (gptr->StandStill())
+			{
+				// can device for next direction (yet still invalid)
+				Vec2 nextDir;
+
+				// acquire every basic direction
+				int numDir = 0;
+				Vec2* basicDirs = gptr->GetBasicDirections(numDir);
+
+				// investigate all directions
+				double bestDirLen = DBL_MAX;
+				int bestDirIndex = -1;
+				for (int di = 0; di < numDir; di++)
+				{
+					// shortcut
+					Vec2* bd = &basicDirs[di];
+
+					// exclude (for the most cases) the direction the ghost is coming from
+					if (gptr->CurrentDirection != Vec2(0, 0) && (gptr->CurrentDirection * (-1)) == *bd)
+						continue;
+
+					// potential next step position
+					Vec2 nsp = gptr->CurrentTilePosition + *bd;
+
+					// check if the direction is still moveable?
+					Tile* tp = LevelCurr->GetAsTile(nsp);
+					if (tp == nullptr || !tp->IsMoveablePosition())
+						continue;
+
+					// compute NSP from target
+					// Note: currently the home zone
+					double l = (nsp - gptr->HomeZone).Length();
+
+					// store as best?
+					if (l < bestDirLen)
+					{
+						// DEBUG
+						if (bd->Y > 0)
+						{
+							auto c1 = gptr->CurrentDirection != Vec2(0, 0);
+							auto rd = gptr->CurrentDirection * (-1);
+							auto c2 = rd == *bd;
+							if (c1 && c2)
+							{
+								int a = 1;
+							}
+						}
+
+
+						bestDirLen = l;
+						bestDirIndex = di;
+					}
+				}
+
+				// found?
+				if (bestDirIndex >= 0)
+				{
+					// found!
+					nextDir = basicDirs[bestDirIndex];
+				}
+				else
+				{
+					// REVERSE possible?
+					if (gptr->CurrentDirection != Vec2(0, 0))
+					{
+						// REVERSE
+						nextDir = gptr->CurrentDirection * (-1);
+					}
+				}
+
+				// delete basic dirs
+				delete[] basicDirs;
+
+				// initiate this dir
+				if (nextDir.IsValid)
+				{
+					gptr->CurrentDirection = nextDir;
+					gptr->MakeStep();
+					alreadyMoved = true;
+				}
+			}
+
+			// not already moved
+			if (!alreadyMoved && !gptr->StandStill())
+			{
+				// move
+				gptr->MakeStep();
+
+				if (gptr->StandStill())
+				{
+					// newFinalPosition = true;
+				}
+			}
+		}
 
 		//
 		// Further items

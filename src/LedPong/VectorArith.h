@@ -1,5 +1,7 @@
 #pragma once
 
+#include "math.h"
+
 // This class represents a zero-based (0,0) position on a map or a template.
 class Vec2
 {
@@ -14,10 +16,11 @@ public:
 	// Zero-based (0,0) position on a map
 	int X = 0, Y = 0;
 
-	// operators
+	// Operators
 	inline Vec2 operator +(Vec2 other) { return Vec2(X + other.X, Y + other.Y); }
+	inline Vec2 operator -(Vec2 other) { return Vec2(X - other.X, Y - other.Y); }
 
-	// scalar product
+	// Scalar product
 	inline Vec2 operator *(int i) { return Vec2(X * i, Y * i); }
 
 	// Hadamard product
@@ -26,5 +29,8 @@ public:
 	// Equality
 	inline bool operator ==(Vec2 other) { return X == other.X && Y == other.Y; }
 	inline bool operator !=(Vec2 other) { return X != other.X || Y != other.Y; }
+
+	// Length
+	inline double Length() { return sqrt(X * X + Y * Y); }
 };
 
