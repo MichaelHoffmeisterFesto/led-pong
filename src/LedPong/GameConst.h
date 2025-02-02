@@ -4,7 +4,7 @@
 
 // GAME
 
-const int GAME_FrameRate = 30;
+const int GAME_FrameRate = 60;
 
 // 96:128 = 3:4
 const int WALL_Xdim = 3 * 32;
@@ -26,3 +26,5 @@ const int GAME_Switch_Text_Frames = 45;
 
 const int GAME_Message_Max_Char = 5;
 const int GAME_Message_Life_time_frames = 45;
+
+const double GAME_PacMan_Phase_per_Frame = 0.14; // Google Pac Man -> 0.16

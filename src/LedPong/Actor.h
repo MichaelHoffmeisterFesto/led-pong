@@ -1,6 +1,7 @@
 #pragma once
 
 #include "VectorArith.h"
+#include "GameConst.h"
 #include "GameRun.h"
 
 // This class defines the base class for an actor, that is, an moving
@@ -39,16 +40,19 @@ public:
 	Vec2 CurrentDirection;
 
 	// Phase of animation; 0 = CurrentTilePosition; FinalPhase = last phase before stand still
-	int Phase = 0;
+	double Phase = 0;
 
-	// Last (final) phase value, before movement is over
-	int FinalPhase = 1;
+	// Fractal step of complete movement (1.0) for normal movement
+	double PhaseStepNorm = GAME_PacMan_Phase_per_Frame;
+	
+	// Fractal step of complete movement (1.0) for movement while ghosts are frightened
+	double PhaseStepFright = GAME_PacMan_Phase_per_Frame;
 
 	// Actor is without movement. When not StandStill(), Animate() shall be called
 	// until the actor has reached StandStill() again.
 	inline bool StandStill()
 	{
-		if (Phase > FinalPhase)
+		if (Phase > 1.0)
 			Phase = 0;
 		return Phase == 0;
 	}
@@ -56,18 +60,18 @@ public:
 	// Calculate, based on Phase, the current pixel position
 	inline Vec2 GetCurrentPixelPos(Vec2 charDim)
 	{
-		return CurrentTilePosition * charDim + CurrentDirection * Phase;
+		return CurrentTilePosition * charDim + CurrentDirection * (int) (1.0 * charDim.X * Phase);
 	}
 
 	// Care for (free-running) animation.
-	inline virtual void Animate() { }
+	inline virtual void Animate(GameRun& run) { }
 
 	// Take an animation step forward.
-	inline virtual void MakeStep()
+	inline virtual void MakeStep(GameRun& run)
 	{
-		Phase++;
+		Phase += run.FrightMode ? PhaseStepFright : PhaseStepNorm;
 		
-		if (Phase > FinalPhase)
+		if (Phase > 1.0)
 		{
 			Phase = 0;
 			CurrentTilePosition = CurrentTilePosition + CurrentDirection;
@@ -94,9 +98,9 @@ public:
 	char GetPlayerAvatarChar(GameRun& run, Vec2 direction);
 
 	// take an animation step forward
-	inline virtual void Animate()
+	inline virtual void Animate(GameRun& run)
 	{
-		Actor::Animate();
+		Actor::Animate(run);
 		if (OpenMouthTime > 0)
 		{
 			OpenMouthTime--;

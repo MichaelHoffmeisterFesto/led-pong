@@ -39,9 +39,15 @@ public:
 	// How many frames in this run?
 	int FrameCounter = 0;
 
+	// Number of Level
+	int LevelNo = 1;
+
 	// When initialized, remaining number (not points!) of pills in this level.
 	// Note: If zero, subject to change to new level.
 	int PillsAvailable = 0;
+
+	// If true, ghosts are frightened and PacMan is motivated and can eat them!
+	bool FrightMode;
 
 	// Some text ar divided into halfs. TextSwitch is either 0 or 1.
 	int FramesToTextSwitch = 1;

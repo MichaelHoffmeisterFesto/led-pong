@@ -63,7 +63,7 @@ public:
 
 	void AddWelcomeAnimations();
 
-	void LoadLevel(TileMap* level);
+	void LoadLevel(TileMap* level, int levelNo);
 
 	void Loop();
 

@@ -143,23 +143,59 @@ Game::Game()
 	Levels[LevelNum++] = tm2;
 
 	// load level
-	LoadLevel(tm1);
+	LoadLevel(tm1, 1);
 
 	// start with welcome
 	AddWelcomeAnimations();
 }	
 
-void Game::LoadLevel(TileMap* level)
+void Game::LoadLevel(TileMap* level, int levelNo)
 {
 	// remember
 	LevelCurr = level;
+	Run.LevelNo = levelNo;
 
 	// reset various states
 	Run.PillsAvailable = LevelCurr->PillsTotal;
-	
+
+	// determine speed of pac and ghost
+	// see: https://www.reddit.com/r/Pacman/comments/1cg2ogp/does_anyone_know_the_pixel_per_frame_speeds_of/
+	double phaseStepPacNorm = GAME_PacMan_Phase_per_Frame;
+	double phaseStepPacFright = GAME_PacMan_Phase_per_Frame;
+	double phaseStepGhostNorm = GAME_PacMan_Phase_per_Frame;
+	double phaseStepGhostFright = GAME_PacMan_Phase_per_Frame;
+	switch (levelNo)
+	{
+		case 1:
+			phaseStepPacNorm *= 1.0;
+			phaseStepPacFright *= 1.25;
+			phaseStepGhostNorm *= 0.9375;
+			phaseStepGhostFright *= 0.625;
+			break;
+
+		case 2:
+		case 3:
+		case 4:
+			phaseStepPacNorm *= 1.25;
+			phaseStepPacFright *= 1.1875;
+			phaseStepGhostNorm *= 1.0625;
+			phaseStepGhostFright *= 0.6875;
+			break;
+
+		default:
+			phaseStepPacNorm *= 1.25;
+			phaseStepPacFright *= 1.25;
+			phaseStepGhostNorm *= 1.1875;
+			phaseStepGhostFright *= 0.75;
+			break;
+	}
+
+
 	for (int i = 0; i < SIZE_OF_ARR(Players); i++)
 	{
 		Players[i]->CurrentTilePosition = LevelCurr->PlayerStartPos[i];
+		Players[i]->PhaseStepNorm = phaseStepPacNorm;
+		Players[i]->PhaseStepFright = phaseStepPacFright;
 	}
 
 	for (int i = 0; i < SIZE_OF_ARR(Ghosts); i++)
@@ -168,6 +204,8 @@ void Game::LoadLevel(TileMap* level)
 			continue;
 		Ghosts[i]->CurrentTilePosition = LevelCurr->GhostStartPos[i];
 		Ghosts[i]->HomeZone = LevelCurr->GhostHomeZone[i];
+		Ghosts[i]->PhaseStepNorm = phaseStepGhostNorm;
+		Ghosts[i]->PhaseStepFright = phaseStepGhostFright;
 	}
 }
 
@@ -257,7 +295,7 @@ void Game::Loop()
 				xx
 			);
 
-			pptr->Animate();
+			pptr->Animate(Run);
 
 			// already moved?
 			bool alreadyMoved = false;
@@ -289,7 +327,7 @@ void Game::Loop()
 					{
 						pptr->CurrentDirection = tmpDirs[di];
 						pptr->TriggerOpenMouth();
-						pptr->MakeStep();
+						pptr->MakeStep(Run);
 					}
 
 					// no automatic move anymore
@@ -307,7 +345,7 @@ void Game::Loop()
 			if (!alreadyMoved && !pptr->StandStill())
 			{
 				// move
-				pptr->MakeStep();
+				pptr->MakeStep(Run);
 
 				if (pptr->StandStill())
 				{
@@ -408,7 +446,7 @@ void Game::Loop()
 				xx
 			);
 
-			gptr->Animate();
+			gptr->Animate(Run);
 
 			// already moved?
 			bool alreadyMoved = false;
@@ -478,7 +516,7 @@ void Game::Loop()
 				if (nextDir.IsValid)
 				{
 					gptr->CurrentDirection = nextDir;
-					gptr->MakeStep();
+					gptr->MakeStep(Run);
 					alreadyMoved = true;
 				}
 			}
@@ -487,7 +525,7 @@ void Game::Loop()
 			if (!alreadyMoved && !gptr->StandStill())
 			{
 				// move
-				gptr->MakeStep();
+				gptr->MakeStep(Run);
 
 				if (gptr->StandStill())
 				{

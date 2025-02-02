@@ -15,7 +15,7 @@ char Player::GetPlayerAvatarChar(GameRun& run, Vec2 direction)
 			break;
 		}
 
-	bool openMouth = (run.FrameCounter % 6) >= 3;
+	bool openMouth = (run.FrameCounter % 12) >= 6;
 
 	if (OpenMouthTime > 0 && openMouth)
 		index++;
