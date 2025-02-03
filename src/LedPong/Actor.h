@@ -33,20 +33,8 @@ public:
 		return res;
 	}
 
-	// Current position on the tile map
-	Vec2 CurrentTilePosition;
-
-	// Current direction as unity vector
-	Vec2 CurrentDirection;
-
-	// Phase of animation; 0 = CurrentTilePosition; FinalPhase = last phase before stand still
-	double Phase = 0;
-
-	// Fractal step of complete movement (1.0) for normal movement
-	double PhaseStepNorm = GAME_PacMan_Phase_per_Frame;
-	
-	// Fractal step of complete movement (1.0) for movement while ghosts are frightened
-	double PhaseStepFright = GAME_PacMan_Phase_per_Frame;
+	// The actor is actively waiting.
+	inline bool IsWaiting() { return WaitAtCurrentPos > 0; }
 
 	// Actor is without movement. When not StandStill(), Animate() shall be called
 	// until the actor has reached StandStill() again.
@@ -64,12 +52,16 @@ public:
 	}
 
 	// Care for (free-running) animation.
-	inline virtual void Animate(GameRun& run) { }
+	inline virtual void Animate(GameRun& run) { 
+		if (WaitAtCurrentPos > 0)
+			WaitAtCurrentPos--;
+	}
 
 	// Take an animation step forward.
 	inline virtual void MakeStep(GameRun& run)
 	{
-		Phase += run.FrightMode ? PhaseStepFright : PhaseStepNorm;
+		Phase += (run.GhostsMode == GhostMode::Freightened
+			      || run.GhostsMode == GhostMode::SuperFreightened) ? PhaseStepFright : PhaseStepNorm;
 		
 		if (Phase > 1.0)
 		{
@@ -77,6 +69,26 @@ public:
 			CurrentTilePosition = CurrentTilePosition + CurrentDirection;
 		}
 	}
+
+public:
+	// Current position on the tile map
+	Vec2 CurrentTilePosition;
+
+	// Current direction as unity vector
+	Vec2 CurrentDirection;
+
+	// Phase of animation; 0 = CurrentTilePosition; FinalPhase = last phase before stand still
+	double Phase = 0;
+
+	// Fractal step of complete movement (1.0) for normal movement
+	double PhaseStepNorm = GAME_PacMan_Phase_per_Frame;
+
+	// Fractal step of complete movement (1.0) for movement while ghosts are frightened
+	double PhaseStepFright = GAME_PacMan_Phase_per_Frame;
+
+	// If greater zero, will wait at current pos before proceeding ..
+	int WaitAtCurrentPos = 0;
+
 };
 
 // Player class
@@ -96,6 +108,9 @@ public:
 
 	// Get the character, which is to be rendered as avatar of the actor.
 	char GetPlayerAvatarChar(GameRun& run, Vec2 direction);
+
+	// Which char to show for a dead player
+	inline virtual char GetDeadPlayerAvatar(double phase) { return ((int)(10.0 * phase) % 2) ? ' ' : 'W'; }
 
 	// take an animation step forward
 	inline virtual void Animate(GameRun& run)
@@ -120,29 +135,42 @@ public:
 	int Lives = 3;
 };
 
-// The movement of the ghosts depends on this mode.
-enum GhostMode { 
-	// Ghost is supposed to head towards a target tile which is located in the "home corner" of the ghost.
-	Scatter,		
-	// Ghost tries to move accordingly / anticipating the Pac Man movements.
-	Chase,
-	// Ghost tries to flee from Pac Man.
-	Freightened 
-};
-
 // Ghost class. Underlying foundation for all 4 individual ghosts.
 class Ghost : public Actor
 {
 public:
-	// Mode of the ghost. Externally synchronized.
-	GhostMode Mode = GhostMode::Scatter;
+	inline virtual void ResetToInitialPosition(Vec2 initialPos)
+	{
+		CurrentTilePosition = initialPos;
+		WaitAtCurrentPos = 4 * GAME_FrameRate;
+	}
 
+	// As the target positions of the ghost is the most influential difference between the ghosts, 
+	// this is being realized by the different sub classes of Ghost.
+	// see: https://web.archive.org/web/20241229103340/http://gameinternals.com/understanding-pac-man-ghost-behavior
+	inline virtual Vec2 GetCurrentTargetPos(GameRun& run, Vec2 pacPos, Vec2 pacDir, Ghost** siblings) 
+	{ 
+		return HomeZone; 
+	}
+
+	// Just a helper to have the different chars for modes
+	inline char PrepareAvatarChar(GameRun& run, char normalAvatar)
+	{
+		return
+			(run.GhostsMode == GhostMode::SuperFreightened) ? '§'
+			: ( (run.GhostsMode == GhostMode::Freightened) ? '$' : normalAvatar );
+	}
+
+	// Get the character, which is to be rendered as avatar of the actor.
+	inline virtual char GetGhostAvatarChar(GameRun& run, Vec2 direction) = 0;
+
+public:
 	// Tile (typically unreachable) representing the "home zone" of the ghost.
 	// This leads typically to an orbiting behaviour near to the home zone while scattering.
 	Vec2 HomeZone;
 
-	// Get the character, which is to be rendered as avatar of the actor.
-	inline virtual char GetGhostAvatarChar(GameRun& run, Vec2 direction) = 0;
+	// for debugging purposes, this is held inside the class
+	Vec2 UseTargetPosition;
 };
 
 // Individual ghost class
@@ -157,10 +185,15 @@ public:
 
 	virtual inline Actor* Clone() { return new Blinky(*this); }
 
-	// Get the character, which is to be rendered as avatar of the actor.
+	inline virtual Vec2 GetCurrentTargetPos(GameRun& run, Vec2 pacPos, Vec2 pacDir, Ghost** siblings)
+	{
+		// in chase, just go to pac
+		return (run.GhostsMode == GhostMode::Scatter) ? HomeZone : pacPos ;
+	}
+
 	inline virtual char GetGhostAvatarChar(GameRun& run, Vec2 direction)
 	{
-		return 'A';
+		return PrepareAvatarChar(run, 'A');
 	}
 };
 
@@ -176,10 +209,15 @@ public:
 
 	virtual inline Actor* Clone() { return new Pinky(*this); }
 
-	// Get the character, which is to be rendered as avatar of the actor.
+	inline virtual Vec2 GetCurrentTargetPos(GameRun& run, Vec2 pacPos, Vec2 pacDir, Ghost** siblings)
+	{
+		// in chase, go to pac's position and 4 times the direction further
+		return (run.GhostsMode == GhostMode::Scatter) ? HomeZone : pacPos + pacDir * 4;
+	}
+
 	inline virtual char GetGhostAvatarChar(GameRun& run, Vec2 direction)
 	{
-		return 'B';
+		return PrepareAvatarChar(run, 'B');
 	}
 };
 
@@ -195,10 +233,17 @@ public:
 
 	virtual inline Actor* Clone() { return new Inky(*this); }
 
-	// Get the character, which is to be rendered as avatar of the actor.
+	inline virtual Vec2 GetCurrentTargetPos(GameRun& run, Vec2 pacPos, Vec2 pacDir, Ghost** siblings)
+	{
+		// in chase, take the vector from Blinky to Pac times 2 from Blink and go there
+		return (run.GhostsMode == GhostMode::Scatter) 
+			? HomeZone 
+			: (siblings[0]->CurrentTilePosition + ( ( pacPos + pacDir * 2 ) - siblings[0]->CurrentTilePosition ) * 2);
+	}
+
 	inline virtual char GetGhostAvatarChar(GameRun& run, Vec2 direction)
 	{
-		return 'C';
+		return PrepareAvatarChar(run, 'C');
 	}
 };
 
@@ -214,9 +259,19 @@ public:
 
 	virtual inline Actor* Clone() { return new Clyde(*this); }
 
-	// Get the character, which is to be rendered as avatar of the actor.
+	inline virtual Vec2 GetCurrentTargetPos(GameRun& run, Vec2 pacPos, Vec2 pacDir, Ghost** siblings)
+	{
+		// in chase, go either to pac's position and when to close, restrain and go to home zone
+		if (run.GhostsMode == GhostMode::Scatter)
+			return HomeZone;
+		double dist = (pacPos - CurrentTilePosition).Length();
+		if (dist > 8.0)
+			return pacPos;
+		return HomeZone;
+	}
+
 	inline virtual char GetGhostAvatarChar(GameRun& run, Vec2 direction)
 	{
-		return 'D';
+		return PrepareAvatarChar(run, 'D');
 	}
 };

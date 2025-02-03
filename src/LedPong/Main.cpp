@@ -88,7 +88,9 @@ void LoadSoundSamples()
 	SoundSamples[GameSoundSampleEnum::EmptyTile] = new SDL_SoundSample("media/pop-268648-shortened-fade-out.wav", MIX_MAX_VOLUME / 4);
 	SoundSamples[GameSoundSampleEnum::EnergyPill] = new SDL_SoundSample("media/arcade-fx-288597_shorted_fade_out.wav", MIX_MAX_VOLUME / 2);
 	SoundSamples[GameSoundSampleEnum::TurnToGhosts] = new SDL_SoundSample("media/arcade-arped-145549-shortened.wav", MIX_MAX_VOLUME);
+	SoundSamples[GameSoundSampleEnum::TurnFromGhosts] = new SDL_SoundSample("media/arcade-ui-18-229517-shortened.wav", MIX_MAX_VOLUME);
 	SoundSamples[GameSoundSampleEnum::Fruit] = new SDL_SoundSample("media/arcade-ui-28-229497-shortened.wav", MIX_MAX_VOLUME);
+	SoundSamples[GameSoundSampleEnum::PacManDead] = new SDL_SoundSample("media/arcade-ui-26-229495-shortened.wav", MIX_MAX_VOLUME);
 }
 
 void PlaySoundSample(GameSoundSampleEnum ss)
@@ -193,6 +195,27 @@ bool loop() {
 	sprintf_s(buffer, "Frame %02d", TheGame.Run.FrameCounter % GAME_FrameRate);
 	SDL_RenderDrawText(Main->Renderer, Main->FontNormal, SDL_Color_From(LedColors.White), spX, spY, buffer);	
 
+	// debug this target pos
+	if (TheGame.showDebug)
+	{
+		SDL_Color COLOR_debug = { 204, 236, 255 };
+		SDL_SetRenderDrawColor(Main->Renderer, &COLOR_debug);
+
+		for (int gni = 0; gni < std::max(1, std::min(4, TheGame.Run.NumGhost)); gni++)
+		{
+			// more explicit
+			Ghost* gptr = TheGame.Ghosts[gni];
+			if (gptr == nullptr)
+				continue;
+
+			Vec2 from = gptr->CurrentTilePosition * (5 * (WALL_XpixSize + WALL_Xgap));
+			Vec2 to = gptr->UseTargetPosition * (5 * (WALL_XpixSize + WALL_Xgap));
+			SDL_Point pts[] = { { 14 + from.X, 14 + from.Y }, { 14 + to.X, 14 + to.Y } };
+			SDL_RenderDrawLines(Main->Renderer, pts, 2);
+		}
+	}
+
+
 	//
 	// End of loop
 	//
@@ -209,7 +232,7 @@ bool loop() {
 
 int main(int argc, char** args)
 {
-	srand(time(0));
+	srand((unsigned int) time(0));
 
 	Main = new SDL_Application();
 

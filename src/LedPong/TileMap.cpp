@@ -74,7 +74,7 @@ TileMap::TileMap(int numRow, string rows[])
 
 	// go thru rows again
 	for (int ri = 0; ri < numRow; ri++)
-		for (int ci = 0; ci < rows[ri].length(); ci++)
+		for (int ci = 0; ci < (int) rows[ri].length(); ci++)
 		{
 			TileBase* tile = TileFactory::GenerateTile(rows[ri].at(ci));
 			Put(ci, ri, tile);

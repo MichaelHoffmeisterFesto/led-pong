@@ -333,12 +333,12 @@ bool ReadFile(std::string fn, BmpMetaData& img)
 	return true;
 }
 
-unsigned unsigned int Decode2Bytes(BmpMetaData& img, int pos)
+unsigned int Decode2Bytes(BmpMetaData& img, int pos)
 {
 	return img.Data[pos + 1] * 256 + img.Data[pos + 0];
 }
 
-unsigned unsigned int Decode4Bytes(BmpMetaData& img, int pos)
+unsigned int Decode4Bytes(BmpMetaData& img, int pos)
 {
 	return
 		img.Data[pos + 3] << 24

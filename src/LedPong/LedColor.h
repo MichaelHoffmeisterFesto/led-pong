@@ -19,7 +19,7 @@ public:
 	LedColor(uint8_t r, uint8_t g, uint8_t b);
 	LedColor(uint32_t rgb);
 
-	inline LedColor& operator * (double f)
+	inline LedColor operator * (double f)
 	{
 		LedColor res{ 
 			(uint8_t) std::max(0, std::min(255, (int) (f * R) )),
@@ -29,7 +29,7 @@ public:
 		return res;
 	}
 
-	inline static LedColor& FadeBetween (LedColor color1, LedColor color2, double f)
+	inline static LedColor FadeBetween (LedColor color1, LedColor color2, double f)
 	{
 		LedColor res{
 			(uint8_t)std::max(0, std::min(255, (int)(f * color2.R + (1.0-f) * color1.R))),

@@ -49,7 +49,7 @@ enum GameKeyEnum {
 };
 
 enum GameSoundSampleEnum {
-	None, EmptyTile, EnergyPill, TurnToGhosts, Fruit, SOUND_SAMPLE_MAX_NUM
+	None, EmptyTile, EnergyPill, TurnToGhosts, TurnFromGhosts, Fruit, PacManDead, SOUND_SAMPLE_MAX_NUM
 };
 
 
@@ -63,7 +63,7 @@ public:
 
 	void AddWelcomeAnimations();
 
-	void LoadLevel(TileMap* level, int levelNo);
+	void LoadLevel(TileMap* level, int levelNo, bool resetPlayer = true);
 
 	void Loop();
 
@@ -113,6 +113,6 @@ public:
 	// state
 	GameRun Run;
 	int openMouthTime = 0;
-
+	bool showDebug = false;
 };
 

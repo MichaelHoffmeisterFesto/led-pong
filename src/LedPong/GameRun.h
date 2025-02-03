@@ -1,7 +1,20 @@
 #pragma once
 
 #include <algorithm>
+#include "VectorArith.h"
 #include "GameConst.h"
+
+// The movement of the ghosts depends on this mode.
+enum GhostMode {
+	// Ghost is supposed to head towards a target tile which is located in the "home corner" of the ghost.
+	Scatter,
+	// Ghost tries to move accordingly / anticipating the Pac Man movements.
+	Chase,
+	// Ghost tries to flee from Pac Man.
+	Freightened,
+	// Ghost is frightened but will return to normal, soon.
+	SuperFreightened
+};
 
 // This class holds a (volatile) state of a single run of a
 // level / game.
@@ -27,6 +40,32 @@ public:
 		if (MsgLifeTime == 0)
 			strcpy_s(Message, "");
 		MsgLifeTime = std::max(0, MsgLifeTime - 1);
+
+		// Frightened
+		if (FrightenedCounter > GAME_FrameRate)
+		{
+			// is normal frightened
+			FrightenedCounter--;
+			GhostsMode = GhostMode::Freightened;
+		}
+		else if (FrightenedCounter > 1)
+		{
+			// will soon return to normal
+			FrightenedCounter--;
+			GhostsMode = ((FrightenedCounter % 12) < 6) ? GhostMode::SuperFreightened : GhostMode::Freightened;
+		}
+		else if (FrightenedCounter == 1)
+		{
+			// set back
+			FrightenedCounter = 0;			
+			GhostsMode = GhostMode::Chase;
+		}
+
+		// Count down(s)
+		if (CountDownToChase > 0)
+			CountDownToChase--;
+		if (CountDownToScatter > 0)
+			CountDownToScatter--;
 	}
 
 	inline void SetMessage(const char* msg)
@@ -42,12 +81,31 @@ public:
 	// Number of Level
 	int LevelNo = 1;
 
+	// If greater zero, will cause a special display for a dead pacman and ghost going home
+	int CountdownPacManDead = 0;
+
+	// Phase [0.0 .. 1.0] for a special animation
+	double SpecialAnimPhase = 0.0;
+
+	// Step value to be added for every frame to the special animation phase
+	double SpecialAnimStep = 0.0;
+
+	// For special animation of ghosts ..
+	Vec2 SpecialAnimGhostDelta[GAME_Max_Ghost] = { 0 };
+
 	// When initialized, remaining number (not points!) of pills in this level.
 	// Note: If zero, subject to change to new level.
 	int PillsAvailable = 0;
 
-	// If true, ghosts are frightened and PacMan is motivated and can eat them!
-	bool FrightMode;
+	// Mode of the ghosts. 
+	GhostMode GhostsMode = GhostMode::Scatter;
+
+	// Count down to switch from Scatter to Chase or vice versa
+	int CountDownToChase = 0;
+	int CountDownToScatter = 0;
+
+	// If greater than zero, represents the time in frames where the ghosts are frightened.
+	int FrightenedCounter = 0;
 
 	// Some text ar divided into halfs. TextSwitch is either 0 or 1.
 	int FramesToTextSwitch = 1;

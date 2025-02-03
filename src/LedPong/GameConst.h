@@ -6,6 +6,9 @@
 
 const int GAME_FrameRate = 60;
 
+const int GAME_Max_Player = 2;
+const int GAME_Max_Ghost = 4;
+
 // 96:128 = 3:4
 const int WALL_Xdim = 3 * 32;
 const int WALL_Ydim = 2 * 64;
@@ -28,3 +31,5 @@ const int GAME_Message_Max_Char = 5;
 const int GAME_Message_Life_time_frames = 45;
 
 const double GAME_PacMan_Phase_per_Frame = 0.14; // Google Pac Man -> 0.16
+
+const int GAME_Frames_of_death = 1.6 * GAME_FrameRate;

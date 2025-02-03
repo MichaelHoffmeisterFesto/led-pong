@@ -22,6 +22,7 @@ public:
 
 	// Scalar product
 	inline Vec2 operator *(int i) { return Vec2(X * i, Y * i); }
+	inline Vec2 operator *(double d) { return Vec2((int) (d * X), (int) (d * Y)); }
 
 	// Hadamard product
 	inline Vec2 operator *(Vec2 other) { return Vec2(X * other.X, Y * other.Y); }

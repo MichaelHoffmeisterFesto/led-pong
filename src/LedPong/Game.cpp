@@ -15,7 +15,7 @@ Game::Game()
 	// renderers
 	TrFs = TextRendererFixedSize(
 		"media/pacman-kacheln5x5.bmp", 5, 1,
-		"QWERTZUIABCD.-|HJKLtb=lr#jhokasdf uvwx*ceg");
+		"QWERTZUIABCD.-|HJKLtb=lr#jhokasdf uvwx*ceg$§");
 
 	ProportionalTextGlyph glyphs[] = {
 		{ 'A', 0, 5 },
@@ -149,7 +149,7 @@ Game::Game()
 	AddWelcomeAnimations();
 }	
 
-void Game::LoadLevel(TileMap* level, int levelNo)
+void Game::LoadLevel(TileMap* level, int levelNo, bool resetPlayer)
 {
 	// remember
 	LevelCurr = level;
@@ -158,8 +158,13 @@ void Game::LoadLevel(TileMap* level, int levelNo)
 	// reset various states
 	Run.PillsAvailable = LevelCurr->PillsTotal;
 
+	// first the game is in scatter
+	Run.GhostsMode = GhostMode::Scatter;
+	Run.CountDownToChase = 7 * GAME_FrameRate;
+
 	// determine speed of pac and ghost
 	// see: https://www.reddit.com/r/Pacman/comments/1cg2ogp/does_anyone_know_the_pixel_per_frame_speeds_of/
+	// see: https://pacman.holenet.info/#LvlSpecs
 	double phaseStepPacNorm = GAME_PacMan_Phase_per_Frame;
 	double phaseStepPacFright = GAME_PacMan_Phase_per_Frame;
 	double phaseStepGhostNorm = GAME_PacMan_Phase_per_Frame;
@@ -190,10 +195,10 @@ void Game::LoadLevel(TileMap* level, int levelNo)
 			break;
 	}
 
-
 	for (int i = 0; i < SIZE_OF_ARR(Players); i++)
 	{
-		Players[i]->CurrentTilePosition = LevelCurr->PlayerStartPos[i];
+		if (resetPlayer)
+			Players[i]->CurrentTilePosition = LevelCurr->PlayerStartPos[i];
 		Players[i]->PhaseStepNorm = phaseStepPacNorm;
 		Players[i]->PhaseStepFright = phaseStepPacFright;
 	}
@@ -202,11 +207,16 @@ void Game::LoadLevel(TileMap* level, int levelNo)
 	{
 		if (Ghosts[i] == nullptr)
 			continue;
-		Ghosts[i]->CurrentTilePosition = LevelCurr->GhostStartPos[i];
+		Ghosts[i]->ResetToInitialPosition(LevelCurr->GhostStartPos[i]);
 		Ghosts[i]->HomeZone = LevelCurr->GhostHomeZone[i];
 		Ghosts[i]->PhaseStepNorm = phaseStepGhostNorm;
 		Ghosts[i]->PhaseStepFright = phaseStepGhostFright;
 	}
+
+	// reset fruits
+	SpawnedItem dummy;
+	while (nullptr != SpawnedItems.top())
+		SpawnedItems.dequeue(dummy);
 }
 
 Game::~Game()
@@ -229,52 +239,119 @@ void Game::AddWelcomeAnimations()
 
 void Game::Loop()
 {
-	double step = 0.01;
-
-	auto ta = AnimationQueue.top();
-	if (false && ta != nullptr)
+	if (false)
 	{
-		if (ta->mPhase == 0.0)
+		double step = 0.01;
+
+		auto ta = AnimationQueue.top();
+		if (false && ta != nullptr)
 		{
-			// start of animation
-			ta->mStartTexture = Screen.Clone();
+			if (ta->mPhase == 0.0)
+			{
+				// start of animation
+				ta->mStartTexture = Screen.Clone();
+			}
+
+			if (ta->mPhase < 1.0)
+			{
+				// only step in animation
+				auto blend = Screen.Clone();
+				blend.FillGradient(ta->mGradient, ta->mPhase);
+				Screen.BlendFrom(ta->mStartTexture, ta->mTargetTexture, blend, ta->mBlendEffect);
+
+				// go (last) step further ..
+				ta->mPhase = std::min(1.0, ta->mPhase + ta->mSpeed * step);
+			}
+			else
+			{
+				// animation ended
+				Screen.BlitFrom(0, 0, ta->mTargetTexture);
+
+				// remove this animation
+				LedAnimation tmp;
+				AnimationQueue.dequeue(tmp);
+			}
 		}
 
-		if (ta->mPhase < 1.0)
+		// restart again?
+		if (false && AnimationQueue.GetLength() < 1)
 		{
-			// only step in animation
-			auto blend = Screen.Clone();
-			blend.FillGradient(ta->mGradient, ta->mPhase);
-			Screen.BlendFrom(ta->mStartTexture, ta->mTargetTexture, blend, ta->mBlendEffect);
-
-			// go (last) step further ..
-			ta->mPhase = std::min(1.0, ta->mPhase + ta->mSpeed * step);
-		}
-		else
-		{
-			// animation ended
-			Screen.BlitFrom(0, 0, ta->mTargetTexture);
-
-			// remove this animation
-			LedAnimation tmp;
-			AnimationQueue.dequeue(tmp);
+			AddWelcomeAnimations();
 		}
 	}
-
-	// restart again?
-	if (false && AnimationQueue.GetLength() < 1)
+	else if (Run.CountdownPacManDead > 0)
 	{
-		AddWelcomeAnimations();
+		//
+		// Dead Pac Man
+		//
+
+		LevelCurr->DrawMap(Run, Screen, Vec2(0, 0), TrFs, 5, 5);
+
+		for (int pni = 0; pni < std::max(1, std::min(2, Run.NumPlayer)); pni++)
+		{
+			char xx[] = { Players[pni]->GetDeadPlayerAvatar(Run.SpecialAnimPhase), '\0'};
+			TrFs.DrawTextTo(
+				Screen, Players[pni]->GetCurrentPixelPos(Vec2(5, 5)),
+				xx
+			);
+		}
+
+		for (int gni = 0; gni < std::max(1, std::min(4, Run.NumGhost)); gni++)
+		{
+			char xx[] = { Ghosts[gni]->GetGhostAvatarChar(Run, Ghosts[gni]->CurrentDirection), '\0'};
+			Vec2 xy = Run.SpecialAnimGhostDelta[gni] * (5.0 * Run.SpecialAnimPhase);
+			printf("%d %d\n", xy.X, xy.Y);
+			TrFs.DrawTextTo(
+				Screen, Ghosts[gni]->GetCurrentPixelPos(Vec2(5, 5)) + xy,
+				xx
+			);
+		}
+
+		Run.SpecialAnimPhase += Run.SpecialAnimStep;
+
+		Run.CountdownPacManDead--;
+
+		if (Run.CountdownPacManDead == 0)
+		{
+			// finally
+			LoadLevel(LevelCurr, Run.LevelNo, false);
+		}
 	}
-
-	// test
-	if (true)
+	else 
 	{
+		//
+		// normal gameplay
+		//
+
 		// some runtime
 		char buffer[10];
 
 		// increment pure game level run state
 		Run.Animate();
+
+		// not very elegantly programmed: access some of the game-run counters to release some events
+		if (Run.FrightenedCounter == 2)
+		{
+			Run.SetMessage("CHASE");
+			SoundSampleToPlay = GameSoundSampleEnum::TurnFromGhosts;
+			Run.CountDownToScatter = 10 * GAME_FrameRate;
+		}
+
+		if (Run.CountDownToChase == 1 && Run.GhostsMode == GhostMode::Scatter)
+		{
+			Run.GhostsMode = GhostMode::Chase;
+			Run.SetMessage("CHASE");
+			SoundSampleToPlay = GameSoundSampleEnum::TurnFromGhosts;
+			Run.CountDownToScatter = 20 * GAME_FrameRate;
+		}
+
+		if (Run.CountDownToScatter == 1 && Run.GhostsMode == GhostMode::Chase)
+		{
+			Run.GhostsMode = GhostMode::Scatter;
+			Run.SetMessage("SCATR");
+			SoundSampleToPlay = GameSoundSampleEnum::TurnFromGhosts;
+			Run.CountDownToChase = 5 * GAME_FrameRate;
+		}
 
 		// the basic map is drawn every frame!
 		LevelCurr->DrawMap(Run, Screen, Vec2(0, 0), TrFs, 5, 5);
@@ -369,6 +446,8 @@ void Game::Loop()
 							// turn to ghosts!
 							// TODO!
 							SoundSampleToPlay = GameSoundSampleEnum::TurnToGhosts;
+							// see: https://pacman.holenet.info/#LvlSpecs
+							Run.FrightenedCounter = std::max(2, (7 - Run.LevelNo)) * GAME_FrameRate;
 							Run.SetMessage("SCARE");
 						}
 						else if (ct->IsFruit())
@@ -432,6 +511,12 @@ void Game::Loop()
 		// Ghost 1..4
 		//
 
+		// Some ghosts are heading towards a particular player.
+		// Always heading towards the winning player .. he he 
+		Player* headingToPlayer = Players[0];
+		if (Run.NumPlayer > 1 && Player2.Score > Player1.Score)
+			headingToPlayer = Players[1];
+
 		for (int gni = 0; gni < std::max(1, std::min(4, Run.NumGhost)); gni++)
 		{
 			// more explicit
@@ -439,7 +524,7 @@ void Game::Loop()
 			if (gptr == nullptr)
 				continue;
 
-			// draw player itself
+			// draw ghost itself
 			char xx[] = { gptr->GetGhostAvatarChar(Run, gptr->CurrentDirection), '\0' };
 			TrFs.DrawTextTo(
 				Screen, gptr->GetCurrentPixelPos(Vec2(5, 5)),
@@ -447,6 +532,10 @@ void Game::Loop()
 			);
 
 			gptr->Animate(Run);
+
+			// ghost is actively waiting?
+			if (gptr->IsWaiting())
+				continue;
 
 			// already moved?
 			bool alreadyMoved = false;
@@ -458,8 +547,14 @@ void Game::Loop()
 				Vec2 nextDir;
 
 				// acquire every basic direction
+				// right now, no jumps are foreseen
 				int numDir = 0;
 				Vec2* basicDirs = gptr->GetBasicDirections(numDir);
+
+				// get the current target tile
+				gptr->UseTargetPosition = gptr->GetCurrentTargetPos(Run, 
+					headingToPlayer->CurrentTilePosition, 
+					headingToPlayer->CurrentDirection ,Ghosts);
 
 				// investigate all directions
 				double bestDirLen = DBL_MAX;
@@ -483,7 +578,7 @@ void Game::Loop()
 
 					// compute NSP from target
 					// Note: currently the home zone
-					double l = (nsp - gptr->HomeZone).Length();
+					double l = (nsp - gptr->UseTargetPosition).Length();
 
 					// store as best?
 					if (l < bestDirLen)
@@ -529,7 +624,37 @@ void Game::Loop()
 
 				if (gptr->StandStill())
 				{
-					// newFinalPosition = true;
+					// check new position
+					Player* foundPlayer = nullptr;
+					for (int pni = 0; pni < std::max(1, std::min(2, Run.NumPlayer)); pni++)
+						if (Players[pni]->CurrentTilePosition == gptr->CurrentTilePosition)
+						{
+							foundPlayer = Players[pni]; 
+							// the 2nd Player on the same tile will have good luck ;-)
+							break;
+						}
+
+					// player found .. kill it :-/
+					if (foundPlayer != nullptr)
+					{
+						if (foundPlayer->Lives < 1)
+						{
+							exit(0);
+						}
+						else
+						{
+							foundPlayer->Lives--;
+							Run.CountdownPacManDead = GAME_Frames_of_death;
+							Run.SpecialAnimPhase = 0.0;
+							Run.SpecialAnimStep = 1.0 / GAME_Frames_of_death;
+
+							for (int i = 0; i < SIZE_OF_ARR(Ghosts); i++)
+								Run.SpecialAnimGhostDelta[i] = LevelCurr->GhostStartPos[i] - Ghosts[i]->CurrentTilePosition;
+
+							Run.SetMessage("DEAD");
+							SoundSampleToPlay = GameSoundSampleEnum::PacManDead;
+						}
+					}
 				}
 			}
 		}

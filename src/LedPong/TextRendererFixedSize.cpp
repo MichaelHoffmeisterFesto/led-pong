@@ -35,7 +35,7 @@ void TextRendererFixedSize::DrawTextTo(
 	Vec2 workPos = pixelPos;
 
 	// over all chars
-	for (int ci = 0; ci < strlen(nullTerminatedText); ci++)
+	for (int ci = 0; ci < (int) strlen(nullTerminatedText); ci++)
 	{
 		// char to search
 		char cSearch = nullTerminatedText[ci];
@@ -50,7 +50,7 @@ void TextRendererFixedSize::DrawTextTo(
 
 		// find index?
 		int fi = -1;
-		for (int fii=0; fii < mIndexToChar.length(); fii++)
+		for (int fii=0; fii < (int) mIndexToChar.length(); fii++)
 			if (mIndexToChar[fii] == cSearch)
 			{
 				fi = fii;
