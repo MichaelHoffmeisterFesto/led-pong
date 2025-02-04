@@ -91,6 +91,7 @@ void LoadSoundSamples()
 	SoundSamples[GameSoundSampleEnum::TurnFromGhosts] = new SDL_SoundSample("media/arcade-ui-18-229517-shortened.wav", MIX_MAX_VOLUME);
 	SoundSamples[GameSoundSampleEnum::Fruit] = new SDL_SoundSample("media/arcade-ui-28-229497-shortened.wav", MIX_MAX_VOLUME);
 	SoundSamples[GameSoundSampleEnum::PacManDead] = new SDL_SoundSample("media/arcade-ui-26-229495-shortened.wav", MIX_MAX_VOLUME);
+	SoundSamples[GameSoundSampleEnum::GhostDead] = new SDL_SoundSample("media/arcade-ui-1-229498-shortened.wav", MIX_MAX_VOLUME);
 }
 
 void PlaySoundSample(GameSoundSampleEnum ss)

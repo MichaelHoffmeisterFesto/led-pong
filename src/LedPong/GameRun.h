@@ -78,17 +78,23 @@ public:
 	// How many frames in this run?
 	int FrameCounter = 0;
 
-	// Number of Level
+	// Index of the current tile map 
+	int TileMapIndex = 0;
+
+	// Number of Level (how many levels pac man was going thru)
 	int LevelNo = 1;
 
 	// If greater zero, will cause a special display for a dead pacman and ghost going home
-	int CountdownPacManDead = 0;
+	int CountdownPacOrGhostDead = 0;
 
 	// Phase [0.0 .. 1.0] for a special animation
 	double SpecialAnimPhase = 0.0;
 
 	// Step value to be added for every frame to the special animation phase
 	double SpecialAnimStep = 0.0;
+
+	// -1 means restart level, 0..3 means reset only 1 ghost position
+	int SpecialResetOnlyGhost = -1;
 
 	// For special animation of ghosts ..
 	Vec2 SpecialAnimGhostDelta[GAME_Max_Ghost] = { 0 };

@@ -49,7 +49,7 @@ enum GameKeyEnum {
 };
 
 enum GameSoundSampleEnum {
-	None, EmptyTile, EnergyPill, TurnToGhosts, TurnFromGhosts, Fruit, PacManDead, SOUND_SAMPLE_MAX_NUM
+	None, EmptyTile, EnergyPill, TurnToGhosts, TurnFromGhosts, Fruit, PacManDead, GhostDead, SOUND_SAMPLE_MAX_NUM
 };
 
 
@@ -63,7 +63,11 @@ public:
 
 	void AddWelcomeAnimations();
 
-	void LoadLevel(TileMap* level, int levelNo, bool resetPlayer = true);
+	// Restarts ghost from initial pos, all modes reset, but level (pills, score, ..) untouched
+	void RestartLevel();
+
+	// Load a new tilemap into the level, restart everything
+	void LoadLevel(int tileMapIndex, int levelNo);
 
 	void Loop();
 

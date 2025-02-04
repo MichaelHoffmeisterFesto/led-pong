@@ -142,6 +142,7 @@ public:
 	inline virtual void ResetToInitialPosition(Vec2 initialPos)
 	{
 		CurrentTilePosition = initialPos;
+		Phase = 0.0;
 		WaitAtCurrentPos = 4 * GAME_FrameRate;
 	}
 

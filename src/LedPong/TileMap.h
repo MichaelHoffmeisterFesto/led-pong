@@ -49,7 +49,7 @@ public:
 	~TileMap();
 
 	// cloning
-	TileMap& Clone();
+	TileMap* Clone();
 
 	// accessors
 	inline int GetWidth() { return mWidth; }
@@ -91,6 +91,19 @@ public:
 
 	// Checks if a move in a given direction is possible.
 	bool FindPossibleMoveInDir(Actor* actor, Vec2 checkPos, Vec2 dir, PossibleMove& move);
+
+	// For a given set of basic directions and a position on the map, count the adjacent tiles, which are a moveable position.
+	inline int CountMoveableDirections(Vec2 pos, int numPos, Vec2* dirs)
+	{
+		int res = 0;
+		for (int i = 0; i < numPos; i++)
+		{
+			Tile* tp = GetAsTile(pos + dirs[i]);
+			if (tp != nullptr && tp->IsMoveablePosition())
+				res++;
+		}
+		return res;
+	}
 
 	// Find a position, which is occupated by an energy pill and nothing else.
 	Vec2 FindRandomFreeEnergyPillPosition();

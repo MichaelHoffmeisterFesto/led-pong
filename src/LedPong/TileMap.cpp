@@ -112,9 +112,24 @@ TileMap::~TileMap()
 }
 
 // clone
-TileMap& TileMap::Clone()
+TileMap* TileMap::Clone()
 {
-	TileMap res(mWidth, mHeight, mTiles, true);
+	TileMap* res = new TileMap(mWidth, mHeight, mTiles, true);
+
+	// very hacky
+#define __FULL_COPY(X) copy_n(X, SIZE_OF_ARR(X), res->X);
+	__FULL_COPY(PlayerStartPos);
+	__FULL_COPY(GhostStartPos);
+	__FULL_COPY(GhostHomeZone);
+	res->GateToLeft = GateToLeft;
+	res->GateToTop = GateToTop;
+	res->GateToRight = GateToRight;
+	res->GateToBottom = GateToBottom;
+	__FULL_COPY(PlayerTextScorePos);
+	__FULL_COPY(PlayerTextExtraPos);
+	res->MessagePos = MessagePos;
+#undef __FULL_COPY
+
 	return res;
 }
 
