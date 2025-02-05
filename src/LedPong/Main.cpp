@@ -69,12 +69,14 @@ const SDL_Color COLOR_white = { 255, 255, 255 };
 
 SDL_Scancode SdlScanToMap[] = { 
 	SDL_SCANCODE_LEFT, SDL_SCANCODE_RIGHT, SDL_SCANCODE_UP, SDL_SCANCODE_DOWN, 
-	SDL_SCANCODE_A, SDL_SCANCODE_D, SDL_SCANCODE_W, SDL_SCANCODE_S
+	SDL_SCANCODE_A, SDL_SCANCODE_D, SDL_SCANCODE_W, SDL_SCANCODE_S,
+	SDL_SCANCODE_F12
 };
 
 GameKeyEnum GameKeyToMap[] = { 
 	KEY_P1_LEFT, KEY_P1_RIGHT, KEY_P1_UP, KEY_P1_DOWN,
 	KEY_P2_LEFT, KEY_P2_RIGHT, KEY_P2_UP, KEY_P2_DOWN,
+	KEY_DEBUG
 };
 
 // sound samples
@@ -105,6 +107,21 @@ void DeleteSoundSamples()
 	for (int i = 0; i < GameSoundSampleEnum::SOUND_SAMPLE_MAX_NUM; i++)
 		if (SoundSamples[i] != nullptr)
 			delete SoundSamples[i];
+}
+
+void DebugSound()
+{
+	printf("Music Error %s", SDL_GetError());
+
+	int total = Mix_GetNumChunkDecoders();
+	for (int i = 0; i < total; i++) {
+		printf(" - chunk decoder: %s\n", Mix_GetChunkDecoder(i));
+	}
+
+	total = Mix_GetNumMusicDecoders();
+	for (int i = 0; i < total; i++) {
+		printf(" - music decoder: %s\n", Mix_GetMusicDecoder(i));
+	}
 }
 
 //
@@ -216,7 +233,6 @@ bool loop() {
 		}
 	}
 
-
 	//
 	// End of loop
 	//
@@ -233,38 +249,31 @@ bool loop() {
 
 int main(int argc, char** args)
 {
+	// set the randomness
 	srand((unsigned int) time(0));
 
+	// init SDL application; fixed size
 	Main = new SDL_Application();
+	if (!Main->init(800, 670)) return 1;	
 
-	if (!Main->init(800, 670)) return 1;
-
-	//printf("Music Error %s", SDL_GetError());
-
-	//int total = Mix_GetNumChunkDecoders();
-	//for (int i = 0; i < total; i++) {
-	//	printf(" - chunk decoder: %s\n", Mix_GetChunkDecoder(i));
-	//}
-
-	//total = Mix_GetNumMusicDecoders();
-	//for (int i = 0; i < total; i++) {
-	//	printf(" - music decoder: %s\n", Mix_GetMusicDecoder(i));
-	//}
-
+	// init sound
 	LoadSoundSamples();
 
-	SDL_SoundSample smp1("media/arcade-fx-288597_shorted_fade_out.wav", MIX_MAX_VOLUME);
-	smp1.play();
+	// primitive command line parsing
+	for (int i = 1; i < argc; i++)
+	{
+		if (strcmp(args[i], "-mute") == 0)
+			SoundOn = !SoundOn;
+	}
 
-
+	// main loop
 	while (loop()) {
 		// wait before processing the next frame
 		SDL_Delay(1000 / GAME_FrameRate);
 	}
 
+	// end of application
 	Main->kill();
-
 	DeleteSoundSamples();
-
 	return 0;
 }

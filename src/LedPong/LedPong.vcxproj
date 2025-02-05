@@ -166,7 +166,7 @@
     <ClCompile Include="LedColor.cpp" />
     <ClCompile Include="LedColors.cpp" />
     <ClCompile Include="LedTexture.cpp" />
-    <ClCompile Include="SampleGen.cpp" />
+    <ClCompile Include="LevelInit.cpp" />
     <ClCompile Include="SDL_Application.cpp" />
     <ClCompile Include="SDL_Helper.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -191,7 +191,7 @@
     <ClInclude Include="LedColor.h" />
     <ClInclude Include="LedColors.h" />
     <ClInclude Include="LedTexture.h" />
-    <ClInclude Include="SampleGen.h" />
+    <ClInclude Include="LevelInit.h" />
     <ClInclude Include="SDL_Application.h" />
     <ClInclude Include="SDL_Helper.h" />
     <ClInclude Include="SDL_SoundSample.h" />

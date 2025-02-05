@@ -48,9 +48,6 @@
     <ClCompile Include="LedAnimation.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="SampleGen.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
     <ClCompile Include="Tiles.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
@@ -76,6 +73,9 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="SpawnedItem.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="LevelInit.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
@@ -113,9 +113,6 @@
     <ClInclude Include="LedAnimation.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="SampleGen.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
     <ClInclude Include="Tiles.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
@@ -144,6 +141,9 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="GameConst.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="LevelInit.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>

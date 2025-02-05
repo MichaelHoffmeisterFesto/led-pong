@@ -33,8 +33,6 @@ using namespace std;
 
 #include "CQueueDynGeneric.h"
 
-#include "SampleGen.h"
-
 #include "Tiles.h"
 #include "TileMap.h"
 
@@ -45,11 +43,13 @@ using namespace std;
 enum GameKeyEnum { 
 	KEY_P1_LEFT, KEY_P1_RIGHT, KEY_P1_UP, KEY_P1_DOWN, 
 	KEY_P2_LEFT, KEY_P2_RIGHT, KEY_P2_UP, KEY_P2_DOWN, 
+	KEY_DEBUG,
 	KEY_MAX_NUM 
 };
 
 enum GameSoundSampleEnum {
-	None, EmptyTile, EnergyPill, TurnToGhosts, TurnFromGhosts, Fruit, PacManDead, GhostDead, SOUND_SAMPLE_MAX_NUM
+	None, EmptyTile, EnergyPill, TurnToGhosts, TurnFromGhosts, 
+	Fruit, PacManDead, GhostDead, LevelWin, SOUND_SAMPLE_MAX_NUM
 };
 
 
