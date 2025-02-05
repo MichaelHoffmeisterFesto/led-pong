@@ -310,6 +310,7 @@ void Game::Loop()
 
 		LevelCurr->DrawMap(Run, Screen, Vec2(0, 0), TrFs, 5, 5);
 
+		// blink player
 		for (int pni = 0; pni < std::max(1, std::min(2, Run.NumPlayer)); pni++)
 		{
 			char xx[] = { Players[pni]->GetDeadPlayerAvatar(Run.SpecialAnimPhase), '\0'};
@@ -319,21 +320,22 @@ void Game::Loop()
 			);
 		}
 
+		// animate ghosts (if directional vector is not 0/0)
 		for (int gni = 0; gni < std::max(1, std::min(4, Run.NumGhost)); gni++)
 		{
 			char xx[] = { Ghosts[gni]->GetGhostAvatarChar(Run, Ghosts[gni]->CurrentDirection), '\0'};
 			Vec2 xy = Run.SpecialAnimGhostDelta[gni] * (5.0 * Run.SpecialAnimPhase);
-			printf("%d %d\n", xy.X, xy.Y);
 			TrFs.DrawTextTo(
 				Screen, Ghosts[gni]->GetCurrentPixelPos(Vec2(5, 5)) + xy,
 				xx
 			);
 		}
 
+		// count down animation phase
 		Run.SpecialAnimPhase += Run.SpecialAnimStep;
-
 		Run.CountdownPacOrGhostDead--;
 
+		// at the end
 		if (Run.CountdownPacOrGhostDead == 0)
 		{
 			if (Run.SpecialResetOnlyGhost >= 0)
