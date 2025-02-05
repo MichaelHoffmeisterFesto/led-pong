@@ -174,6 +174,9 @@ void Game::LoadLevel(int tileMapIndex, int levelNo)
 
 Game::~Game()
 {
+	if (LevelCurr != nullptr)
+		delete LevelCurr;
+	
 	for (int i = 0; i < LevelNum; i++)
 		delete Levels[i];
 }
@@ -395,9 +398,6 @@ void Game::Loop()
 
 					// no automatic move anymore
 					alreadyMoved = true;
-
-					// allow open mouth
-					openMouthTime = 6;
 
 					// no more direction
 					break;

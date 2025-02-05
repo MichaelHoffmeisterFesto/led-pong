@@ -118,7 +118,6 @@ public:
 
 	// state
 	GameRun Run;
-	int openMouthTime = 0;
 	bool showDebug = false;
 };
 
