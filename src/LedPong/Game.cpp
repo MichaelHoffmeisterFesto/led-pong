@@ -320,9 +320,20 @@ void Game::Loop()
 		int ghostDead = -1;
 		bool advanceNextLevel = false;
 
-		// debug key pressed
+		// keys pressed for some options
 		if (GameKey[KEY_DEBUG] && !WasGameKey[KEY_DEBUG])
 			advanceNextLevel = true;
+
+		if (GameKey[KEY_MUTE] && !WasGameKey[KEY_MUTE])
+			Run.Mute = !Run.Mute;
+
+		if (GameKey[KEY_GOD_MODE] && !WasGameKey[KEY_GOD_MODE])
+		{
+			Run.GodMode = !Run.GodMode;
+			sprintf_s(buffer, "GOD %01d", Run.GodMode);
+			Run.SetMessage(buffer);
+			SoundSampleToPlay = GameSoundSampleEnum::SMP_Fruit;
+		}
 
 		//
 		// Player 1/2
@@ -452,7 +463,8 @@ void Game::Loop()
 				// check if ran into ghost
 				for (int gni = 0; gni < std::max(1, std::min(4, Run.NumGhost)); gni++)
 					if (Ghosts[gni] != nullptr
-						&& Ghosts[gni]->CurrentTilePosition == pptr->CurrentTilePosition)
+						&& Ghosts[gni]->CurrentTilePosition == pptr->CurrentTilePosition
+						&& !Run.GodMode)
 					{
 						if (Run.GhostsMode == GhostMode::Freightened || Run.GhostsMode == GhostMode::SuperFreightened)
 						{
@@ -628,7 +640,8 @@ void Game::Loop()
 					// check new position
 					Player* foundPlayer = nullptr;
 					for (int pni = 0; pni < std::max(1, std::min(2, Run.NumPlayer)); pni++)
-						if (Players[pni]->CurrentTilePosition == gptr->CurrentTilePosition)
+						if (Players[pni]->CurrentTilePosition == gptr->CurrentTilePosition
+							&& !Run.GodMode)
 						{
 							if (Run.GhostsMode == GhostMode::Freightened || Run.GhostsMode == GhostMode::SuperFreightened)
 							{

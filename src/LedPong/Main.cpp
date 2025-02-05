@@ -70,20 +70,18 @@ const SDL_Color COLOR_white = { 255, 255, 255 };
 SDL_Scancode SdlScanToMap[] = { 
 	SDL_SCANCODE_LEFT, SDL_SCANCODE_RIGHT, SDL_SCANCODE_UP, SDL_SCANCODE_DOWN, 
 	SDL_SCANCODE_A, SDL_SCANCODE_D, SDL_SCANCODE_W, SDL_SCANCODE_S,
-	SDL_SCANCODE_F10
+	SDL_SCANCODE_F10, SDL_SCANCODE_M, SDL_SCANCODE_G
 };
 
 GameKeyEnum GameKeyToMap[] = { 
 	KEY_P1_LEFT, KEY_P1_RIGHT, KEY_P1_UP, KEY_P1_DOWN,
 	KEY_P2_LEFT, KEY_P2_RIGHT, KEY_P2_UP, KEY_P2_DOWN,
-	KEY_DEBUG
+	KEY_DEBUG, KEY_MUTE, KEY_GOD_MODE
 };
 
 // sound samples
 
 SDL_SoundSample* SoundSamples[GameSoundSampleEnum::SMP_MAX_NUM] = { nullptr };
-
-bool SoundOn = true;
 
 void LoadSoundSamples()
 {
@@ -153,11 +151,6 @@ bool loop() {
 		if (e.type == SDL_QUIT)
 			return false;
 
-		if (e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_M)
-		{
-			SoundOn = !SoundOn;
-		}
-
 		if (e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_E)
 		{
 		}
@@ -180,7 +173,7 @@ bool loop() {
 
 	TheGame.Loop();
 
-	if (SoundOn) 
+	if (!TheGame.Run.Mute) 
 		PlaySoundSample(TheGame.SoundSampleToPlay);
 	TheGame.SoundSampleToPlay = GameSoundSampleEnum::SMP_None;
 
@@ -264,7 +257,9 @@ int main(int argc, char** args)
 	for (int i = 1; i < argc; i++)
 	{
 		if (strcmp(args[i], "-mute") == 0)
-			SoundOn = !SoundOn;
+			TheGame.Run.Mute = !TheGame.Run.Mute;
+		if (strcmp(args[i], "-god") == 0)
+			TheGame.Run.GodMode = !TheGame.Run.GodMode;
 	}
 
 	// main loop

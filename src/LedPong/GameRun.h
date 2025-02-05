@@ -17,7 +17,7 @@ enum GhostMode {
 };
 
 // This class holds a (volatile) state of a single run of a
-// level / game.
+// level / game. It encompasses also the game options.
 class GameRun
 {
 public:
@@ -126,4 +126,10 @@ public:
 
 	// Number of ghosts (typically 4)
 	int NumGhost = 4;
+
+	// Sound turned on or off
+	bool Mute = true;
+
+	// immortal
+	bool GodMode = false;
 };
