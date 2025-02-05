@@ -260,6 +260,8 @@ int main(int argc, char** args)
 			TheGame.Run.Mute = !TheGame.Run.Mute;
 		if (strcmp(args[i], "-god") == 0)
 			TheGame.Run.GodMode = !TheGame.Run.GodMode;
+		if (strcmp(args[i], "-debug") == 0)
+			TheGame.Run.AllowDebug = !TheGame.Run.AllowDebug;
 	}
 
 	// main loop

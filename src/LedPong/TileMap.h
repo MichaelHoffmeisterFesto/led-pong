@@ -105,6 +105,9 @@ public:
 		return res;
 	}
 
+	// Counts all tiles which are of a special code
+	int CountTileCode(char code);
+
 	// Find a position, which is occupated by an energy pill and nothing else.
 	Vec2 FindRandomFreeEnergyPillPosition();
 

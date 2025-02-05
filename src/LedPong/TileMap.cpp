@@ -289,6 +289,19 @@ bool TileMap::FindPossibleMoveInDir(Actor* actor, Vec2 checkPos, Vec2 dir, Possi
 	return res;
 }
 
+int TileMap::CountTileCode(char code)
+{
+	int res = 0;for (int y = 0; y < mHeight; y++)
+		for (int x = 0; x < mWidth; x++)
+		{
+			// find
+			Tile* tile = GetAsTile(x, y);
+			if (tile != nullptr && tile->mTileCode == code)
+				res++;
+		}
+	return res;
+}
+
 Vec2 TileMap::FindRandomFreeEnergyPillPosition()
 {
 	// this is a job done in two passes over the free energy pills

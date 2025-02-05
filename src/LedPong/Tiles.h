@@ -34,9 +34,14 @@ public:
 
 	virtual inline bool IsFruit() { return mTileCode == 'c' || mTileCode == 'e' || mTileCode == 'g'; }
 
-	virtual inline bool IsEnergizer(GameRun& run) { 
+	virtual inline bool IsEnergizerAnyway(GameRun& run) {
+		return mTileCode == '*';
+	}
+
+	virtual inline bool IsEnergizerActive(GameRun& run) { 
 		return mTileCode == '*' && (run.FrameCounter % 300) < 90; 
 	}
+
 	virtual inline bool IsEmptyPill() { return mTileCode == ' '; }
 
 	virtual inline bool IsMoveablePosition() { 
@@ -51,7 +56,7 @@ public:
 
 	virtual inline char GetTileAvatarChar(GameRun& run) { 
 		if (mTileCode == '*')
-			return IsEnergizer(run) ? '*' : '.';
+			return IsEnergizerActive(run) ? '*' : '.';
 		return mTileCode; 
 	}
 	

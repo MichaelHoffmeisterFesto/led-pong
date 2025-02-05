@@ -71,6 +71,10 @@ Game::Game()
 	// load level
 	LoadLevel(0, 1);
 
+	// indicate
+	Run.SetMessage("LEV01");
+	SoundSampleToPlay = GameSoundSampleEnum::SMP_LevelWin;
+
 	// start with welcome
 	AddWelcomeAnimations();
 }	
@@ -321,18 +325,21 @@ void Game::Loop()
 		bool advanceNextLevel = false;
 
 		// keys pressed for some options
-		if (GameKey[KEY_DEBUG] && !WasGameKey[KEY_DEBUG])
-			advanceNextLevel = true;
-
 		if (GameKey[KEY_MUTE] && !WasGameKey[KEY_MUTE])
 			Run.Mute = !Run.Mute;
 
-		if (GameKey[KEY_GOD_MODE] && !WasGameKey[KEY_GOD_MODE])
+		if (Run.AllowDebug)
 		{
-			Run.GodMode = !Run.GodMode;
-			sprintf_s(buffer, "GOD %01d", Run.GodMode);
-			Run.SetMessage(buffer);
-			SoundSampleToPlay = GameSoundSampleEnum::SMP_Fruit;
+			if (GameKey[KEY_DEBUG] && !WasGameKey[KEY_DEBUG])
+				advanceNextLevel = true;
+
+			if (GameKey[KEY_GOD_MODE] && !WasGameKey[KEY_GOD_MODE])
+			{
+				Run.GodMode = !Run.GodMode;
+				sprintf_s(buffer, "GOD %01d", Run.GodMode);
+				Run.SetMessage(buffer);
+				SoundSampleToPlay = GameSoundSampleEnum::SMP_Fruit;
+			}
 		}
 
 		//
@@ -420,17 +427,45 @@ void Game::Loop()
 					if (ct->IsEatablePosition())
 					{
 						// now differentiate
-						if (ct->IsEnergizer(Run) /* debug fright mode: || pptr->Score == 3 */)
+						if (ct->IsEnergizerAnyway(Run) /* debug fright mode: || pptr->Score == 3 */)
 						{
-							// a little achievement
-							pptr->Score += 50;
+							// is actively on?
+							if (ct->IsEnergizerActive(Run))
+							{
+								// a little achievement
+								pptr->Score += 50;
 
-							// turn to ghosts!
-							// TODO!
-							SoundSampleToPlay = GameSoundSampleEnum::SMP_TurnToGhosts;
-							// see: https://pacman.holenet.info/#LvlSpecs
-							Run.FrightenedCounter = std::max(2, (7 - Run.LevelNo)) * GAME_FrameRate;
-							Run.SetMessage("SCARE");
+								// turn to ghosts!
+								// TODO!
+								SoundSampleToPlay = GameSoundSampleEnum::SMP_TurnToGhosts;
+								// see: https://pacman.holenet.info/#LvlSpecs
+								Run.FrightenedCounter = std::max(2, (7 - Run.LevelNo)) * GAME_FrameRate;
+								Run.SetMessage("SCARE");
+							}
+							else
+							{
+								// not on, only 'normal' pill
+								pptr->Score += 1;
+								SoundSampleToPlay = GameSoundSampleEnum::SMP_EnergyPill;
+							}
+
+							// Extension to original Pac Man: refresh energizers?
+							char etc = ct->mTileCode;
+							ct->mTileCode = ' ';
+							// Note: instead of doing book-keeping, count directly; the performance loss
+							// is not that often.
+							int remain = LevelCurr->CountTileCode(etc);
+							if (remain < 1)
+							{
+								// add for more new energizers on remaining tiles
+								for (int i = 0; i < 4; i++)
+								{
+									Vec2 pos = LevelCurr->FindRandomFreeEnergyPillPosition();
+									Tile* tp = LevelCurr->GetAsTile(pos);
+									if (pos.IsValid && tp != nullptr)
+										tp->mTileCode = etc;
+								}
+							}
 						}
 						else if (ct->IsFruit())
 						{
@@ -747,14 +782,15 @@ void Game::Loop()
 
 		if (advanceNextLevel)
 		{
-			// Indicate
-			Run.SetMessage("W I N");
-			SoundSampleToPlay = GameSoundSampleEnum::SMP_LevelWin;
-
 			// Start new level
 			Run.LevelNo++;
 			int tileMapNdx = (Run.LevelNo + 0) % 2;
 			LoadLevel(tileMapNdx, Run.LevelNo);
+
+			// Indicate
+			sprintf_s(buffer, "LEV%02d", Run.LevelNo);
+			Run.SetMessage(buffer);
+			SoundSampleToPlay = GameSoundSampleEnum::SMP_LevelWin;
 		}
 
 		// allow slope detection of keys

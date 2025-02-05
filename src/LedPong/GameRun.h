@@ -128,8 +128,11 @@ public:
 	int NumGhost = 4;
 
 	// Sound turned on or off
-	bool Mute = true;
+	bool Mute = false;
 
 	// immortal
 	bool GodMode = false;
+
+	// Allow debug and god mode?
+	bool AllowDebug = false;
 };
