@@ -292,7 +292,7 @@ void Game::Loop()
 		if (Run.FrightenedCounter == 2)
 		{
 			Run.SetMessage("CHASE");
-			SoundSampleToPlay = GameSoundSampleEnum::TurnFromGhosts;
+			SoundSampleToPlay = GameSoundSampleEnum::SMP_TurnFromGhosts;
 			Run.CountDownToScatter = 10 * GAME_FrameRate;
 		}
 
@@ -300,7 +300,7 @@ void Game::Loop()
 		{
 			Run.GhostsMode = GhostMode::Chase;
 			Run.SetMessage("CHASE");
-			SoundSampleToPlay = GameSoundSampleEnum::TurnFromGhosts;
+			SoundSampleToPlay = GameSoundSampleEnum::SMP_TurnFromGhosts;
 			Run.CountDownToScatter = 20 * GAME_FrameRate;
 		}
 
@@ -308,7 +308,7 @@ void Game::Loop()
 		{
 			Run.GhostsMode = GhostMode::Scatter;
 			Run.SetMessage("SCATR");
-			SoundSampleToPlay = GameSoundSampleEnum::TurnFromGhosts;
+			SoundSampleToPlay = GameSoundSampleEnum::SMP_TurnFromGhosts;
 			Run.CountDownToChase = 5 * GAME_FrameRate;
 		}
 
@@ -319,6 +319,10 @@ void Game::Loop()
 		int playerDead = -1;
 		int ghostDead = -1;
 		bool advanceNextLevel = false;
+
+		// debug key pressed
+		if (GameKey[KEY_DEBUG] && !WasGameKey[KEY_DEBUG])
+			advanceNextLevel = true;
 
 		//
 		// Player 1/2
@@ -412,7 +416,7 @@ void Game::Loop()
 
 							// turn to ghosts!
 							// TODO!
-							SoundSampleToPlay = GameSoundSampleEnum::TurnToGhosts;
+							SoundSampleToPlay = GameSoundSampleEnum::SMP_TurnToGhosts;
 							// see: https://pacman.holenet.info/#LvlSpecs
 							Run.FrightenedCounter = std::max(2, (7 - Run.LevelNo)) * GAME_FrameRate;
 							Run.SetMessage("SCARE");
@@ -420,13 +424,13 @@ void Game::Loop()
 						else if (ct->IsFruit())
 						{
 							pptr->Score += 100;
-							SoundSampleToPlay = GameSoundSampleEnum::Fruit;
+							SoundSampleToPlay = GameSoundSampleEnum::SMP_Fruit;
 							Run.SetMessage("100UP");
 						}
 						else if (ct->IsEnergyPill())
 						{
 							pptr->Score += 1;
-							SoundSampleToPlay = GameSoundSampleEnum::EnergyPill;
+							SoundSampleToPlay = GameSoundSampleEnum::SMP_EnergyPill;
 						}
 
 						// pill consumed in any case
@@ -441,7 +445,7 @@ void Game::Loop()
 					{
 						// empty place
 						// release a (smaller) sound
-						SoundSampleToPlay = GameSoundSampleEnum::EmptyTile;
+						SoundSampleToPlay = GameSoundSampleEnum::SMP_EmptyTile;
 					}
 				}
 
@@ -709,7 +713,7 @@ void Game::Loop()
 					Run.SpecialAnimGhostDelta[i] = LevelCurr->GhostStartPos[i] - Ghosts[i]->CurrentTilePosition;
 
 				Run.SetMessage("DEAD");
-				SoundSampleToPlay = GameSoundSampleEnum::PacManDead;
+				SoundSampleToPlay = GameSoundSampleEnum::SMP_PacManDead;
 			}
 		}
 
@@ -725,14 +729,23 @@ void Game::Loop()
 				: LevelCurr->GhostStartPos[i] - Ghosts[i]->CurrentTilePosition;
 
 			Run.SetMessage("BUUUH");
-			SoundSampleToPlay = GameSoundSampleEnum::GhostDead;
+			SoundSampleToPlay = GameSoundSampleEnum::SMP_GhostDead;
 		}
 
 		if (advanceNextLevel)
 		{
+			// Indicate
 			Run.SetMessage("W I N");
-			SoundSampleToPlay = GameSoundSampleEnum::GhostDead;
+			SoundSampleToPlay = GameSoundSampleEnum::SMP_LevelWin;
+
+			// Start new level
+			Run.LevelNo++;
+			int tileMapNdx = (Run.LevelNo + 0) % 2;
+			LoadLevel(tileMapNdx, Run.LevelNo);
 		}
+
+		// allow slope detection of keys
+		memcpy_s(WasGameKey, sizeof(WasGameKey), GameKey, sizeof(GameKey));
 	}
 
 }

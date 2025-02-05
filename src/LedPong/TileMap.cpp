@@ -44,7 +44,8 @@ TileMap::TileMap(int width, int height, TileBase** source, bool doCopy)
 	{
 		int num = mWidth * mHeight;
 		mTiles = new TileBase*[num];
-		std::copy_n(source, num, mTiles);
+		for (int i = 0; i < num; i++)
+			mTiles[i] = source[i]->Clone();
 	}
 }
 

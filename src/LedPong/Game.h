@@ -48,10 +48,9 @@ enum GameKeyEnum {
 };
 
 enum GameSoundSampleEnum {
-	None, EmptyTile, EnergyPill, TurnToGhosts, TurnFromGhosts, 
-	Fruit, PacManDead, GhostDead, LevelWin, SOUND_SAMPLE_MAX_NUM
+	SMP_None, SMP_EmptyTile, SMP_EnergyPill, SMP_TurnToGhosts, SMP_TurnFromGhosts, 
+	SMP_Fruit, SMP_PacManDead, SMP_GhostDead, SMP_LevelWin, SMP_MAX_NUM
 };
-
 
 // This class is the master / root class for the game application.
 // It holds the overall status and all important ressources
@@ -72,8 +71,11 @@ public:
 	void Loop();
 
 public:
-	// input keys
+	// actual input keys .. set by the main function
 	bool GameKey[KEY_MAX_NUM] = { false } ;
+
+	// old / delayed by one cycle .. values of the keys
+	bool WasGameKey[KEY_MAX_NUM] = { false };
 
 	// ressources
 	LedTexture PageBallons;
@@ -107,7 +109,7 @@ public:
 	Ghost* Ghosts[4] = { &blinky, &pinky, &inky, &clyde };
 
 	// Sound sample played by main application at end of the loop cycle.
-	GameSoundSampleEnum SoundSampleToPlay = GameSoundSampleEnum::None;
+	GameSoundSampleEnum SoundSampleToPlay = GameSoundSampleEnum::SMP_None;
 
 	// monitored items
 

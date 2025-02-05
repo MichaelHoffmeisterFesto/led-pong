@@ -70,7 +70,7 @@ const SDL_Color COLOR_white = { 255, 255, 255 };
 SDL_Scancode SdlScanToMap[] = { 
 	SDL_SCANCODE_LEFT, SDL_SCANCODE_RIGHT, SDL_SCANCODE_UP, SDL_SCANCODE_DOWN, 
 	SDL_SCANCODE_A, SDL_SCANCODE_D, SDL_SCANCODE_W, SDL_SCANCODE_S,
-	SDL_SCANCODE_F12
+	SDL_SCANCODE_F10
 };
 
 GameKeyEnum GameKeyToMap[] = { 
@@ -81,19 +81,20 @@ GameKeyEnum GameKeyToMap[] = {
 
 // sound samples
 
-SDL_SoundSample* SoundSamples[GameSoundSampleEnum::SOUND_SAMPLE_MAX_NUM] = { nullptr };
+SDL_SoundSample* SoundSamples[GameSoundSampleEnum::SMP_MAX_NUM] = { nullptr };
 
 bool SoundOn = true;
 
 void LoadSoundSamples()
 {
-	SoundSamples[GameSoundSampleEnum::EmptyTile] = new SDL_SoundSample("media/pop-268648-shortened-fade-out.wav", MIX_MAX_VOLUME / 4);
-	SoundSamples[GameSoundSampleEnum::EnergyPill] = new SDL_SoundSample("media/arcade-fx-288597_shorted_fade_out.wav", MIX_MAX_VOLUME / 2);
-	SoundSamples[GameSoundSampleEnum::TurnToGhosts] = new SDL_SoundSample("media/arcade-arped-145549-shortened.wav", MIX_MAX_VOLUME);
-	SoundSamples[GameSoundSampleEnum::TurnFromGhosts] = new SDL_SoundSample("media/arcade-ui-18-229517-shortened.wav", MIX_MAX_VOLUME);
-	SoundSamples[GameSoundSampleEnum::Fruit] = new SDL_SoundSample("media/arcade-ui-28-229497-shortened.wav", MIX_MAX_VOLUME);
-	SoundSamples[GameSoundSampleEnum::PacManDead] = new SDL_SoundSample("media/arcade-ui-26-229495-shortened.wav", MIX_MAX_VOLUME);
-	SoundSamples[GameSoundSampleEnum::GhostDead] = new SDL_SoundSample("media/arcade-ui-1-229498-shortened.wav", MIX_MAX_VOLUME);
+	SoundSamples[GameSoundSampleEnum::SMP_EmptyTile] = new SDL_SoundSample("media/pop-268648-shortened-fade-out.wav", MIX_MAX_VOLUME / 4);
+	SoundSamples[GameSoundSampleEnum::SMP_EnergyPill] = new SDL_SoundSample("media/arcade-fx-288597_shorted_fade_out.wav", MIX_MAX_VOLUME / 2);
+	SoundSamples[GameSoundSampleEnum::SMP_TurnToGhosts] = new SDL_SoundSample("media/arcade-arped-145549-shortened.wav", MIX_MAX_VOLUME);
+	SoundSamples[GameSoundSampleEnum::SMP_TurnFromGhosts] = new SDL_SoundSample("media/arcade-ui-18-229517-shortened.wav", MIX_MAX_VOLUME);
+	SoundSamples[GameSoundSampleEnum::SMP_Fruit] = new SDL_SoundSample("media/arcade-ui-28-229497-shortened.wav", MIX_MAX_VOLUME);
+	SoundSamples[GameSoundSampleEnum::SMP_PacManDead] = new SDL_SoundSample("media/arcade-ui-26-229495-shortened.wav", MIX_MAX_VOLUME);
+	SoundSamples[GameSoundSampleEnum::SMP_GhostDead] = new SDL_SoundSample("media/arcade-ui-1-229498-shortened.wav", MIX_MAX_VOLUME);
+	SoundSamples[GameSoundSampleEnum::SMP_LevelWin] = new SDL_SoundSample("media/arcade-ui-11-229509-shortened.wav", MIX_MAX_VOLUME);
 }
 
 void PlaySoundSample(GameSoundSampleEnum ss)
@@ -104,7 +105,7 @@ void PlaySoundSample(GameSoundSampleEnum ss)
 
 void DeleteSoundSamples()
 {
-	for (int i = 0; i < GameSoundSampleEnum::SOUND_SAMPLE_MAX_NUM; i++)
+	for (int i = 0; i < GameSoundSampleEnum::SMP_MAX_NUM; i++)
 		if (SoundSamples[i] != nullptr)
 			delete SoundSamples[i];
 }
@@ -181,7 +182,7 @@ bool loop() {
 
 	if (SoundOn) 
 		PlaySoundSample(TheGame.SoundSampleToPlay);
-	TheGame.SoundSampleToPlay = GameSoundSampleEnum::None;
+	TheGame.SoundSampleToPlay = GameSoundSampleEnum::SMP_None;
 
 	//
 	// Display
