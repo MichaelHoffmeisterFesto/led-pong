@@ -1,0 +1,206 @@
+@startuml
+
+skinparam linetype polyline
+
+class Main {
+    + main()
+}
+
+class GameEnvironment {
+	+Screen : LedTexture
+	+TrFs : TextRendererFixedSize
+	+TrPt : TextRendererProportionalText
+	+AllowDebug : bool
+	+GodMode : bool
+	+Mute : bool
+	+GameKey : bool[]
+	+WasGameKey : bool[]
+	+FrameCounter : int
+}
+
+' Main --> "use" GameEnvironment
+
+class GameBase {
+	+GameBase(GameEnvironment* env)
+	+Env : GameEnvironment*
+	+Loop() : void
+}
+
+Main --> "use" GameBase
+
+GameBase -right-> "use" GameEnvironment
+
+enum GhostMode {
+	Chase
+	Freightened
+	Scatter
+	SuperFreightened
+}
+
+class GameRun {
+	+GhostsMode : GhostMode
+	+LevelNo : int
+	+NumGhost : int
+	+NumPlayer : int
+	+PillsAvailable : int
+}
+
+GameRun --> GhostMode
+
+class LevelInit {
+	+InitPresetLevels()
+}
+
+class PacManGame {
+	+Run : GameRun
+	+Ghosts : Ghost*[]
+	+Players : Player*[]
+	+LevelCurr : TileMap*
+	+Levels : TileMap*[]
+	+Loop() : void
+}
+
+PacManGame --> "use" LevelInit
+
+PacManGame --> "use" GameRun
+
+PacManGame --> "use" Ghost
+
+PacManGame --> "use" Player
+
+PacManGame -up-|> GameBase
+
+class IntroGame {
+	+PageBallons : LedTexture
+	+PageFunnyCar : LedTexture
+	+PageInfo2 : LedTexture
+	+Loop() : void
+}
+
+IntroGame -up-|> GameBase
+
+IntroGame --> LedTexture
+
+class MenuGame {
+}
+
+MenuGame -up-|> GameBase
+
+class Vec2 {
+	+operator+() : Vec2
+	+operator-() : Vec2
+	+operator*() : Vec2
+	+IsValid : bool
+	+operator!=() : bool
+	+operator!=() : bool
+	+operator==() : bool
+	+Length() : double
+	+X : int
+	+X : int
+	+X : int
+}
+
+class Actor {
+	+CurrentDirection : Vec2
+	+CurrentTilePosition : Vec2
+}
+
+Actor -up-> "use" Vec2
+
+abstract class Ghost {
+	+HomeZone : Vec2
+	+GetCurrentTargetPos() : Vec2
+}
+
+Ghost -up-|> Actor
+
+class Blinky {
+	+GetCurrentTargetPos()
+}
+
+class Pinky {
+	+GetCurrentTargetPos()
+}
+
+class Inky {
+	+GetCurrentTargetPos()
+}
+
+class Clyde {
+	+GetCurrentTargetPos()
+}
+
+Blinky -up-|> Ghost
+Pinky --up--|> Ghost
+Inky -up-|> Ghost
+Clyde --up--|> Ghost
+
+class Player {
+	+Player()
+	+Player(Player& other)
+	+Lives : int
+	+Score : int
+}
+
+Player -up-|> Actor
+
+class TileMap {
+	+Get(int x, int y) : TileBase*
+	+GetAsTile(Vec2 pos) : Tile*
+	+GateToBottom : Vec2
+	+GateToLeft : Vec2
+	+GateToRight : Vec2
+	+GateToTop : Vec2
+	+MessagePos : Vec2
+	+GhostHomeZone : Vec2[]
+	+GhostStartPos : Vec2[]
+	+PlayerStartPos : Vec2[]
+	+PlayerTextExtraPos : Vec2[]
+	+PlayerTextScorePos : Vec2[]
+	+GetHeight() : int
+	+GetWidth() : int
+	+PillsTotal : int
+	-mTiles : TileBase**
+	-mHeight : int
+	-mWidth : int
+}
+
+' TileMap -up-> "use" Vec2
+
+PacManGame --> "use" TileMap
+
+class TileBase {
+}
+
+class Tile {
+	+mTileCode : char
+}
+
+Tile -up-|> TileBase
+
+TileMap --> "use" TileBase
+
+class LedColor {
+	+B : uint8_t
+	+G : uint8_t
+	+R : uint8_t
+}
+
+class LedTexture {
+	+LedTexture(width, height)
+	+LedTexture(fn)
+	-mPixels : LedColor*
+	-mHeight : int
+	-mWidth : int
+}
+
+LedTexture --> "use" LedColor
+
+GameEnvironment --> "use" LedTexture
+
+legend right
+  Note: For giving an overview, only selected classes and members are shown.
+  Argument-lists are shortened or skipped.
+endlegend
+
+@enduml

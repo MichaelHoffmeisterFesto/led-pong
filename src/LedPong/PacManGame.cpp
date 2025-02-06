@@ -1,70 +1,11 @@
-#include "Game.h"
+#include "GameBase.h"
+#include "PacManGame.h"
 
 #include <float.h> // for DBL_MAX ..
 #include "LevelInit.h"
 
-Game::Game()
+PacManGame::PacManGame(GameEnvironment* env) : GameBase(env)
 {
-	// Ressources
-	PageBallons = LedTexture("media/ballons.bmp");
-	PageFunnyCar = LedTexture("media/ai_funny_car.bmp");
-	PageInfo2 = LedTexture("media/HKA_Info2.bmp");
-
-	// screen
-	Screen = LedTexture(WALL_Xdim, WALL_Ydim);
-
-	// renderers
-	TrFs = TextRendererFixedSize(
-		"media/pacman-kacheln5x5.bmp", 5, 1,
-		"QWERTZUIABCD.-|HJKLtb=lr#jhokasdf uvwx*ceg$§");
-
-	ProportionalTextGlyph glyphs[] = {
-		{ 'A', 0, 5 },
-		{ 'B', 6, 5 },
-		{ 'C', 12, 5 },
-		{ 'D', 18, 5 },
-		{ 'E', 24, 5 },
-		{ 'F', 30, 5 },
-		{ 'G', 36, 5 },
-		{ 'H', 42, 5 },
-		{ 'I', 48, 5 },
-		{ 'J', 54, 4 },
-		{ 'K', 59, 4 },
-		{ 'L', 64, 4 },
-		{ 'M', 69, 5 },
-		{ 'N', 75, 5 },
-		{ 'O', 81, 5 },
-		{ 'P', 87, 5 },
-		{ 'Q', 93, 5 },
-		{ 'R', 99, 5 },
-		{ 'S', 105, 5 },
-		{ 'T', 111, 5 },
-		{ 'U', 117, 5 },
-		{ 'V', 123, 5 },
-		{ 'W', 129, 5 },
-		{ 'X', 135, 5 },
-		{ 'Y', 141, 5 },
-		{ 'Z', 147, 5 },
-		{ '0', 153, 4 },
-		{ '1', 158, 4 },
-		{ '2', 163, 4 },
-		{ '3', 168, 4 },
-		{ '4', 173, 4 },
-		{ '5', 178, 4 },
-		{ '6', 183, 4 },
-		{ '7', 188, 4 },
-		{ '8', 193, 4 },
-		{ '9', 198, 4 },
-		{ '-', 203, 3 },
-		{ '_', 207, 3 },
-		{ '.', 211, 3 },
-		{ ',', 214, 4 },
-		{ ' ', 218, 3 }
-	};
-
-	TrPt = TextRendererProportionalText("media/charset-prop-5x5.bmp", 
-		SIZE_OF_ARR(glyphs), glyphs);
-
 	// level presets (outsourced for clarity)
 	LevelInit::InitPresetLevels(LevelNum, Levels);
 
@@ -74,12 +15,9 @@ Game::Game()
 	// indicate
 	Run.SetMessage("LEV01");
 	SoundSampleToPlay = GameSoundSampleEnum::SMP_LevelWin;
-
-	// start with welcome
-	AddWelcomeAnimations();
 }	
 
-void Game::RestartLevel()
+void PacManGame::RestartLevel()
 {
 	// first the game is in scatter
 	Run.GhostsMode = GhostMode::Scatter;
@@ -99,7 +37,7 @@ void Game::RestartLevel()
 	}
 }
 
-void Game::LoadLevel(int tileMapIndex, int levelNo)
+void PacManGame::LoadLevel(int tileMapIndex, int levelNo)
 {
 	// remember
 	if (tileMapIndex >= 0 && tileMapIndex < LevelNum)
@@ -172,7 +110,7 @@ void Game::LoadLevel(int tileMapIndex, int levelNo)
 	RestartLevel();
 }
 
-Game::~Game()
+PacManGame::~PacManGame()
 {
 	if (LevelCurr != nullptr)
 		delete LevelCurr;
@@ -181,74 +119,25 @@ Game::~Game()
 		delete Levels[i];
 }
 
-void Game::AddWelcomeAnimations()
+void PacManGame::Loop()
 {
-	AnimationQueue.enqueue(LedAnimation(
-		PageInfo2, 1.0, LedTexture::GetRandomGradient(), LedTexture::GetRandomBlendEffect()));
+	// some book keeping for independent classes
+	Run.FrameCounter = Env->FrameCounter;
 
-	AnimationQueue.enqueue(LedAnimation(
-		PageFunnyCar, 1.0, LedTexture::GetRandomGradient(), LedTexture::GetRandomBlendEffect()));
-
-	AnimationQueue.enqueue(LedAnimation(
-		PageBallons, 2.0, LedTexture::GetRandomGradient(), LedTexture::GetRandomBlendEffect()));
-}
-
-void Game::Loop()
-{
-	if (false)
-	{
-		double step = 0.01;
-
-		auto ta = AnimationQueue.top();
-		if (false && ta != nullptr)
-		{
-			if (ta->mPhase == 0.0)
-			{
-				// start of animation
-				ta->mStartTexture = Screen.Clone();
-			}
-
-			if (ta->mPhase < 1.0)
-			{
-				// only step in animation
-				auto blend = Screen.Clone();
-				blend.FillGradient(ta->mGradient, ta->mPhase);
-				Screen.BlendFrom(ta->mStartTexture, ta->mTargetTexture, blend, ta->mBlendEffect);
-
-				// go (last) step further ..
-				ta->mPhase = std::min(1.0, ta->mPhase + ta->mSpeed * step);
-			}
-			else
-			{
-				// animation ended
-				Screen.BlitFrom(0, 0, ta->mTargetTexture);
-
-				// remove this animation
-				LedAnimation tmp;
-				AnimationQueue.dequeue(tmp);
-			}
-		}
-
-		// restart again?
-		if (false && AnimationQueue.GetLength() < 1)
-		{
-			AddWelcomeAnimations();
-		}
-	}
-	else if (Run.CountdownPacOrGhostDead > 0)
+	if (Run.CountdownPacOrGhostDead > 0)
 	{
 		//
 		// Dead Pac Man / Ghost
 		//
 
-		LevelCurr->DrawMap(Run, Screen, Vec2(0, 0), TrFs, 5, 5);
+		LevelCurr->DrawMap(Run, Env->Screen, Vec2(0, 0), Env->TrFs, 5, 5);
 
 		// blink player
 		for (int pni = 0; pni < std::max(1, std::min(2, Run.NumPlayer)); pni++)
 		{
 			char xx[] = { Players[pni]->GetDeadPlayerAvatar(Run.SpecialAnimPhase), '\0'};
-			TrFs.DrawTextTo(
-				Screen, Players[pni]->GetCurrentPixelPos(Vec2(5, 5)),
+			Env->TrFs.DrawTextTo(
+				Env->Screen, Players[pni]->GetCurrentPixelPos(Vec2(5, 5)),
 				xx
 			);
 		}
@@ -258,8 +147,8 @@ void Game::Loop()
 		{
 			char xx[] = { Ghosts[gni]->GetGhostAvatarChar(Run, Ghosts[gni]->CurrentDirection), '\0'};
 			Vec2 xy = Run.SpecialAnimGhostDelta[gni] * (5.0 * Run.SpecialAnimPhase);
-			TrFs.DrawTextTo(
-				Screen, Ghosts[gni]->GetCurrentPixelPos(Vec2(5, 5)) + xy,
+			Env->TrFs.DrawTextTo(
+				Env->Screen, Ghosts[gni]->GetCurrentPixelPos(Vec2(5, 5)) + xy,
 				xx
 			);
 		}
@@ -320,7 +209,7 @@ void Game::Loop()
 		}
 
 		// the basic map is drawn every frame!
-		LevelCurr->DrawMap(Run, Screen, Vec2(0, 0), TrFs, 5, 5);
+		LevelCurr->DrawMap(Run, Env->Screen, Vec2(0, 0), Env->TrFs, 5, 5);
 
 		// some events?
 		int playerDead = -1;
@@ -328,18 +217,15 @@ void Game::Loop()
 		bool advanceNextLevel = false;
 
 		// keys pressed for some options
-		if (GameKey[KEY_MUTE] && !WasGameKey[KEY_MUTE])
-			Run.Mute = !Run.Mute;
-
-		if (Run.AllowDebug)
+		if (Env->AllowDebug)
 		{
-			if (GameKey[KEY_DEBUG] && !WasGameKey[KEY_DEBUG])
+			if (Env->GameKey[KEY_DEBUG] && !Env->WasGameKey[KEY_DEBUG])
 				advanceNextLevel = true;
 
-			if (GameKey[KEY_GOD_MODE] && !WasGameKey[KEY_GOD_MODE])
+			if (Env->GameKey[KEY_GOD_MODE] && !Env->WasGameKey[KEY_GOD_MODE])
 			{
-				Run.GodMode = !Run.GodMode;
-				sprintf_s(buffer, "GOD %01d", Run.GodMode);
+				Env->GodMode = !Env->GodMode;
+				sprintf_s(buffer, "GOD %01d", Env->GodMode);
 				Run.SetMessage(buffer);
 				SoundSampleToPlay = GameSoundSampleEnum::SMP_Fruit;
 			}
@@ -356,8 +242,8 @@ void Game::Loop()
 
 			// draw player itself
 			char xx[] = { pptr->GetPlayerAvatarChar(Run, pptr->CurrentDirection), '\0' };
-			TrFs.DrawTextTo(
-				Screen, pptr->GetCurrentPixelPos(Vec2(5, 5)),
+			Env->TrFs.DrawTextTo(
+				Env->Screen, pptr->GetCurrentPixelPos(Vec2(5, 5)),
 				xx
 			);
 
@@ -380,7 +266,7 @@ void Game::Loop()
 				PossibleMove pm;
 				if (LevelCurr->FindPossibleMoveInDir(&Player1, pptr->CurrentTilePosition, tmpDirs[di], pm)
 					&& pptr->StandStill()
-					&& GameKey[tmpScans[di + 4*pni]])
+					&& Env->GameKey[tmpScans[di + 4*pni]])
 				{
 					// initiate new movement
 					if (pm.JumpMove)
@@ -499,7 +385,7 @@ void Game::Loop()
 				for (int gni = 0; gni < std::max(1, std::min(4, Run.NumGhost)); gni++)
 					if (Ghosts[gni] != nullptr
 						&& Ghosts[gni]->CurrentTilePosition == pptr->CurrentTilePosition
-						&& !Run.GodMode)
+						&& !Env->GodMode)
 					{
 						if (Run.GhostsMode == GhostMode::Freightened || Run.GhostsMode == GhostMode::SuperFreightened)
 						{
@@ -524,19 +410,19 @@ void Game::Loop()
 					else
 						sprintf_s(buffer, "K%03d", pptr->Score % 1000);
 				}
-				TrPt.DrawTextTo(Screen, LevelCurr->PlayerTextScorePos[pni] * 5, buffer, 1, 0);
+				Env->TrPt.DrawTextTo(Env->Screen, LevelCurr->PlayerTextScorePos[pni] * 5, buffer, 1, 0);
 			}
 
 			if (LevelCurr->PlayerTextExtraPos[pni].IsValid)
 			{
 				sprintf_s(buffer, "%1d", 1 + pni);
-				TrPt.DrawTextTo(Screen, LevelCurr->PlayerTextExtraPos[pni] * 5, buffer, 0, 0);
+				Env->TrPt.DrawTextTo(Env->Screen, LevelCurr->PlayerTextExtraPos[pni] * 5, buffer, 0, 0);
 
 				strcpy_s(buffer, "\0\0\0\0");
 				for (int i = 0; i < 3; i++)
 					if (i < pptr->Lives)
 						buffer[i] = 'W';
-				TrFs.DrawTextTo(Screen, LevelCurr->PlayerTextExtraPos[pni] * 5 + Vec2(5, 0), buffer, 0, 0);
+				Env->TrFs.DrawTextTo(Env->Screen, LevelCurr->PlayerTextExtraPos[pni] * 5 + Vec2(5, 0), buffer, 0, 0);
 			}
 		}
 	
@@ -559,8 +445,8 @@ void Game::Loop()
 
 			// draw ghost itself
 			char xx[] = { gptr->GetGhostAvatarChar(Run, gptr->CurrentDirection), '\0' };
-			TrFs.DrawTextTo(
-				Screen, gptr->GetCurrentPixelPos(Vec2(5, 5)),
+			Env->TrFs.DrawTextTo(
+				Env->Screen, gptr->GetCurrentPixelPos(Vec2(5, 5)),
 				xx
 			);
 
@@ -676,7 +562,7 @@ void Game::Loop()
 					Player* foundPlayer = nullptr;
 					for (int pni = 0; pni < std::max(1, std::min(2, Run.NumPlayer)); pni++)
 						if (Players[pni]->CurrentTilePosition == gptr->CurrentTilePosition
-							&& !Run.GodMode)
+							&& !Env->GodMode)
 						{
 							if (Run.GhostsMode == GhostMode::Freightened || Run.GhostsMode == GhostMode::SuperFreightened)
 							{
@@ -702,7 +588,7 @@ void Game::Loop()
 		if (Run.MsgLifeTime > 0 && LevelCurr->MessagePos.IsValid)
 		{
 			strcpy_s(buffer, Run.Message);
-			TrPt.DrawTextTo(Screen, LevelCurr->MessagePos * 5, buffer, 0, 0);
+			Env->TrPt.DrawTextTo(Env->Screen, LevelCurr->MessagePos * 5, buffer, 0, 0);
 		}
 
 		// monitor and remove spawned items
@@ -792,9 +678,6 @@ void Game::Loop()
 			Run.SetMessage(buffer);
 			SoundSampleToPlay = GameSoundSampleEnum::SMP_LevelWin;
 		}
-
-		// allow slope detection of keys
-		memcpy_s(WasGameKey, sizeof(WasGameKey), GameKey, sizeof(GameKey));
 	}
 
 }

@@ -8,8 +8,8 @@ LedAnimation::LedAnimation()
 
 LedAnimation::LedAnimation(LedTexture targetTexture, double speed,
 	LedGradient gradient, LedBlendEffect blendEffect)
+	: mTargetTexture(targetTexture)
 {
-	mTargetTexture = targetTexture;
 	mPhase = 0.0;
 	mSpeed = speed;
 	mGradient = gradient;

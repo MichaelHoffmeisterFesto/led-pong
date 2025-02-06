@@ -63,7 +63,7 @@
     <ClCompile Include="TilePos.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="Game.cpp">
+    <ClCompile Include="PacManGame.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="SDL_SoundSample.cpp">
@@ -76,6 +76,15 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="LevelInit.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="GameBase.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="GameEnvironment.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="IntroGame.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
@@ -128,7 +137,7 @@
     <ClInclude Include="VectorArith.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="Game.h">
+    <ClInclude Include="PacManGame.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="SDL_SoundSample.h">
@@ -144,6 +153,15 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="LevelInit.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="GameBase.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="GameEnvironment.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="IntroGame.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>

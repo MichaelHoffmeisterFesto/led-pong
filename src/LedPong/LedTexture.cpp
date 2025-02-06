@@ -14,6 +14,37 @@ LedTexture::LedTexture()
 	mPixels = nullptr;
 }
 
+LedTexture::~LedTexture()
+{
+	if (mPixels != nullptr)
+		delete[] mPixels;
+}
+
+LedTexture::LedTexture(const LedTexture& other)
+{
+	mWidth = other.mWidth;
+	mHeight = other.mHeight;
+
+	int num = mWidth * mHeight;
+	mPixels = new LedColor[num];
+	std::copy_n(other.mPixels, num, mPixels);
+}
+
+LedTexture& LedTexture::operator=(const LedTexture& other)
+{
+	this->mWidth = other.mWidth;
+	this->mHeight = other.mHeight;
+
+	if (mPixels != nullptr)
+		delete[] mPixels;
+
+	int num = mWidth * mHeight;
+	mPixels = new LedColor[num];
+	std::copy_n(other.mPixels, num, mPixels);
+
+	return *this;
+}
+
 // Constructor for definining an empty texture by explicit dimensions
 LedTexture::LedTexture(int width, int height)
 {
@@ -44,10 +75,9 @@ LedTexture::LedTexture(std::string fn)
 }
 
 // clone
-LedTexture& LedTexture::Clone()
+LedTexture* LedTexture::Clone()
 {
-	LedTexture res(mWidth, mHeight, mPixels, true);
-	return res;
+	return new LedTexture(mWidth, mHeight, mPixels, true);
 }
 
 // save
@@ -465,5 +495,5 @@ bool LedTexture::LoadBmpInternal(std::string fn)
 	}
 
 	// no?
-	return false;
+	return true;
 }

@@ -160,7 +160,10 @@
   <ItemGroup>
     <ClCompile Include="Actor.cpp" />
     <ClCompile Include="CQueueDynGeneric.cpp" />
-    <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GameEnvironment.cpp" />
+    <ClCompile Include="IntroGame.cpp" />
+    <ClCompile Include="PacManGame.cpp" />
+    <ClCompile Include="GameBase.cpp" />
     <ClCompile Include="GameRun.cpp" />
     <ClCompile Include="LedAnimation.cpp" />
     <ClCompile Include="LedColor.cpp" />
@@ -184,7 +187,10 @@
     <ClInclude Include="Actor.h" />
     <ClInclude Include="basic.h" />
     <ClInclude Include="CQueueDynGeneric.h" />
-    <ClInclude Include="Game.h" />
+    <ClInclude Include="GameEnvironment.h" />
+    <ClInclude Include="IntroGame.h" />
+    <ClInclude Include="PacManGame.h" />
+    <ClInclude Include="GameBase.h" />
     <ClInclude Include="GameConst.h" />
     <ClInclude Include="GameRun.h" />
     <ClInclude Include="LedAnimation.h" />

@@ -20,6 +20,7 @@ using namespace std;
 
 #include "VectorArith.h"
 
+#include "CQueueDynGeneric.h"
 #include "SpawnedItem.h"
 
 #include "LedColor.h"
@@ -29,38 +30,21 @@ using namespace std;
 #include "TextRendererFixedSize.h"
 #include "TextRendererProportionalText.h"
 
-#include "LedAnimation.h"
-
-#include "CQueueDynGeneric.h"
-
 #include "Tiles.h"
 #include "TileMap.h"
 
 #include "GameRun.h"
 #include "GameConst.h"
+#include "GameEnvironment.h"
+#include "GameBase.h"
 
-// enum for key input
-enum GameKeyEnum { 
-	KEY_P1_LEFT, KEY_P1_RIGHT, KEY_P1_UP, KEY_P1_DOWN, 
-	KEY_P2_LEFT, KEY_P2_RIGHT, KEY_P2_UP, KEY_P2_DOWN, 
-	KEY_DEBUG, KEY_MUTE, KEY_GOD_MODE,
-	KEY_MAX_NUM 
-};
-
-enum GameSoundSampleEnum {
-	SMP_None, SMP_EmptyTile, SMP_EnergyPill, SMP_TurnToGhosts, SMP_TurnFromGhosts, 
-	SMP_Fruit, SMP_PacManDead, SMP_GhostDead, SMP_LevelWin, SMP_MAX_NUM
-};
-
-// This class is the master / root class for the game application.
+// This class is root class for the pac man game application itself.
 // It holds the overall status and all important ressources
-class Game
+class PacManGame : public GameBase
 {
 public:
-	Game();
-	~Game();
-
-	void AddWelcomeAnimations();
+	PacManGame(GameEnvironment* env);
+	~PacManGame();
 
 	// Restarts ghost from initial pos, all modes reset, but level (pills, score, ..) untouched
 	void RestartLevel();
@@ -68,30 +52,10 @@ public:
 	// Load a new tilemap into the level, restart everything
 	void LoadLevel(int tileMapIndex, int levelNo);
 
-	void Loop();
+	// Repeatedly called by the main application
+	virtual void Loop();
 
 public:
-	// actual input keys .. set by the main function
-	bool GameKey[KEY_MAX_NUM] = { false } ;
-
-	// old / delayed by one cycle .. values of the keys
-	bool WasGameKey[KEY_MAX_NUM] = { false };
-
-	// ressources
-	LedTexture PageBallons;
-	LedTexture PageFunnyCar;
-	LedTexture PageInfo2;
-
-	// components
-	CQueueDynGeneric<LedAnimation> AnimationQueue;
-
-	// renderers
-	TextRendererFixedSize TrFs;
-	TextRendererProportionalText TrPt;
-
-	// main LED screen
-	LedTexture Screen;
-
 	// levels
 	TileMap* Levels[LEVEL_Max] = { 0 };
 	int LevelNum = 0;
@@ -110,8 +74,6 @@ public:
 
 	// Sound sample played by main application at end of the loop cycle.
 	GameSoundSampleEnum SoundSampleToPlay = GameSoundSampleEnum::SMP_None;
-
-	// monitored items
 
 	// Several fruits are spawned concurrently and are removed one after each other again.
 	CQueueDynGeneric<SpawnedItem> SpawnedItems;

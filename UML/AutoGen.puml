@@ -1,0 +1,828 @@
+@startuml
+
+
+
+
+
+/' Objects '/
+
+class Actor {
+	+Actor()
+	+Actor(Actor& other)
+	+Clone() : Actor*
+	+CurrentDirection : Vec2
+	+CurrentTilePosition : Vec2
+	+GetCurrentPixelPos(Vec2 charDim) : Vec2
+	+GetBasicDirections(int& numPos) : Vec2*
+	+IsWaiting() : bool
+	+StandStill() : bool
+	+Phase : double
+	+PhaseStepFright : double
+	+PhaseStepNorm : double
+	+WaitAtCurrentPos : int
+	+Animate(GameRun& run) : void
+	+MakeStep(GameRun& run) : void
+}
+
+
+class Blinky {
+	+Blinky()
+	+Blinky(Blinky& other)
+	+Clone() : Actor*
+	+GetCurrentTargetPos(GameRun& run, Vec2 pacPos, Vec2 pacDir, Ghost** siblings) : Vec2
+	+GetGhostAvatarChar(GameRun& run, Vec2 direction) : char
+}
+
+
+class CElementGeneric <template<class T>> {
+	+CElementGeneric(const T& data)
+	+~CElementGeneric()
+	+mPtrNext : CElementGeneric*
+	+mData : T
+	+TestAAA() : void
+}
+
+
+class CQueueDynGeneric <template<class T>> {
+	+CQueueDynGeneric()
+	+~CQueueDynGeneric()
+	-mPtrHead : CElementGeneric<T>*
+	-mPtrTail : CElementGeneric<T>*
+	+top() : T*
+	+dequeue(T& data) : bool
+	+enqueue(const T& data) : bool
+	+GetLength() : int
+	-length : int
+	+GetDisplay() : void
+}
+
+
+class Clyde {
+	+Clyde()
+	+Clyde(Clyde& other)
+	+Clone() : Actor*
+	+GetCurrentTargetPos(GameRun& run, Vec2 pacPos, Vec2 pacDir, Ghost** siblings) : Vec2
+	+GetGhostAvatarChar(GameRun& run, Vec2 direction) : char
+}
+
+
+class GameBase {
+	+GameBase(GameEnvironment* env)
+	+Env : GameEnvironment*
+	+Loop() : void
+}
+
+
+class GameEnvironment {
+	+GameEnvironment()
+	+~GameEnvironment()
+	+PageBallons : LedTexture
+	+PageFunnyCar : LedTexture
+	+PageInfo2 : LedTexture
+	+Screen : LedTexture
+	+TrFs : TextRendererFixedSize
+	+TrPt : TextRendererProportionalText
+	+AllowDebug : bool
+	+GodMode : bool
+	+Mute : bool
+	+GameKey : bool[]
+	+WasGameKey : bool[]
+	+FrameCounter : int
+	+Animate() : void
+}
+
+
+class GameRun {
+	+GameRun()
+	+GhostsMode : GhostMode
+	+SpecialAnimGhostDelta : Vec2[]
+	+Message : char[]
+	+SpecialAnimPhase : double
+	+SpecialAnimStep : double
+	+CountDownToChase : int
+	+CountDownToScatter : int
+	+CountdownPacOrGhostDead : int
+	+FrameCounter : int
+	+FramesToTextSwitch : int
+	+FrightenedCounter : int
+	+LevelNo : int
+	+MsgLifeTime : int
+	+NumGhost : int
+	+NumPlayer : int
+	+PillsAvailable : int
+	+SpecialResetOnlyGhost : int
+	+TextSwitch : int
+	+TileMapIndex : int
+	+Animate() : void
+	+SetMessage(const char* msg) : void
+}
+
+
+abstract class Ghost {
+	+GetCurrentTargetPos(GameRun& run, Vec2 pacPos, Vec2 pacDir, Ghost** siblings) : Vec2
+	+HomeZone : Vec2
+	+UseTargetPosition : Vec2
+	+{abstract} GetGhostAvatarChar(GameRun& run, Vec2 direction) : char
+	+PrepareAvatarChar(GameRun& run, char normalAvatar) : char
+	+ResetToInitialPosition(Vec2 initialPos) : void
+}
+
+
+class Inky {
+	+Inky()
+	+Inky(Inky& other)
+	+Clone() : Actor*
+	+GetCurrentTargetPos(GameRun& run, Vec2 pacPos, Vec2 pacDir, Ghost** siblings) : Vec2
+	+GetGhostAvatarChar(GameRun& run, Vec2 direction) : char
+}
+
+
+class IntroGame {
+	+IntroGame(GameEnvironment* env)
+	+~IntroGame()
+	-AnimationQueue : CQueueDynGeneric<LedAnimation>
+	-AddWelcomeAnimations() : void
+	+Loop() : void
+}
+
+
+class LedAnimation {
+	+LedAnimation()
+	+LedAnimation(LedTexture targetTexture, double speed, LedGradient gradient, LedBlendEffect blendEffect)
+	+mBlendEffect : LedBlendEffect
+	+mGradient : LedGradient
+	+mStartTexture : LedTexture
+	+mTargetTexture : LedTexture
+	+mPhase : double
+	+mSpeed : double
+}
+
+
+class LedColor {
+	+LedColor()
+	+LedColor(uint8_t r, uint8_t g, uint8_t b)
+	+LedColor(uint32_t rgb)
+	+{static} FadeBetween(LedColor color1, LedColor color2, double f) : LedColor
+	+operator*(double f) : LedColor
+	+PercievedIntensity() : double
+	+B : uint8_t
+	+G : uint8_t
+	+R : uint8_t
+}
+
+
+class LedColorsTable {
+	+Alice_Blue : LedColor
+	+Antique_White : LedColor
+	+Aqua : LedColor
+	+Aqua_Marine : LedColor
+	+Azure : LedColor
+	+Beige : LedColor
+	+Bisque : LedColor
+	+Black : LedColor
+	+Blanched_Almond : LedColor
+	+Blue : LedColor
+	+Blue_Violet : LedColor
+	+Brown : LedColor
+	+Burly_Wood : LedColor
+	+Cadet_Blue : LedColor
+	+Chartreuse : LedColor
+	+Chocolate : LedColor
+	+Coral : LedColor
+	+Corn_Flower_Blue : LedColor
+	+Corn_Silk : LedColor
+	+Crimson : LedColor
+	+Cyan : LedColor
+	+Dark_Blue : LedColor
+	+Dark_Cyan : LedColor
+	+Dark_Golden_Rod : LedColor
+	+Dark_Gray : LedColor
+	+Dark_Green : LedColor
+	+Dark_Khaki : LedColor
+	+Dark_Magenta : LedColor
+	+Dark_Olive_Green : LedColor
+	+Dark_Orange : LedColor
+	+Dark_Orchid : LedColor
+	+Dark_Red : LedColor
+	+Dark_Salmon : LedColor
+	+Dark_Sea_Green : LedColor
+	+Dark_Slate_Blue : LedColor
+	+Dark_Slate_Gray : LedColor
+	+Dark_Turquoise : LedColor
+	+Dark_Violet : LedColor
+	+Deep_Pink : LedColor
+	+Deep_Sky_Blue : LedColor
+	+Dim_Gray : LedColor
+	+Dodger_Blue : LedColor
+	+Firebrick : LedColor
+	+Floral_White : LedColor
+	+Forest_Green : LedColor
+	+Fuchsia : LedColor
+	+Gainsboro : LedColor
+	+Ghost_White : LedColor
+	+Gold : LedColor
+	+Golden_Rod : LedColor
+	+Gray : LedColor
+	+Green : LedColor
+	+Green_Yellow : LedColor
+	+Honeydew : LedColor
+	+Hot_Pink : LedColor
+	+Indian_Red : LedColor
+	+Indigo : LedColor
+	+Ivory : LedColor
+	+Khaki : LedColor
+	+Lavender : LedColor
+	+Lavender_Blush : LedColor
+	+Lawn_Green : LedColor
+	+Lemon_Chiffon : LedColor
+	+Light_Blue : LedColor
+	+Light_Coral : LedColor
+	+Light_Cyan : LedColor
+	+Light_Golden_Rod_Yellow : LedColor
+	+Light_Gray : LedColor
+	+Light_Green : LedColor
+	+Light_Pink : LedColor
+	+Light_Salmon : LedColor
+	+Light_Sea_Green : LedColor
+	+Light_Sky_Blue : LedColor
+	+Light_Slate_Gray : LedColor
+	+Light_Steel_Blue : LedColor
+	+Light_Yellow : LedColor
+	+Lime : LedColor
+	+Lime_Green : LedColor
+	+Linen : LedColor
+	+Magenta : LedColor
+	+Maroon : LedColor
+	+Medium_Aqua_Marine : LedColor
+	+Medium_Blue : LedColor
+	+Medium_Orchid : LedColor
+	+Medium_Purple : LedColor
+	+Medium_Sea_Green : LedColor
+	+Medium_Slate_Blue : LedColor
+	+Medium_Spring_Green : LedColor
+	+Medium_Turquoise : LedColor
+	+Medium_Violet_Red : LedColor
+	+Middle_Green : LedColor
+	+Midnight_Blue : LedColor
+	+Mint_Cream : LedColor
+	+Misty_Rose : LedColor
+	+Moccasin : LedColor
+	+Navajo_White : LedColor
+	+Navy : LedColor
+	+Old_Lace : LedColor
+	+Olive : LedColor
+	+Olive_Drab : LedColor
+	+Orange : LedColor
+	+Orange_Red : LedColor
+	+Orchid : LedColor
+	+Pale_Golden_Rod : LedColor
+	+Pale_Green : LedColor
+	+Pale_Turquoise : LedColor
+	+Pale_Violet_Red : LedColor
+	+Papaya_Whip : LedColor
+	+Peach_Puff : LedColor
+	+Peru : LedColor
+	+Pink : LedColor
+	+Plum : LedColor
+	+Powder_Blue : LedColor
+	+Purple : LedColor
+	+Red : LedColor
+	+Rosy_Brown : LedColor
+	+Royal_Blue : LedColor
+	+Saddle_Brown : LedColor
+	+Salmon : LedColor
+	+Sandy_Brown : LedColor
+	+Sea_Green : LedColor
+	+Sea_Shell : LedColor
+	+Sienna : LedColor
+	+Silver : LedColor
+	+Sky_Blue : LedColor
+	+Slate_Blue : LedColor
+	+Slate_Gray : LedColor
+	+Snow : LedColor
+	+Spring_Green : LedColor
+	+Steel_Blue : LedColor
+	+Tan : LedColor
+	+Teal : LedColor
+	+Thistle : LedColor
+	+Tomato : LedColor
+	+Turquoise : LedColor
+	+Violet : LedColor
+	+Wheat : LedColor
+	+White : LedColor
+	+White_Smoke : LedColor
+	+Yellow : LedColor
+	+Yellow_Green : LedColor
+	+{ : LedColor BlackLightFluorescent
+	+{ : LedColor BlackLightFluorescent[]
+	+{ : LedColor BlackLightFluorescent[]
+	+{ : LedColor CarbonArc[]
+	+{ : LedColor CarbonArc[]
+	+{ : LedColor CarbonArc[]
+	+{ : LedColor ClearBlueSky[]
+	+{ : LedColor ClearBlueSky[]
+	+{ : LedColor ClearBlueSky[]
+	+{ : LedColor CoolWhiteFluorescent[]
+	+{ : LedColor CoolWhiteFluorescent[]
+	+{ : LedColor CoolWhiteFluorescent[]
+	+{ : LedColor DirectSunlight[]
+	+{ : LedColor DirectSunlight[]
+	+{ : LedColor DirectSunlight[]
+	+{ : LedColor FullSpectrumFluorescent[]
+	+{ : LedColor FullSpectrumFluorescent[]
+	+{ : LedColor FullSpectrumFluorescent[]
+	+{ : LedColor GrowLightFluorescent[]
+	+{ : LedColor GrowLightFluorescent[]
+	+{ : LedColor GrowLightFluorescent[]
+	+{ : LedColor Halogen[]
+	+{ : LedColor Halogen[]
+	+{ : LedColor Halogen[]
+	+{ : LedColor HighNoonSun[]
+	+{ : LedColor HighNoonSun[]
+	+{ : LedColor HighNoonSun[]
+	+{ : LedColor HighPressureSodium[]
+	+{ : LedColor HighPressureSodium[]
+	+{ : LedColor HighPressureSodium[]
+	+{ : LedColor MercuryVapor[]
+	+{ : LedColor MercuryVapor[]
+	+{ : LedColor MercuryVapor[]
+	+{ : LedColor MetalHalide[]
+	+{ : LedColor MetalHalide[]
+	+{ : LedColor MetalHalide[]
+	+{ : LedColor OvercastSky[]
+	+{ : LedColor OvercastSky[]
+	+{ : LedColor OvercastSky[]
+	+{ : LedColor SodiumVapor[]
+	+{ : LedColor SodiumVapor[]
+	+{ : LedColor SodiumVapor[]
+	+{ : LedColor StandardFluorescent[]
+	+{ : LedColor StandardFluorescent[]
+	+{ : LedColor StandardFluorescent[]
+	+{ : LedColor Tungsten100W[]
+	+{ : LedColor Tungsten100W[]
+	+{ : LedColor Tungsten100W[]
+	+{ : LedColor Tungsten40W[]
+	+{ : LedColor Tungsten40W[]
+	+{ : LedColor Tungsten40W[]
+	+{ : LedColor WarmFluorescent[]
+	+{ : LedColor WarmFluorescent[]
+	+{ : LedColor WarmFluorescent[]
+	+LedColors : LedColorsTable
+}
+
+
+class LedTexture {
+	+LedTexture()
+	+LedTexture(int width, int height)
+	+LedTexture(int width, int height, LedColor* source, bool doCopy)
+	+LedTexture(std::string fn)
+	+Get(int x, int y) : LedColor
+	-mPixels : LedColor*
+	+operator[](int row) : LedColor*
+	+Clone() : LedTexture&
+	+BlendFrom(LedTexture& source1, LedTexture& source2, LedTexture& gradient, LedBlendEffect effect) : bool
+	+BlitFrom(int destX, int destY, LedTexture& src, int srcX, int srcY, int srcWidth, int srcHeight) : bool
+	+HasContent() : bool
+	-LoadBmpInternal(std::string fn) : bool
+	+GetHeight() : int
+	+{static} GetRandomBlendEffect() : int
+	+{static} GetRandomGradient() : int
+	+GetWidth() : int
+	-mHeight : int
+	-mWidth : int
+	+FillGradient(LedGradient gradient, double f) : void
+	+FillRect(LedColor color, int x, int y, int width, int height) : void
+	+Put(int x, int y, LedColor pixel) : void
+}
+
+
+class LevelInit {
+	+{static} InitPresetLevels(int& levelNum, TileMap* levels) : void
+}
+
+
+class PacManGame {
+	+PacManGame(GameEnvironment* env)
+	+~PacManGame()
+	+blinky : Blinky
+	+SpawnedItems : CQueueDynGeneric<SpawnedItem>
+	+clyde : Clyde
+	+Run : GameRun
+	+SoundSampleToPlay : GameSoundSampleEnum
+	+Ghosts : Ghost*[]
+	+Ghosts : Ghost*[]
+	+Ghosts : Ghost*[]
+	+Ghosts : Ghost*[]
+	+Ghosts : Ghost*[]
+	+Ghosts : Ghost*[]
+	+inky : Inky
+	+pinky : Pinky
+	+Player1 : Player
+	+Player2 : Player
+	+Players : Player*[]
+	+Players : Player*[]
+	+Players : Player*[]
+	+LevelCurr : TileMap*
+	+Levels : TileMap*[]
+	+showDebug : bool
+	+LevelNum : int
+	+LoadLevel(int tileMapIndex, int levelNo) : void
+	+Loop() : void
+	+RestartLevel() : void
+}
+
+
+class Pinky {
+	+Pinky()
+	+Pinky(Pinky& other)
+	+Clone() : Actor*
+	+GetCurrentTargetPos(GameRun& run, Vec2 pacPos, Vec2 pacDir, Ghost** siblings) : Vec2
+	+GetGhostAvatarChar(GameRun& run, Vec2 direction) : char
+}
+
+
+class Player {
+	+Player()
+	+Player(Player& other)
+	+Clone() : Actor*
+	+GetDeadPlayerAvatar(double phase) : char
+	+GetPlayerAvatarChar(GameRun& run, Vec2 direction) : char
+	+Lives : int
+	+OpenMouthTime : int
+	+Score : int
+	+Animate(GameRun& run) : void
+	+TriggerOpenMouth() : void
+}
+
+
+class PossibleMove {
+	+PossibleMove()
+	+PossibleMove(Vec2 actualPos, Vec2 direction, Vec2 finalPos, bool jumpMove)
+	+ActualPos : Vec2
+	+Direction : Vec2
+	+FinalPosition : Vec2
+	+JumpMove : bool
+}
+
+
+class SDL_Application {
+	+Renderer : SDL_Renderer*
+	+ImageHka : SDL_Surface*
+	+Window : SDL_Window*
+	+FontNormal : TTF_Font*
+	+init(int width, int height) : bool
+	+Height : int
+	+Width : int
+	+kill() : void
+}
+
+
+class SDL_SoundSample {
+	+SDL_SoundSample(const std::string& path, int volume)
+	- : std::unique_ptr<Mix_Chunk, void (* ) ( Mix_Chunk* )>chunk
+	+play() : void
+	+play(int times) : void
+	+set_volume(int volume) : void
+}
+
+
+class SpawnedItem {
+	+SpawnedItem()
+	+SpawnedItem(Vec2 position, int frameCountdown)
+	+Position : Vec2
+	+FrameCountdown : int
+}
+
+
+abstract class TextRendererAbstractBase {
+	+{abstract} DrawTextTo(LedTexture& texture, Vec2 pixelPos, const char nullTerminatedText, int renderSpacingX, int renderSpacingY) : void
+}
+
+
+class TextRendererFixedSize {
+	+TextRendererFixedSize()
+	+TextRendererFixedSize(string fn, int charWidth, int charSpacing, string mIndexToChar)
+	-mCharDefs : LedTexture
+	-mCharSpacing : int
+	-mCharWidth : int
+	-mIndexToChar : string
+	+DrawTextTo(LedTexture& texture, Vec2 pixelPos, const char nullTerminatedText, int renderSpacingX, int renderSpacingY) : void
+}
+
+
+class TextRendererProportionalText {
+	+TextRendererProportionalText()
+	+TextRendererProportionalText(string fn, int numGlyphs, ProportionalTextGlyph* glyphDefs)
+	-mCharDefs : LedTexture
+	-mGlyphDefs : ProportionalTextGlyph*
+	-mNumGlyphs : int
+	+DrawTextTo(LedTexture& texture, Vec2 pixelPos, const char nullTerminatedText, int renderSpacingX, int renderSpacingY) : void
+}
+
+
+class Tile {
+	+Tile()
+	+Tile(Tile& other)
+	+Clone() : TileBase*
+	+IsEatablePosition() : bool
+	+IsEmptyPill() : bool
+	+IsEnergizerActive(GameRun& run) : bool
+	+IsEnergizerAnyway(GameRun& run) : bool
+	+IsEnergyPill() : bool
+	+IsFruit() : bool
+	+IsMoveablePosition() : bool
+	+GetTileAvatarChar(GameRun& run) : char
+	+mTileCode : char
+}
+
+
+class TileBase {
+	+TileBase()
+	+TileBase(TileBase& other)
+	+Clone() : TileBase*
+}
+
+
+class TileFactory {
+	+{static} GenerateTile(char code) : TileBase*
+}
+
+
+class TileMap {
+	+TileMap()
+	+TileMap(int width, int height)
+	+TileMap(int width, int height, TileBase** source, bool doCopy)
+	+TileMap(int numRow, string rows)
+	+~TileMap()
+	+GetPossibleMovesFor(Actor* actor, Vec2 checkPos, int& numMoves) : PossibleMove*
+	+GetAsTile(int x, int y) : Tile*
+	+GetAsTile(Vec2 pos) : Tile*
+	+Get(int x, int y) : TileBase*
+	-mTiles : TileBase**
+	+Clone() : TileMap*
+	+FindRandomFreeEnergyPillPosition() : Vec2
+	+GateToBottom : Vec2
+	+GateToLeft : Vec2
+	+GateToRight : Vec2
+	+GateToTop : Vec2
+	+MessagePos : Vec2
+	+GhostHomeZone : Vec2[]
+	+GhostStartPos : Vec2[]
+	+PlayerStartPos : Vec2[]
+	+PlayerTextExtraPos : Vec2[]
+	+PlayerTextScorePos : Vec2[]
+	+CheckPos(Vec2 pos) : bool
+	+CheckXY(int x, int y) : bool
+	+DrawMap(GameRun& run, LedTexture& texture, Vec2 pixelPos, TextRendererAbstractBase& textRenderer, int charWidth, int charHeight) : bool
+	+FindPossibleMoveInDir(Actor* actor, Vec2 checkPos, Vec2 dir, PossibleMove& move) : bool
+	+HasContent() : bool
+	+CountMoveableDirections(Vec2 pos, int numPos, Vec2* dirs) : int
+	+CountTileCode(char code) : int
+	+GetHeight() : int
+	+GetWidth() : int
+	+PillsTotal : int
+	-mHeight : int
+	-mWidth : int
+	+Fill(TileBase* preset) : void
+	+Put(int x, int y, TileBase* preset) : void
+	-UpdatePillsAvailable() : void
+}
+
+
+class Vec2 {
+	+Vec2()
+	+Vec2(bool isValid)
+	+Vec2(int x, int y)
+	+operator*(int i) : Vec2
+	+operator*(double d) : Vec2
+	+operator*(Vec2 other) : Vec2
+	+operator+(Vec2 other) : Vec2
+	+operator-(Vec2 other) : Vec2
+	+IsValid : bool
+	+operator!=(Vec2 other) : bool
+	+operator==(Vec2 other) : bool
+	+Length() : double
+	+X : int
+	+X : int
+	+X : int
+}
+
+
+enum GameKeyEnum {
+	KEY_DEBUG
+	KEY_GOD_MODE
+	KEY_MAX_NUM
+	KEY_MUTE
+	KEY_P1_DOWN
+	KEY_P1_LEFT
+	KEY_P1_RIGHT
+	KEY_P1_UP
+	KEY_P2_DOWN
+	KEY_P2_LEFT
+	KEY_P2_RIGHT
+	KEY_P2_UP
+}
+
+
+enum GameSoundSampleEnum {
+	SMP_EmptyTile
+	SMP_EnergyPill
+	SMP_Fruit
+	SMP_GhostDead
+	SMP_LevelWin
+	SMP_MAX_NUM
+	SMP_None
+	SMP_PacManDead
+	SMP_TurnFromGhosts
+	SMP_TurnToGhosts
+}
+
+
+enum GhostMode {
+	Chase
+	Freightened
+	Scatter
+	SuperFreightened
+}
+
+
+enum LedBlendEffect {
+	No
+	Sparcle
+	__LedBlendEffect_Count
+}
+
+
+enum LedGradient {
+	LeftToRight
+	RightToLeft
+	TopLeftToRightBottom
+	TopToBottom
+	__LedGradient_Count
+}
+
+
+class ProportionalTextGlyph {
+	+Letter : char
+	+OfsX : int
+	+Width : int
+}
+
+
+
+
+
+/' Inheritance relationships '/
+
+Actor <|-- Ghost
+
+
+Actor <|-- Player
+
+
+GameBase <|-- IntroGame
+
+
+GameBase <|-- PacManGame
+
+
+Ghost <|-- Blinky
+
+
+Ghost <|-- Clyde
+
+
+Ghost <|-- Inky
+
+
+Ghost <|-- Pinky
+
+
+TextRendererAbstractBase <|-- TextRendererFixedSize
+
+
+TextRendererAbstractBase <|-- TextRendererProportionalText
+
+
+TileBase <|-- Tile
+
+
+
+
+
+/' Aggregation relationships '/
+
+Actor "2" *-- Vec2
+
+
+CElementGeneric o-- CElementGeneric
+
+
+CQueueDynGeneric "2" *-- CElementGeneric
+
+
+GameBase o-- GameEnvironment
+
+
+GameEnvironment "4" *-- LedTexture
+
+
+GameEnvironment *-- TextRendererFixedSize
+
+
+GameEnvironment *-- TextRendererProportionalText
+
+
+GameRun *-- GhostMode
+
+
+GameRun *-- Vec2
+
+
+Ghost "2" *-- Vec2
+
+
+IntroGame *-- CQueueDynGeneric
+
+
+LedAnimation *-- LedBlendEffect
+
+
+LedAnimation *-- LedGradient
+
+
+LedAnimation "2" *-- LedTexture
+
+
+LedColorsTable "195" *-- LedColor
+
+
+LedColorsTable *-- LedColorsTable
+
+
+LedTexture o-- LedColor
+
+
+PacManGame *-- Blinky
+
+
+PacManGame *-- CQueueDynGeneric
+
+
+PacManGame *-- Clyde
+
+
+PacManGame *-- GameRun
+
+
+PacManGame *-- GameSoundSampleEnum
+
+
+PacManGame "6" o-- Ghost
+
+
+PacManGame *-- Inky
+
+
+PacManGame *-- Pinky
+
+
+PacManGame "3" o-- Player
+
+
+PacManGame "2" *-- Player
+
+
+PacManGame "2" o-- TileMap
+
+
+PossibleMove "3" *-- Vec2
+
+
+SpawnedItem *-- Vec2
+
+
+TextRendererFixedSize *-- LedTexture
+
+
+TextRendererProportionalText *-- LedTexture
+
+
+TextRendererProportionalText o-- ProportionalTextGlyph
+
+
+TileMap o-- TileBase
+
+
+TileMap "10" *-- Vec2
+
+
+
+
+
+
+/' Nested objects '/
+
+
+
+@enduml

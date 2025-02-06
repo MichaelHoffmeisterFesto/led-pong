@@ -9,8 +9,8 @@ TextRendererFixedSize::TextRendererFixedSize()
 }
 
 TextRendererFixedSize::TextRendererFixedSize(string fn, int charWidth, int charSpacing, string indexToChar)
+	: mCharDefs(LedTexture(fn))
 {
-	mCharDefs = LedTexture(fn);
 	mCharWidth = charWidth;
 	mCharSpacing = charSpacing;
 	mIndexToChar = indexToChar;

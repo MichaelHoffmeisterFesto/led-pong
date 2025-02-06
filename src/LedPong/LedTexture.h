@@ -16,14 +16,23 @@ enum LedBlendEffect { No, Sparcle, __LedBlendEffect_Count };
 class LedTexture
 {
 public:
-	// constructors
+	// standard con/de-structors
 	LedTexture();
+	~LedTexture();
+
+	// copy constructor
+	LedTexture(const LedTexture &other);
+
+	// assignment operator
+	LedTexture& operator=(const LedTexture& x);
+
+	// other constructors
 	LedTexture(int width, int height);
 	LedTexture(int width, int height, LedColor* source, bool doCopy);
 	LedTexture(std::string fn);
 
 	// cloning
-	LedTexture& Clone();
+	LedTexture* Clone();
 
 	// accessors
 	inline int GetWidth() { return mWidth; }

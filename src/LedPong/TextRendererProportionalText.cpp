@@ -12,8 +12,8 @@ TextRendererProportionalText::TextRendererProportionalText(
 	string fn, 
 	int numGlyphs,
 	ProportionalTextGlyph* glyphDefs)
-{
-	mCharDefs = LedTexture(fn);
+	: mCharDefs (LedTexture(fn))
+{	
 	mNumGlyphs = numGlyphs;
 
 	// copy defs (!), as might be on the stack ...

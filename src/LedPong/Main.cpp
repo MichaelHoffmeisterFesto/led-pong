@@ -16,7 +16,10 @@
 #include "SDL_SoundSample.h"
 
 #include "basic.h"
-#include "Game.h"
+
+#include "GameBase.h"
+#include "IntroGame.h"
+#include "PacManGame.h"
 
 // provide instances for extern symbols
 LedColorsTable LedColors;
@@ -27,7 +30,9 @@ using namespace std;
 // technology neutral game
 //
 
-Game TheGame;
+GameEnvironment TheEnv;
+IntroGame TheIntro(&TheEnv);
+PacManGame TheGame(&TheEnv);
 
 //
 // SDL
@@ -169,13 +174,16 @@ bool loop() {
 	//
 
 	for (int i = 0; i < SIZE_OF_ARR(SdlScanToMap); i++)
-		TheGame.GameKey[i] = keys[SdlScanToMap[i]];
+		TheEnv.GameKey[i] = keys[SdlScanToMap[i]];
 
-	TheGame.Loop();
+	// TheGame.Loop();
+	TheIntro.Loop();
 
-	if (!TheGame.Run.Mute) 
-		PlaySoundSample(TheGame.SoundSampleToPlay);
-	TheGame.SoundSampleToPlay = GameSoundSampleEnum::SMP_None;
+	//if (!TheGame.Run.Mute) 
+	//	PlaySoundSample(TheGame.SoundSampleToPlay);
+	//TheGame.SoundSampleToPlay = GameSoundSampleEnum::SMP_None;
+
+	TheEnv.Animate();
 
 	//
 	// Display
@@ -186,7 +194,7 @@ bool loop() {
 		for (int y = 0; y < WALL_Ydim; y++)
 		{
 			// no object allocation, please!
-			LedColor* lp = &TheGame.Screen[y][x];
+			LedColor* lp = &TheEnv.Screen[y][x];
 			SDL_Color col = { lp->R, lp->G, lp->B };
 			SDL_SetRenderDrawColor(Main->Renderer, &col);
 
@@ -204,7 +212,7 @@ bool loop() {
 	int spY = 14;
 
 	char buffer[100];
-	sprintf_s(buffer, "Frame %02d", TheGame.Run.FrameCounter % GAME_FrameRate);
+	sprintf_s(buffer, "Frame %02d", TheEnv.FrameCounter % GAME_FrameRate);
 	SDL_RenderDrawText(Main->Renderer, Main->FontNormal, SDL_Color_From(LedColors.White), spX, spY, buffer);	
 
 	// debug this target pos
@@ -257,11 +265,11 @@ int main(int argc, char** args)
 	for (int i = 1; i < argc; i++)
 	{
 		if (strcmp(args[i], "-mute") == 0)
-			TheGame.Run.Mute = !TheGame.Run.Mute;
+			TheEnv.Mute = !TheEnv.Mute;
 		if (strcmp(args[i], "-god") == 0)
-			TheGame.Run.GodMode = !TheGame.Run.GodMode;
+			TheEnv.GodMode = !TheEnv.GodMode;
 		if (strcmp(args[i], "-debug") == 0)
-			TheGame.Run.AllowDebug = !TheGame.Run.AllowDebug;
+			TheEnv.AllowDebug = !TheEnv.AllowDebug;
 	}
 
 	// main loop

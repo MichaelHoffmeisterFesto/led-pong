@@ -25,9 +25,6 @@ public:
 
 	inline void Animate()
 	{
-		// Thought to be a (global) frame counter
-		FrameCounter++;
-
 		// To indicate different texts in one portion of the screen
 		FramesToTextSwitch--;
 		if (FramesToTextSwitch <= 0)
@@ -126,13 +123,4 @@ public:
 
 	// Number of ghosts (typically 4)
 	int NumGhost = 4;
-
-	// Sound turned on or off
-	bool Mute = false;
-
-	// immortal
-	bool GodMode = false;
-
-	// Allow debug and god mode?
-	bool AllowDebug = false;
 };
