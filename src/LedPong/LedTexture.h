@@ -8,10 +8,13 @@
 #include "LedColor.h"
 
 // Different gradients to create blending functions
-enum LedGradient { LeftToRight, RightToLeft, TopToBottom, TopLeftToRightBottom, __LedGradient_Count };
+enum LedGradient { 
+	GRAD_LeftToRight, GRAD_RightToLeft, GRAD_TopToBottom, GRAD_BottomToTop, 
+	GRAD_TopLeftToRightBottom, GRAD_RightBottomTopLeft, GRAD_TopRightToLeftBottom, GRAD_LeftBottomToTopRight,
+	GRAD_NUM };
 
 // Special effects for the blending frontier
-enum LedBlendEffect { No, Sparcle, __LedBlendEffect_Count };
+enum LedBlendEffect { BLEND_No, BLEND_Sparcle, BLEND_NUM };
 
 class LedTexture
 {
@@ -51,6 +54,7 @@ public:
 	LedColor* operator[](int row);
 
 	// drawing
+	void DrawRect(LedColor color, int x = 0, int y = 0, int width = -1, int height = -1);
 	void FillRect(LedColor color, int x = 0, int y = 0, int width = -1, int height = -1);
 
 	// different gradients for blending
@@ -63,7 +67,8 @@ public:
 		int destX, int destY,
 		LedTexture& src,
 		int srcX = 0, int srcY = 0,
-		int srcWidth = -1, int srcHeight = -1);
+		int srcWidth = -1, int srcHeight = -1,
+		int thresholdIntensity = -1);
 
 	// Blending means, that source1 and source2 are blended pixel by pixel
 	// depending on the respective pixel of the gradient.

@@ -14,7 +14,7 @@ PacManGame::PacManGame(GameEnvironment* env) : GameBase(env)
 
 	// indicate
 	Run.SetMessage("LEV01");
-	SoundSampleToPlay = GameSoundSampleEnum::SMP_LevelWin;
+	// Env->SoundSampleToPlay = GameSoundSampleEnum::SMP_LevelWin;
 }	
 
 void PacManGame::RestartLevel()
@@ -188,7 +188,7 @@ void PacManGame::Loop()
 		if (Run.FrightenedCounter == 2)
 		{
 			Run.SetMessage("CHASE");
-			SoundSampleToPlay = GameSoundSampleEnum::SMP_TurnFromGhosts;
+			Env->SoundSampleToPlay = GameSoundSampleEnum::SMP_TurnFromGhosts;
 			Run.CountDownToScatter = 10 * GAME_FrameRate;
 		}
 
@@ -196,7 +196,7 @@ void PacManGame::Loop()
 		{
 			Run.GhostsMode = GhostMode::Chase;
 			Run.SetMessage("CHASE");
-			SoundSampleToPlay = GameSoundSampleEnum::SMP_TurnFromGhosts;
+			Env->SoundSampleToPlay = GameSoundSampleEnum::SMP_TurnFromGhosts;
 			Run.CountDownToScatter = 20 * GAME_FrameRate;
 		}
 
@@ -204,7 +204,7 @@ void PacManGame::Loop()
 		{
 			Run.GhostsMode = GhostMode::Scatter;
 			Run.SetMessage("SCATR");
-			SoundSampleToPlay = GameSoundSampleEnum::SMP_TurnFromGhosts;
+			Env->SoundSampleToPlay = GameSoundSampleEnum::SMP_TurnFromGhosts;
 			Run.CountDownToChase = 5 * GAME_FrameRate;
 		}
 
@@ -227,7 +227,7 @@ void PacManGame::Loop()
 				Env->GodMode = !Env->GodMode;
 				sprintf_s(buffer, "GOD %01d", Env->GodMode);
 				Run.SetMessage(buffer);
-				SoundSampleToPlay = GameSoundSampleEnum::SMP_Fruit;
+				Env->SoundSampleToPlay = GameSoundSampleEnum::SMP_Fruit;
 			}
 		}
 
@@ -323,7 +323,7 @@ void PacManGame::Loop()
 
 								// turn to ghosts!
 								// TODO!
-								SoundSampleToPlay = GameSoundSampleEnum::SMP_TurnToGhosts;
+								Env->SoundSampleToPlay = GameSoundSampleEnum::SMP_TurnToGhosts;
 								// see: https://pacman.holenet.info/#LvlSpecs
 								Run.FrightenedCounter = std::max(2, (7 - Run.LevelNo)) * GAME_FrameRate;
 								Run.SetMessage("SCARE");
@@ -332,7 +332,7 @@ void PacManGame::Loop()
 							{
 								// not on, only 'normal' pill
 								pptr->Score += 1;
-								SoundSampleToPlay = GameSoundSampleEnum::SMP_EnergyPill;
+								Env->SoundSampleToPlay = GameSoundSampleEnum::SMP_EnergyPill;
 							}
 
 							// Extension to original Pac Man: refresh energizers?
@@ -356,13 +356,13 @@ void PacManGame::Loop()
 						else if (ct->IsFruit())
 						{
 							pptr->Score += 100;
-							SoundSampleToPlay = GameSoundSampleEnum::SMP_Fruit;
+							Env->SoundSampleToPlay = GameSoundSampleEnum::SMP_Fruit;
 							Run.SetMessage("100UP");
 						}
 						else if (ct->IsEnergyPill())
 						{
 							pptr->Score += 1;
-							SoundSampleToPlay = GameSoundSampleEnum::SMP_EnergyPill;
+							Env->SoundSampleToPlay = GameSoundSampleEnum::SMP_EnergyPill;
 						}
 
 						// pill consumed in any case
@@ -377,7 +377,7 @@ void PacManGame::Loop()
 					{
 						// empty place
 						// release a (smaller) sound
-						SoundSampleToPlay = GameSoundSampleEnum::SMP_EmptyTile;
+						Env->SoundSampleToPlay = GameSoundSampleEnum::SMP_EmptyTile;
 					}
 				}
 
@@ -647,7 +647,7 @@ void PacManGame::Loop()
 					Run.SpecialAnimGhostDelta[i] = LevelCurr->GhostStartPos[i] - Ghosts[i]->CurrentTilePosition;
 
 				Run.SetMessage("DEAD");
-				SoundSampleToPlay = GameSoundSampleEnum::SMP_PacManDead;
+				Env->SoundSampleToPlay = GameSoundSampleEnum::SMP_PacManDead;
 			}
 		}
 
@@ -663,7 +663,7 @@ void PacManGame::Loop()
 				: LevelCurr->GhostStartPos[i] - Ghosts[i]->CurrentTilePosition;
 
 			Run.SetMessage("BUUUH");
-			SoundSampleToPlay = GameSoundSampleEnum::SMP_GhostDead;
+			Env->SoundSampleToPlay = GameSoundSampleEnum::SMP_GhostDead;
 		}
 
 		if (advanceNextLevel)
@@ -676,7 +676,7 @@ void PacManGame::Loop()
 			// Indicate
 			sprintf_s(buffer, "LEV%02d", Run.LevelNo);
 			Run.SetMessage(buffer);
-			SoundSampleToPlay = GameSoundSampleEnum::SMP_LevelWin;
+			Env->SoundSampleToPlay = GameSoundSampleEnum::SMP_LevelWin;
 		}
 	}
 

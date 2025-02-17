@@ -72,14 +72,10 @@ public:
 	Clyde clyde;
 	Ghost* Ghosts[4] = { &blinky, &pinky, &inky, &clyde };
 
-	// Sound sample played by main application at end of the loop cycle.
-	GameSoundSampleEnum SoundSampleToPlay = GameSoundSampleEnum::SMP_None;
-
 	// Several fruits are spawned concurrently and are removed one after each other again.
 	CQueueDynGeneric<SpawnedItem> SpawnedItems;
 
 	// state
 	GameRun Run;
-	bool showDebug = false;
 };
 

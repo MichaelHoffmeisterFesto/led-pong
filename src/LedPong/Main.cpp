@@ -31,8 +31,10 @@ using namespace std;
 //
 
 GameEnvironment TheEnv;
-IntroGame TheIntro(&TheEnv);
-PacManGame TheGame(&TheEnv);
+//IntroGame TheIntro(&TheEnv);
+//PacManGame TheGame(&TheEnv);
+
+GameBase* CurrentGame = new IntroGame(&TheEnv);
 
 //
 // SDL
@@ -73,12 +75,14 @@ const SDL_Color COLOR_background = { 30, 20, 20 };
 const SDL_Color COLOR_white = { 255, 255, 255 };
 
 SDL_Scancode SdlScanToMap[] = { 
+	SDL_SCANCODE_UNKNOWN,
 	SDL_SCANCODE_LEFT, SDL_SCANCODE_RIGHT, SDL_SCANCODE_UP, SDL_SCANCODE_DOWN, 
 	SDL_SCANCODE_A, SDL_SCANCODE_D, SDL_SCANCODE_W, SDL_SCANCODE_S,
 	SDL_SCANCODE_F10, SDL_SCANCODE_M, SDL_SCANCODE_G
 };
 
 GameKeyEnum GameKeyToMap[] = { 
+	KEY_ANY,
 	KEY_P1_LEFT, KEY_P1_RIGHT, KEY_P1_UP, KEY_P1_DOWN,
 	KEY_P2_LEFT, KEY_P2_RIGHT, KEY_P2_UP, KEY_P2_DOWN,
 	KEY_DEBUG, KEY_MUTE, KEY_GOD_MODE
@@ -98,12 +102,25 @@ void LoadSoundSamples()
 	SoundSamples[GameSoundSampleEnum::SMP_PacManDead] = new SDL_SoundSample("media/arcade-ui-26-229495-shortened.wav", MIX_MAX_VOLUME);
 	SoundSamples[GameSoundSampleEnum::SMP_GhostDead] = new SDL_SoundSample("media/arcade-ui-1-229498-shortened.wav", MIX_MAX_VOLUME);
 	SoundSamples[GameSoundSampleEnum::SMP_LevelWin] = new SDL_SoundSample("media/arcade-ui-11-229509-shortened.wav", MIX_MAX_VOLUME);
+	SoundSamples[GameSoundSampleEnum::SMP_IntroMusic] = new SDL_SoundSample("media/cool-hip-hop-loop-251857.wav", MIX_MAX_VOLUME / 4);
+	SoundSamples[GameSoundSampleEnum::SMP_MenuMusic] = new SDL_SoundSample("media/fast-rocky-loop-251869.wav", MIX_MAX_VOLUME / 4);
 }
 
 void PlaySoundSample(GameSoundSampleEnum ss)
 {
 	if (SoundSamples[ss] != nullptr)
 		SoundSamples[ss]->play();
+}
+
+void SoundDoAllStop()
+{
+	Mix_HaltChannel(-1);
+}
+
+bool SoundIsSomePlaying()
+{
+	int playing_chans = Mix_Playing(-1);
+	return playing_chans > 0;
 }
 
 void DeleteSoundSamples()
@@ -173,15 +190,41 @@ bool loop() {
 	// call technology neutral game core
 	//
 
-	for (int i = 0; i < SIZE_OF_ARR(SdlScanToMap); i++)
+	bool keyAny = false;
+	for (int i = 1; i < SIZE_OF_ARR(SdlScanToMap); i++)
+	{
 		TheEnv.GameKey[i] = keys[SdlScanToMap[i]];
+		keyAny = keyAny || TheEnv.GameKey[i];
+	}
+	TheEnv.GameKey[KEY_ANY] = keyAny;
 
 	// TheGame.Loop();
-	TheIntro.Loop();
+	// TheIntro.Loop();
+	if (CurrentGame != nullptr)
+	{
+		CurrentGame->Loop();
 
-	//if (!TheGame.Run.Mute) 
-	//	PlaySoundSample(TheGame.SoundSampleToPlay);
-	//TheGame.SoundSampleToPlay = GameSoundSampleEnum::SMP_None;
+		if (CurrentGame->NextGame != nullptr)
+		{
+			GameBase* oldGame = CurrentGame;
+			CurrentGame = CurrentGame->NextGame;
+			delete oldGame;
+		}
+	}
+
+	if (!TheEnv.Mute)
+	{
+		PlaySoundSample(TheEnv.SoundSampleToPlay);
+		TheEnv.SoundSampleToPlay = GameSoundSampleEnum::SMP_None;
+
+		if (TheEnv.SoundAllStop)
+		{
+			SoundDoAllStop();
+			TheEnv.SoundAllStop = false;
+		}
+
+		TheEnv.SoundIsPlaying = SoundIsSomePlaying();
+	}
 
 	TheEnv.Animate();
 
@@ -206,25 +249,31 @@ bool loop() {
 		}
 	}
 
-	// side panel
+	// Debug: to be removed!!
+	// side panel for pac man??
 
-	int spX = 14 + (WALL_Xdim + 2) * (WALL_XpixSize + WALL_Xgap);
-	int spY = 14;
+	PacManGame* IsPmg = dynamic_cast<PacManGame*>(CurrentGame);
 
-	char buffer[100];
-	sprintf_s(buffer, "Frame %02d", TheEnv.FrameCounter % GAME_FrameRate);
-	SDL_RenderDrawText(Main->Renderer, Main->FontNormal, SDL_Color_From(LedColors.White), spX, spY, buffer);	
+	if (IsPmg != nullptr && TheEnv.ShowDebug)
+	{
+		int spX = 14 + (WALL_Xdim + 2) * (WALL_XpixSize + WALL_Xgap);
+		int spY = 14;
+
+		char buffer[100];
+		sprintf_s(buffer, "Frame %02d", TheEnv.FrameCounter % GAME_FrameRate);
+		SDL_RenderDrawText(Main->Renderer, Main->FontNormal, SDL_Color_From(LedColors.White), spX, spY, buffer);
+	}
 
 	// debug this target pos
-	if (TheGame.showDebug)
+	if (IsPmg != nullptr && TheEnv.ShowDebug)
 	{
 		SDL_Color COLOR_debug = { 204, 236, 255 };
 		SDL_SetRenderDrawColor(Main->Renderer, &COLOR_debug);
 
-		for (int gni = 0; gni < std::max(1, std::min(4, TheGame.Run.NumGhost)); gni++)
+		for (int gni = 0; gni < std::max(1, std::min(4, IsPmg->Run.NumGhost)); gni++)
 		{
 			// more explicit
-			Ghost* gptr = TheGame.Ghosts[gni];
+			Ghost* gptr = IsPmg->Ghosts[gni];
 			if (gptr == nullptr)
 				continue;
 
@@ -256,7 +305,7 @@ int main(int argc, char** args)
 
 	// init SDL application; fixed size
 	Main = new SDL_Application();
-	if (!Main->init(800, 670)) return 1;	
+	if (!Main->init(510 /* 800 */, 670)) return 1;	
 
 	// init sound
 	LoadSoundSamples();

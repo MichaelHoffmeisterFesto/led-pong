@@ -24,6 +24,9 @@ private:
 	LedTexture PageBallons;
 	LedTexture PageFunnyCar;
 	LedTexture PageInfo2;
+	LedTexture PageOnePac;
+	LedTexture PageManyPac;
+	LedTexture PageCredits;
 
 	// Re-add the animations to the queue
 	void AddWelcomeAnimations();

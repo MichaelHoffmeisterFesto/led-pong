@@ -21,6 +21,10 @@ public:
 
 public:
 	// MUST be available to all games
+	// and is provided by the main function (shall be copied)
 	GameEnvironment* Env;
+
+	// If not null, next game to play. The Game needs to be fully functional.
+	GameBase* NextGame = nullptr;
 };
 

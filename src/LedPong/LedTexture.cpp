@@ -108,6 +108,43 @@ LedColor* LedTexture::operator[](int row)
 //
 //
 
+void LedTexture::DrawRect(LedColor color, int x, int y, int width, int height)
+{
+	// clip start X, Y
+	if (x < 0)
+		x = 0;
+	if (y < 0)
+		y = 0;
+	if (x >= mWidth || y >= mHeight)
+		return;
+
+	// establish width and height
+	if (width < 0)
+		width = mWidth;
+	if (height < 0)
+		width = mHeight;
+
+	if (x + width >= mWidth)
+		width = mWidth - x;
+	if (y + height >= mHeight)
+		height = mHeight - y;
+
+	// finally do the intended work
+	for (int iy = 0; iy < 2; iy++)
+		for (int ix = x; ix <= x + width; ix++)
+		{
+			Put(ix, y + 0 * iy * height, color);
+			Put(ix, y + 1 * iy * height, color);
+		}
+
+	for (int iy = y; iy <= y + height; iy++)
+		for (int ix = 0; ix < 2; ix++)
+		{
+			Put(x + 0 * ix * width, iy, color);
+			Put(x + 1 * ix * width, iy, color);
+		}
+}
+
 void LedTexture::FillRect(LedColor color, int x, int y, int width, int height)
 {
 	// clip start X, Y
@@ -150,30 +187,63 @@ void LedTexture::FillGradient(LedGradient gradient, double f)
 
 			switch (gradient)
 			{
-				case LeftToRight:
+				case GRAD_RightToLeft:
 				{
 					double midX = 1.0 * mWidth * f;
 					shade = std::max(0.0, std::min(1.0, 0.1 * (1.0 * x - midX)));
 					break;
 				}
-				case RightToLeft:
+				case GRAD_LeftToRight:
 				{
-					double midX = 1.0 * mWidth - 1.0 * mWidth * f;
-					shade = std::max(0.0, std::min(1.0, 0.1 * (1.0 * x - midX)));
+					double midX = 1.0 * mWidth * (1.0 - f);
+					shade = 1.0 - std::max(0.0, std::min(1.0, 0.1 * (1.0 * x - midX)));
 					break;
 				}
-				case TopToBottom:
+				case GRAD_BottomToTop:
 				{
 					double midY = 1.0 * mHeight * f;
 					shade = std::max(0.0, std::min(1.0, 0.1 * (1.0 * y - midY)));
 					break;
 				}
-				case TopLeftToRightBottom:
+				case GRAD_TopToBottom:
+				{
+					double midY = 1.0 * mHeight * (1.0 - f);
+					shade = 1.0 - std::max(0.0, std::min(1.0, 0.1 * (1.0 * y - midY)));
+					break;
+				}
+				case GRAD_RightBottomTopLeft:
 				{
 					double aspect = 1 * mHeight / mWidth;
 					double midX = (-1.5 * aspect * mWidth) + 3.3 * aspect * mWidth * f;
 					shade = std::max(0.0, std::min(1.0,
-						0.05 * ((1.0 * y - 64.0) + (1.0 * x - midX))
+						0.05 * ((1.0 * y - (0.5 * mHeight)) + (1.0 * x - midX))
+					));
+					break;
+				}
+				case GRAD_TopLeftToRightBottom:
+				{
+					double aspect = 1 * mHeight / mWidth;
+					double midX = (-1.5 * aspect * mWidth) + 3.3 * aspect * mWidth * (1.0 - f);
+					shade = 1.0 - std::max(0.0, std::min(1.0,
+						0.05 * ((1.0 * y - (0.5 * mHeight)) + (1.0 * x - midX))
+					));
+					break;
+				}
+				case GRAD_TopRightToLeftBottom:
+				{
+					double aspect = 1 * mHeight / mWidth;
+					double midX = (-1.5 * aspect * mWidth) + 3.3 * aspect * mWidth * f;
+					shade = std::max(0.0, std::min(1.0,
+						0.05 * ((-1.0 * y + (0.5 * mHeight)) + (1.0 * x - midX))
+					));
+					break;
+				}
+				case GRAD_LeftBottomToTopRight:
+				{
+					double aspect = 1 * mHeight / mWidth;
+					double midX = (-1.5 * aspect * mWidth) + 3.3 * aspect * mWidth * (1.0 - f);
+					shade = 1.0 - std::max(0.0, std::min(1.0,
+						0.05 * ((-1.0 * y + (0.5 * mHeight)) + (1.0 * x - midX))
 					));
 					break;
 				}
@@ -195,7 +265,8 @@ bool LedTexture::BlitFrom(
 	int destX, int destY,
 	LedTexture& src,
 	int srcX, int srcY,
-	int srcWidth, int srcHeight)
+	int srcWidth, int srcHeight,
+	int thresholdIntensity)
 {
 	// first check
 	if (destX < 0 || destX >= mWidth || destY < 0 || destY >= mHeight)
@@ -232,7 +303,9 @@ bool LedTexture::BlitFrom(
 				&& dx >= 0 && dx < mWidth && dy >= 0 && dy < mHeight)
 			{
 				// unsafe is most efficient and ok in these guards
-				(*this)[dy][dx] = src[sy][sx];
+				LedColor col = src[sy][sx];
+				if (thresholdIntensity <= 0 || (thresholdIntensity < col.PercievedIntensity()))
+					(*this)[dy][dx] = src[sy][sx];
 			}
 		}
 	}
@@ -264,7 +337,7 @@ bool LedTexture::BlendFrom(
 	for (int y=0; y < mHeight; y++)
 		for (int x = 0; x < mWidth; x++)
 		{
-			double grad = gradient.Get(x, y).PercievedIntensity();
+			double grad = 1.0 * gradient.Get(x, y).PercievedIntensity() / 255.0;
 
 			if (grad <= 0.0001)
 			{
@@ -285,7 +358,7 @@ bool LedTexture::BlendFrom(
 					grad
 				);
 
-				if (effect == LedBlendEffect::Sparcle)
+				if (effect == LedBlendEffect::BLEND_Sparcle)
 				{
 					double ints = 1.0 - 2.0 * std::max(0.0, std::min(0.5, fabs(0.5 - grad)));
 
@@ -310,14 +383,14 @@ bool LedTexture::BlendFrom(
 // Randomize
 LedGradient LedTexture::GetRandomGradient()
 {
-	int i = rand() % static_cast<int>(LedGradient::__LedGradient_Count);
+	int i = rand() % static_cast<int>(LedGradient::GRAD_NUM);
 	return (LedGradient)i;
 }
 
 // Randomize
 LedBlendEffect LedTexture::GetRandomBlendEffect()
 {
-	int i = rand() % static_cast<int>(LedBlendEffect::__LedBlendEffect_Count);
+	int i = rand() % static_cast<int>(LedBlendEffect::BLEND_NUM);
 	return (LedBlendEffect)i;
 }
 

@@ -8,7 +8,10 @@ class LedAnimation
 public:
 	LedAnimation();
 	LedAnimation(LedTexture targetTexture, double speed, 
-		LedGradient gradient, LedBlendEffect blendEffect);
+		LedGradient gradient, LedBlendEffect blendEffect,
+		int standStillFrames = 0,
+		void *lambdaData = nullptr,
+		int (*lambdaFunc)(void *, int) = nullptr);
 
 public:
 	LedTexture mStartTexture;
@@ -17,11 +20,7 @@ public:
 	double mSpeed = 1.0; // 1.0 = normal speed
 	LedGradient mGradient;
 	LedBlendEffect mBlendEffect;
+	int mStandStillFrames = 0;
+	void* mLambdaData = nullptr;
+	int (*mLambdaFunc)(void *, int) = nullptr;
 };
-
-//class LedAnimationQueue : public CQueueDynGeneric<LedAnimation>
-//{
-//public:
-//	LedAnimationQueue();
-//	~LedAnimationQueue();
-//};

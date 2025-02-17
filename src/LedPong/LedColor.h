@@ -39,10 +39,11 @@ public:
 		return res;
 	}
 
-	inline double PercievedIntensity()
+	inline unsigned char PercievedIntensity()
 	{
-		return std::max(0.0, std::min(255.0,
-			(0.21 * R) + (0.72 * G) + (0.07 * B))) / 255.0;
+		double d = std::max(0.0, std::min(255.0,
+			(0.21 * R) + (0.72 * G) + (0.07 * B)));
+		return (unsigned char)(d);
 	}
 };
 

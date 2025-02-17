@@ -19,7 +19,7 @@ bool SDL_Application::init(int width, int height) {
 
 	this->Width = width;
 	this->Height = height;
-	Window = SDL_CreateWindow("LED wall Simulation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+	Window = SDL_CreateWindow("LED matrix preview", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 		width, height, SDL_WINDOW_RESIZABLE);
 	if (!Window) {
 		cout << "Error creating window: " << SDL_GetError() << endl;

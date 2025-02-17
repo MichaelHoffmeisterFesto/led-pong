@@ -1,15 +1,24 @@
 @startuml
 
+hide empty members
 skinparam linetype polyline
+
+class SDL_Application {
+	+Renderer : SDL_Renderer*
+	+Window : SDL_Window*
+	+Height : int
+	+Width : int
+	+kill() : void
+}
 
 class Main {
     + main()
 }
 
+Main -right-> "use" SDL_Application
+
 class GameEnvironment {
 	+Screen : LedTexture
-	+TrFs : TextRendererFixedSize
-	+TrPt : TextRendererProportionalText
 	+AllowDebug : bool
 	+GodMode : bool
 	+Mute : bool
@@ -199,8 +208,8 @@ LedTexture --> "use" LedColor
 GameEnvironment --> "use" LedTexture
 
 legend right
-  Note: For giving an overview, only selected classes and members are shown.
-  Argument-lists are shortened or skipped.
+  Note: For giving an overview, only selected classes and only selected members are shown.
+  Argument-lists and result types are shortened or skipped.
 endlegend
 
 @enduml

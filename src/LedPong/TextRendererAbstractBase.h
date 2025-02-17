@@ -11,6 +11,7 @@ class TextRendererAbstractBase
 {
 public:
 	virtual void DrawTextTo(LedTexture& texture, Vec2 pixelPos,
-		const char nullTerminatedText[], int renderSpacingX = 0, int renderSpacingY = 0) = 0;
+		const char nullTerminatedText[], int renderSpacingX = 0, int renderSpacingY = 0,
+		int thresholdIntensity = -1) = 0;
 };
 

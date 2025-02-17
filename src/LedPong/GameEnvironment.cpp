@@ -52,7 +52,9 @@ GameEnvironment::GameEnvironment()
 		{ '_', 207, 3 },
 		{ '.', 211, 3 },
 		{ ',', 214, 4 },
-		{ ' ', 218, 3 }
+		{ ' ', 218, 3 },
+		{ '+', 222, 3 },
+		{ ':', 226, 3 }
 	};
 
 	TrPt = TextRendererProportionalText("media/charset-prop-5x5.bmp",

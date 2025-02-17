@@ -9,6 +9,7 @@
 
 // enum for key input
 enum GameKeyEnum {
+	KEY_ANY,
 	KEY_P1_LEFT, KEY_P1_RIGHT, KEY_P1_UP, KEY_P1_DOWN,
 	KEY_P2_LEFT, KEY_P2_RIGHT, KEY_P2_UP, KEY_P2_DOWN,
 	KEY_DEBUG, KEY_MUTE, KEY_GOD_MODE,
@@ -17,7 +18,8 @@ enum GameKeyEnum {
 
 enum GameSoundSampleEnum {
 	SMP_None, SMP_EmptyTile, SMP_EnergyPill, SMP_TurnToGhosts, SMP_TurnFromGhosts,
-	SMP_Fruit, SMP_PacManDead, SMP_GhostDead, SMP_LevelWin, SMP_MAX_NUM
+	SMP_Fruit, SMP_PacManDead, SMP_GhostDead, SMP_LevelWin, SMP_IntroMusic, SMP_MenuMusic,
+	SMP_MAX_NUM
 };
 
 // This class implement variables, states, ressources shared by ALL game class instances
@@ -65,5 +67,17 @@ public:
 
 	// Allow debug and god mode?
 	bool AllowDebug = false;
+
+	// Allow debug and god mode?
+	bool ShowDebug = false;
+
+	// true, if any sound is playing
+	bool SoundIsPlaying = false;
+
+	// true, if to stop all sound
+	bool SoundAllStop = false;
+
+	// Sound sample played by main application at end of the loop cycle.
+	GameSoundSampleEnum SoundSampleToPlay = GameSoundSampleEnum::SMP_None;
 };
 

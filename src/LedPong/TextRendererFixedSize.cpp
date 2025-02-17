@@ -20,7 +20,8 @@ void TextRendererFixedSize::DrawTextTo(
 	LedTexture& texture, 
 	Vec2 pixelPos,
 	const char nullTerminatedText[],
-	int renderSpacingX, int renderSpacingY)
+	int renderSpacingX, int renderSpacingY,
+	int thresholdIntensity)
 {
 	// check, if all required definitions are present
 	if (mCharWidth < 1
@@ -63,7 +64,8 @@ void TextRendererFixedSize::DrawTextTo(
 		texture.BlitFrom(workPos.X, workPos.Y,			// to X/Y
 			mCharDefs,									// source texture
 			(mCharWidth + mCharSpacing) * fi, 0,		// srcX/Y
-			mCharWidth, -1);							// srcWidth/heigh
+			mCharWidth, -1, 							// srcWidth/heigh
+			thresholdIntensity);						// make it "transparent"?
 
 		// advance
 		workPos.X += mCharWidth + renderSpacingX;
