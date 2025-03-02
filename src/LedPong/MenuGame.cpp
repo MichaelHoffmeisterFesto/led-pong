@@ -135,65 +135,70 @@ void MenuGame::Loop()
 	// background
 	Env->Screen.BlitFrom(0, 0, PageMainMenu);
 
-	// draw menu
-	RenderMenu(Env, Vec2(8, 36), mCurrMenu, mNumItem, mSelectedItem,
-		mFirstFrames / 4);
-
-	// saturate first frames
-	if (mFirstFrames > 0)
-		mFirstFrames--;
-
-	// move selected item?
-	if ((Env->GameKey[KEY_P1_UP] && !Env->WasGameKey[KEY_P1_UP])
-		|| (Env->GameKey[KEY_P2_UP] && !Env->WasGameKey[KEY_P2_UP]))
+	// valid menu
+	if (mCurrMenu != nullptr && mNumItem > 0)
 	{
-		MoveSelectedItem(-1);
-	}
 
-	if ((Env->GameKey[KEY_P1_DOWN] && !Env->WasGameKey[KEY_P1_DOWN])
-		|| (Env->GameKey[KEY_P2_DOWN] && !Env->WasGameKey[KEY_P2_DOWN]))
-	{
-		MoveSelectedItem(+1);
+		// draw menu
+		RenderMenu(Env, Vec2(8, 36), mCurrMenu, mNumItem, mSelectedItem,
+			mFirstFrames / 4);
+
+		// saturate first frames
+		if (mFirstFrames > 0)
+			mFirstFrames--;
+
+		// move selected item?
+		if ((Env->GameKey[KEY_P1_UP] && !Env->WasGameKey[KEY_P1_UP])
+			|| (Env->GameKey[KEY_P2_UP] && !Env->WasGameKey[KEY_P2_UP]))
+		{
+			MoveSelectedItem(-1);
+		}
+
+		if ((Env->GameKey[KEY_P1_DOWN] && !Env->WasGameKey[KEY_P1_DOWN])
+			|| (Env->GameKey[KEY_P2_DOWN] && !Env->WasGameKey[KEY_P2_DOWN]))
+		{
+			MoveSelectedItem(+1);
+		}
+
+		// left = back?
+		if ((Env->GameKey[KEY_P1_LEFT] && !Env->WasGameKey[KEY_P1_LEFT])
+			|| (Env->GameKey[KEY_P2_LEFT] && !Env->WasGameKey[KEY_P2_LEFT]))
+		{
+			mChargeNextGame = new IntroGame(Env);
+		}
+
+		// right = enter?
+		if ((Env->GameKey[KEY_P1_RIGHT] && !Env->WasGameKey[KEY_P1_RIGHT])
+			|| (Env->GameKey[KEY_P2_RIGHT] && !Env->WasGameKey[KEY_P2_RIGHT]))
+		{
+			MenuItem* mi = &mCurrMenu[mSelectedItem];
+			if (mi->Kind == MI_Switch)
+			{
+				if (mi->State == false)
+				{
+					// switch all brothers off
+					for (int i = 0; i < mi->NumBrother; i++)
+						mCurrMenu[mi->Brothers[i]].State = false;
+
+					// switch this on
+					mi->State = true;
+				}
+			}
+
+			if (mi->Kind == MI_Button)
+			{
+				if (mLoadIndex == 0 && mSelectedItem == 6)
+				{
+					// start game!!
+					mChargeNextGame = new PacManGame(Env);
+				}
+			}
+		}
 	}
 
 	// keep sound playing
 	if (!Env->SoundIsPlaying)
 		Env->SoundSampleToPlay = GameSoundSampleEnum::SMP_MenuMusic;
-
-	// left = back?
-	if ((Env->GameKey[KEY_P1_LEFT] && !Env->WasGameKey[KEY_P1_LEFT])
-		|| (Env->GameKey[KEY_P2_LEFT] && !Env->WasGameKey[KEY_P2_LEFT]))
-	{
-		mChargeNextGame = new IntroGame(Env);
-	}
-
-	// right = enter?
-	if ((Env->GameKey[KEY_P1_RIGHT] && !Env->WasGameKey[KEY_P1_RIGHT])
-		|| (Env->GameKey[KEY_P2_RIGHT] && !Env->WasGameKey[KEY_P2_RIGHT]))
-	{
-		MenuItem* mi = &mCurrMenu[mSelectedItem];
-		if (mi->Kind == MI_Switch)
-		{
-			if (mi->State == false)
-			{
-				// switch all brothers off
-				for (int i = 0; i < mi->NumBrother; i++)
-					mCurrMenu[mi->Brothers[i]].State = false;
-
-				// switch this on
-				mi->State = true;
-			}
-		}
-
-		if (mi->Kind == MI_Button)
-		{
-			if (mLoadIndex == 0 && mSelectedItem == 6)
-			{
-				// start game!!
-				mChargeNextGame = new PacManGame(Env);
-			}
-		}
-	}
 
 	// timeout?
 	if (Env->GameKey[KEY_ANY])

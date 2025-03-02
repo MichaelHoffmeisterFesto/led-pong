@@ -1,7 +1,10 @@
+#include <float.h> // for DBL_MAX ..
+
 #include "GameBase.h"
 #include "PacManGame.h"
 
-#include <float.h> // for DBL_MAX ..
+#include "MenuGame.h"
+
 #include "LevelInit.h"
 
 PacManGame::PacManGame(GameEnvironment* env) : GameBase(env)
@@ -214,12 +217,16 @@ void PacManGame::Loop()
 		// some events?
 		int playerDead = -1;
 		int ghostDead = -1;
+		bool quitGame = false;
 		bool advanceNextLevel = false;
 
 		// keys pressed for some options
 		if (Env->AllowDebug)
 		{
-			if (Env->GameKey[KEY_DEBUG] && !Env->WasGameKey[KEY_DEBUG])
+			if (Env->GameKey[KEY_DEBUG1] && !Env->WasGameKey[KEY_DEBUG1])
+				quitGame = true;
+
+			if (Env->GameKey[KEY_DEBUG3] && !Env->WasGameKey[KEY_DEBUG3])
 				advanceNextLevel = true;
 
 			if (Env->GameKey[KEY_GOD_MODE] && !Env->WasGameKey[KEY_GOD_MODE])
@@ -633,7 +640,7 @@ void PacManGame::Loop()
 		{
 			if (Players[playerDead]->Lives < 1)
 			{
-				exit(0);
+				quitGame = true;
 			}
 			else
 			{
@@ -664,6 +671,13 @@ void PacManGame::Loop()
 
 			Run.SetMessage("BUUUH");
 			Env->SoundSampleToPlay = GameSoundSampleEnum::SMP_GhostDead;
+		}
+
+		if (quitGame)
+		{
+			// return to menu
+			Env->SoundAllStop = true;
+			NextGame = new MenuGame(Env, 0);
 		}
 
 		if (advanceNextLevel)
