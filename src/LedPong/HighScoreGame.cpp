@@ -68,7 +68,7 @@ bool PD_AddHighScore(const char* name, int score)
 
 	// make new
 	HighScoreRecord hsr;
-	strcpy_s(hsr.Name, name);
+	strcpy(hsr.Name, name);
 	hsr.Score = score;
 
 	// insert

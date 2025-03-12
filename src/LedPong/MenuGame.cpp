@@ -71,15 +71,15 @@ void RenderMenu(GameEnvironment* env, Vec2 startPos, MenuItem* menu, int numItem
 	{
 		// eval state
 		MenuItem* mi = &menu[i];
-		strcpy_s(buffer, "");
+		strcpy(buffer, "");
 		switch (mi->Kind)
 		{
 			case MI_Switch:
-				sprintf_s(buffer, "%c %s", mi->State ? mi->OnChar : mi->OffChar, mi->Text.c_str());
+				sprintf(buffer, "%c %s", mi->State ? mi->OnChar : mi->OffChar, mi->Text.c_str());
 				break;
 
 			default:
-				strcpy_s(buffer, mi->Text.c_str());
+				strcpy(buffer, mi->Text.c_str());
 				break;
 		}
 

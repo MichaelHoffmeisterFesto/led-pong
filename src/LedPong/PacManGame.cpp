@@ -425,7 +425,7 @@ void PacManGame::Loop()
 				sprintf_s(buffer, "%1d", 1 + pni);
 				Env->TrPt.DrawTextTo(Env->Screen, LevelCurr->PlayerTextExtraPos[pni] * 5, buffer, 0, 0);
 
-				strcpy_s(buffer, "\0\0\0\0");
+				strcpy(buffer, "\0\0\0\0");
 				for (int i = 0; i < 3; i++)
 					if (i < pptr->Lives)
 						buffer[i] = 'W';
@@ -594,7 +594,7 @@ void PacManGame::Loop()
 		// message
 		if (Run.MsgLifeTime > 0 && LevelCurr->MessagePos.IsValid)
 		{
-			strcpy_s(buffer, Run.Message);
+			strcpy(buffer, Run.Message);
 			Env->TrPt.DrawTextTo(Env->Screen, LevelCurr->MessagePos * 5, buffer, 0, 0);
 		}
 

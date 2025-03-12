@@ -35,7 +35,7 @@ public:
 
 		// Message
 		if (MsgLifeTime == 0)
-			strcpy_s(Message, "");
+			strcpy(Message, "");
 		MsgLifeTime = std::max(0, MsgLifeTime - 1);
 
 		// Frightened
@@ -67,7 +67,7 @@ public:
 
 	inline void SetMessage(const char* msg)
 	{
-		strcpy_s(Message, msg);
+		strcpy(Message, msg);
 		MsgLifeTime = GAME_Message_Life_time_frames;
 	}
 
