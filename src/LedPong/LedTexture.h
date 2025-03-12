@@ -83,7 +83,7 @@ public:
 	static LedGradient GetRandomGradient();
 	static LedBlendEffect GetRandomBlendEffect();
 
-private:
+protected:
 	int mWidth = 0;
 	int mHeight = 0;
 	LedColor* mPixels = nullptr;

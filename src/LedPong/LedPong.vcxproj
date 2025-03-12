@@ -163,6 +163,7 @@
     <ClCompile Include="GameEnvironment.cpp" />
     <ClCompile Include="HighScoreGame.cpp" />
     <ClCompile Include="IntroGame.cpp" />
+    <ClCompile Include="LedPlasmaTexture.cpp" />
     <ClCompile Include="MenuGame.cpp" />
     <ClCompile Include="PacManGame.cpp" />
     <ClCompile Include="GameBase.cpp" />
@@ -192,6 +193,7 @@
     <ClInclude Include="GameEnvironment.h" />
     <ClInclude Include="HighScoreGame.h" />
     <ClInclude Include="IntroGame.h" />
+    <ClInclude Include="LedPlasmaTexture.h" />
     <ClInclude Include="MenuGame.h" />
     <ClInclude Include="PacManGame.h" />
     <ClInclude Include="GameBase.h" />

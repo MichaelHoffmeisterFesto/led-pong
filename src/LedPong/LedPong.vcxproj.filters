@@ -93,6 +93,9 @@
     <ClCompile Include="HighScoreGame.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="LedPlasmaTexture.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SDL_Helper.h">
@@ -174,6 +177,9 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="HighScoreGame.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="LedPlasmaTexture.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
