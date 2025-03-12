@@ -40,7 +40,7 @@ public:
 			Mute = Mute;
 
 		// allow slope detection of keys
-		memcpy_s(WasGameKey, sizeof(WasGameKey), GameKey, sizeof(GameKey));
+		memcpy(WasGameKey, GameKey, sizeof(GameKey));
 	}
 
 public:

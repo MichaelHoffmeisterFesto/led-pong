@@ -43,7 +43,7 @@ void MenuGame::LoadMenu(int menuIndex)
 		case 0:
 			len = sizeof(GlobalMenu);
 			mCurrMenu = (MenuItem*) malloc(len);
-			memcpy_s(mCurrMenu, len, GlobalMenu, sizeof(GlobalMenu));
+			memcpy(mCurrMenu, GlobalMenu, sizeof(GlobalMenu));
 			mNumItem = SIZE_OF_ARR(GlobalMenu);
 			mSelectedItem = 1;
 			break;
