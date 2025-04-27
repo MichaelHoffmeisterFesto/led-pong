@@ -17,13 +17,13 @@ MenuItem NullMenu[]{
 MenuItem GlobalMenu[] =
 {
 	/* 00 */ { MI_TextOnly, "MAIN MENU",  0,  0, false, ' ', ' ', 0, {} },
-	/* 01 */ { MI_Switch  , "1 PLAYER" ,  0,  2, true , '+', ' ', 1, { 2 } },
-	/* 02 */ { MI_Switch  , "2 PLAYER" ,  0,  3, false, '+', ' ', 1, { 1 } },
-	/* 03 */ { MI_Switch  , "ROOKIE"   ,  0,  5, false, '+', ' ', 2, { 4, 5 } },
-	/* 04 */ { MI_Switch  , "NORMAL"   ,  0,  6, true,  '+', ' ', 2, { 3, 5 } },
-	/* 05 */ { MI_Switch  , "EXPERT"   ,  0,  7, false, '+', ' ', 2, { 3, 4 } },
-	/* 06 */ { MI_Button  , "START"    ,  0,  9, false, '+', ' ', 0, {} },
-	/* 07 */ { MI_Button  , "SETUP"    , 10,  9, false, '+', ' ', 0, {} },
+	/* 01 */ { MI_Button  , "START"    ,  0,  2, false, '+', ' ', 0, {} },
+	/* 02 */ { MI_Switch  , "1 PLAYER" , 11,  1, true , '+', ' ', 1, { 3 } },
+	/* 03 */ { MI_Switch  , "2 PLAYER" , 11,  2, false, '+', ' ', 1, { 2 } },
+	/* 04 */ { MI_Switch  , "ROOKIE"   , 14,  6, true, '+', ' ', 2, { 5, 6 } },
+	/* 05 */ { MI_Switch  , "NORMAL"   , 14,  7, false,  '+', ' ', 2, { 4, 6 } },
+	/* 06 */ { MI_Switch  , "EXPERT"   , 14,  8, false, '+', ' ', 2, { 4, 5 } },
+	/* 07 */ { MI_Button  , "SETUP"    , 14,  9, false, '+', ' ', 0, {} },
 };
 
 void MenuGame::LoadMenu(int menuIndex)
@@ -43,7 +43,8 @@ void MenuGame::LoadMenu(int menuIndex)
 		case 0:
 			len = sizeof(GlobalMenu);
 			mCurrMenu = (MenuItem*) malloc(len);
-			memcpy(mCurrMenu, GlobalMenu, sizeof(GlobalMenu));
+			if (mCurrMenu != nullptr)
+				memcpy(mCurrMenu, GlobalMenu, sizeof(GlobalMenu));
 			mNumItem = SIZE_OF_ARR(GlobalMenu);
 			mSelectedItem = 1;
 			break;
@@ -56,7 +57,7 @@ void MenuGame::LoadMenu(int menuIndex)
 MenuGame::MenuGame(GameEnvironment* env, int menuIndex) : GameBase(env)
 {
 	// Ressources
-	PageMainMenu = LedTexture("media/main_menu.bmp");
+	PageMainMenu = LedTexture("media/ai_tech_pac_4x3_small.bmp");
 
 	// load
 	if (menuIndex >= 0)
@@ -90,7 +91,7 @@ void RenderMenu(GameEnvironment* env, Vec2 startPos, MenuItem* menu, int numItem
 		// selected?
 		if (i == selectedItem)
 		{
-			env->Screen.DrawRect(LedColors.White, pos.X - 2, pos.Y - 2, 2 + 6 * (0 + strnlen_s(buffer, sizeof(buffer))), 8);
+			env->Screen.DrawRect(LedColors.White, pos.X - 2, pos.Y - 2, 2 + 6 * (0 + strnlen(buffer, sizeof(buffer))), 8);
 		}
 	}
 }
@@ -140,7 +141,7 @@ void MenuGame::Loop()
 	{
 
 		// draw menu
-		RenderMenu(Env, Vec2(8, 36), mCurrMenu, mNumItem, mSelectedItem,
+		RenderMenu(Env, Vec2(6, 7), mCurrMenu, mNumItem, mSelectedItem,
 			mFirstFrames / 4);
 
 		// saturate first frames
@@ -187,10 +188,18 @@ void MenuGame::Loop()
 
 			if (mi->Kind == MI_Button)
 			{
-				if (mLoadIndex == 0 && mSelectedItem == 6)
+				if (mLoadIndex == 0 && mSelectedItem == 1)
 				{
+					// get the mode
+					int players = (mCurrMenu[3].State == true) ? 2 : 1;
+					int diffic = 1;
+					if (mCurrMenu[5].State == true)
+						diffic = 2;
+					if (mCurrMenu[6].State == true)
+						diffic = 3;
+
 					// start game!!
-					mChargeNextGame = new PacManGame(Env);
+					mChargeNextGame = new PacManGame(Env, players, diffic);
 				}
 			}
 		}

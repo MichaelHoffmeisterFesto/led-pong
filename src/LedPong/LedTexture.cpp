@@ -1,7 +1,8 @@
 #define _CRT_SECURE_NO_WARNINGS
 
 #include <algorithm>    // std::copy
-
+#include <cmath>      
+#include <cstdlib>
 #include "LedTexture.h"
 #include "LedColor.h"
 #include "LedColors.h"
@@ -167,8 +168,8 @@ void LedTexture::FillRect(LedColor color, int x, int y, int width, int height)
 		height = mHeight - y;
 
 	// finally do the intended work
-	for (int iy = y; iy < y + height; y++)
-		for (int ix = x; ix < x + width; x++)
+	for (int iy = y; iy < y + height; iy++)
+		for (int ix = x; ix < x + width; ix++)
 			Put(ix, iy, color);
 }
 
@@ -213,7 +214,7 @@ void LedTexture::FillGradient(LedGradient gradient, double f)
 				}
 				case GRAD_RightBottomTopLeft:
 				{
-					double aspect = 1 * mHeight / mWidth;
+					double aspect = 1.0 * mHeight / mWidth;
 					double midX = (-1.5 * aspect * mWidth) + 3.3 * aspect * mWidth * f;
 					shade = std::max(0.0, std::min(1.0,
 						0.05 * ((1.0 * y - (0.5 * mHeight)) + (1.0 * x - midX))
@@ -222,7 +223,7 @@ void LedTexture::FillGradient(LedGradient gradient, double f)
 				}
 				case GRAD_TopLeftToRightBottom:
 				{
-					double aspect = 1 * mHeight / mWidth;
+					double aspect = 1.0 * mHeight / mWidth;
 					double midX = (-1.5 * aspect * mWidth) + 3.3 * aspect * mWidth * (1.0 - f);
 					shade = 1.0 - std::max(0.0, std::min(1.0,
 						0.05 * ((1.0 * y - (0.5 * mHeight)) + (1.0 * x - midX))
@@ -231,7 +232,7 @@ void LedTexture::FillGradient(LedGradient gradient, double f)
 				}
 				case GRAD_TopRightToLeftBottom:
 				{
-					double aspect = 1 * mHeight / mWidth;
+					double aspect = 1.0 * mHeight / mWidth;
 					double midX = (-1.5 * aspect * mWidth) + 3.3 * aspect * mWidth * f;
 					shade = std::max(0.0, std::min(1.0,
 						0.05 * ((-1.0 * y + (0.5 * mHeight)) + (1.0 * x - midX))
@@ -240,7 +241,7 @@ void LedTexture::FillGradient(LedGradient gradient, double f)
 				}
 				case GRAD_LeftBottomToTopRight:
 				{
-					double aspect = 1 * mHeight / mWidth;
+					double aspect = 1.0 * mHeight / mWidth;
 					double midX = (-1.5 * aspect * mWidth) + 3.3 * aspect * mWidth * (1.0 - f);
 					shade = 1.0 - std::max(0.0, std::min(1.0,
 						0.05 * ((-1.0 * y + (0.5 * mHeight)) + (1.0 * x - midX))

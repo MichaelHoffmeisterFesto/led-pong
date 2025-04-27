@@ -39,7 +39,7 @@ public:
 	}
 
 	virtual inline bool IsEnergizerActive(GameRun& run) { 
-		return mTileCode == '*' && (run.FrameCounter % 300) < 90; 
+		return mTileCode == '*' && (run.FrameCounter % 300) < 3 * run.EnergizerDutyCycle; 
 	}
 
 	virtual inline bool IsEmptyPill() { return mTileCode == ' '; }
@@ -54,7 +54,7 @@ public:
 			|| mTileCode == 'c' || mTileCode == 'e' || mTileCode == 'g';
 	}
 
-	virtual inline char GetTileAvatarChar(GameRun& run) { 
+	virtual inline char GetTileAvatarChar(GameRun& run) {
 		if (mTileCode == '*')
 			return IsEnergizerActive(run) ? '*' : '.';
 		return mTileCode; 

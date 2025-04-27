@@ -21,11 +21,11 @@ public:
 
 private:
 	// ressources
-	LedTexture PageBallons;
-	LedTexture PageFunnyCar;
-	LedTexture PageInfo2;
-	LedTexture PageOnePac;
-	LedTexture PageManyPac;
+	LedTexture PageEyedBall;
+	LedTexture PageManyPacs;
+	LedTexture PageInfo;
+	LedTexture PageTechMan;
+	LedTexture PageRainbow;
 	LedTexture PageCredits;
 
 	// Re-add the animations to the queue

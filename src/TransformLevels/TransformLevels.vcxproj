@@ -19,12 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>16.0</VCProjectVersion>
-    <ProjectGuid>{DD1BA403-FF8A-40C2-A6F5-3F8FFCE32BD6}</ProjectGuid>
+    <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>Sdl2Test</RootNamespace>
+    <ProjectGuid>{59c88d06-f504-4c81-82e8-873af5158cf2}</ProjectGuid>
+    <RootNamespace>TransformLevels</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>LedPong</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -71,60 +70,21 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)..\SDL2\include;$(ProjectDir)..\SDL2_mixer-2.8.0\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)..\SDL2\lib\x86;$(ProjectDir)..\SDL2_mixer-2.8.0\lib\x86;$(LibraryPath)</LibraryPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)..\SDL2\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)..\SDL2\lib\x86;$(LibraryPath)</LibraryPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>false</LinkIncremental>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LinkIncremental>false</LinkIncremental>
-  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);Use_SDL_Grafix</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_ttf.lib;SDL2_mixer.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ClCompile>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
-      <Optimization>Disabled</Optimization>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-    </ClCompile>
-    <Link>
-      <SubSystem>Console</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
@@ -138,12 +98,21 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
@@ -158,63 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Actor.cpp" />
-    <ClCompile Include="CQueueDynGeneric.cpp" />
-    <ClCompile Include="GameEnvironment.cpp" />
-    <ClCompile Include="HighScoreGame.cpp" />
-    <ClCompile Include="IntroGame.cpp" />
-    <ClCompile Include="LedPlasmaTexture.cpp" />
-    <ClCompile Include="MenuGame.cpp" />
-    <ClCompile Include="PacManGame.cpp" />
-    <ClCompile Include="GameBase.cpp" />
-    <ClCompile Include="GameRun.cpp" />
-    <ClCompile Include="LedAnimation.cpp" />
-    <ClCompile Include="LedColor.cpp" />
-    <ClCompile Include="LedColors.cpp" />
-    <ClCompile Include="LedTexture.cpp" />
-    <ClCompile Include="LevelInit.cpp" />
-    <ClCompile Include="SDL_Application.cpp" />
-    <ClCompile Include="SDL_Helper.cpp" />
-    <ClCompile Include="Main.cpp" />
-    <ClCompile Include="SDL_SoundSample.cpp" />
-    <ClCompile Include="SpawnedItem.cpp" />
-    <ClCompile Include="TextRendererAbstractBase.cpp" />
-    <ClCompile Include="TextRendererFixedSize.cpp" />
-    <ClCompile Include="TextRendererProportionalText.cpp" />
-    <ClCompile Include="TilePos.cpp" />
-    <ClCompile Include="Tiles.cpp" />
-    <ClCompile Include="TileFactory.cpp" />
-    <ClCompile Include="TileMap.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Actor.h" />
-    <ClInclude Include="basic.h" />
-    <ClInclude Include="CQueueDynGeneric.h" />
-    <ClInclude Include="GameEnvironment.h" />
-    <ClInclude Include="HighScoreGame.h" />
-    <ClInclude Include="IntroGame.h" />
-    <ClInclude Include="LedPlasmaTexture.h" />
-    <ClInclude Include="MenuGame.h" />
-    <ClInclude Include="PacManGame.h" />
-    <ClInclude Include="GameBase.h" />
-    <ClInclude Include="GameConst.h" />
-    <ClInclude Include="GameRun.h" />
-    <ClInclude Include="LedAnimation.h" />
-    <ClInclude Include="LedColor.h" />
-    <ClInclude Include="LedColors.h" />
-    <ClInclude Include="LedTexture.h" />
-    <ClInclude Include="LevelInit.h" />
-    <ClInclude Include="SDL_Application.h" />
-    <ClInclude Include="SDL_Helper.h" />
-    <ClInclude Include="SDL_SoundSample.h" />
-    <ClInclude Include="SpawnedItem.h" />
-    <ClInclude Include="TextRendererAbstractBase.h" />
-    <ClInclude Include="TextRendererFixedSize.h" />
-    <ClInclude Include="TextRendererProportionalText.h" />
-    <ClInclude Include="VectorArith.h" />
-    <ClInclude Include="Tiles.h" />
-    <ClInclude Include="TileFactory.h" />
-    <ClInclude Include="TileMap.h" />
+    <ClCompile Include="TransformLevels.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

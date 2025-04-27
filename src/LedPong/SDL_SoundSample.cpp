@@ -2,9 +2,10 @@
 
 SDL_SoundSample::SDL_SoundSample(const std::string& path, int volume)
     : chunk(Mix_LoadWAV(path.c_str()), Mix_FreeChunk) {
-    if (!chunk.get()) {
+    if (chunk == nullptr || !chunk.get()) {
         printf("Couldn't load audio sample: %s", path.c_str());
         // LOG("Couldn't load audio sample: ", path);
+        return;
     }
 
     Mix_VolumeChunk(chunk.get(), volume);

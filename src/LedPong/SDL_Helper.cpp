@@ -2,6 +2,8 @@
 #include "SDL_Helper.h"
 #include "LedColor.h"
 
+#ifdef Use_SDL_Grafix
+
 using namespace std;
 
 int
@@ -145,3 +147,5 @@ SDL_Color SDL_Color_From(LedColor lc)
 {
 	return SDL_Color{ lc.R, lc.G, lc.B };
 }
+
+#endif

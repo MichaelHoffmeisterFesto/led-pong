@@ -43,7 +43,7 @@ using namespace std;
 class PacManGame : public GameBase
 {
 public:
-	PacManGame(GameEnvironment* env);
+	PacManGame(GameEnvironment* env, int players, int difficulty);
 	~PacManGame();
 
 	// Restarts ghost from initial pos, all modes reset, but level (pills, score, ..) untouched
@@ -60,6 +60,10 @@ public:
 	TileMap* Levels[LEVEL_Max] = { 0 };
 	int LevelNum = 0;
 	TileMap* LevelCurr;
+
+	// modes
+	int mPlayers = 1;
+	int mDifficulty = 2;
 
 	// actors
 	Player Player1, Player2;

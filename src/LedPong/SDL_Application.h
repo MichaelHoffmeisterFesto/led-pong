@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef Use_SDL_Grafix
+
 #include <SDL.h>
 #include <SDL_ttf.h>
 #include <SDL_mixer.h>
@@ -19,3 +21,4 @@ public:
 	void kill();	
 };
 
+#endif

@@ -1,6 +1,8 @@
 #include <iostream>
 #include "SDL_Application.h"
 
+#ifdef Use_SDL_Grafix
+
 using namespace std;
 
 bool SDL_Application::init(int width, int height) {
@@ -69,3 +71,5 @@ void SDL_Application::kill() {
 	SDL_DestroyWindow(Window);
 	SDL_Quit();
 }
+
+#endif

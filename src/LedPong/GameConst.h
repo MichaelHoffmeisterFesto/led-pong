@@ -10,8 +10,8 @@ const int GAME_Max_Player = 2;
 const int GAME_Max_Ghost = 4;
 
 // 96:128 = 3:4
-const int WALL_Xdim = 3 * 32;
-const int WALL_Ydim = 2 * 64;
+const int WALL_Xdim = 2 * 64;
+const int WALL_Ydim = 3 * 32;
 
 const int WALL_Xgap = 1;
 const int WALL_Ygap = 1;

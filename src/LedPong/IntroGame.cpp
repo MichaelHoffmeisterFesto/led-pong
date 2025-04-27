@@ -11,12 +11,12 @@
 IntroGame::IntroGame(GameEnvironment* env) : GameBase(env)
 {
 	// Ressources
-	PageBallons = LedTexture("media/ballons.bmp");
-	PageFunnyCar = LedTexture("media/ai_funny_car.bmp");
-	PageInfo2 = LedTexture("media/HKA_Info2.bmp");
-	PageOnePac = LedTexture("media/ai_pac_man_small.bmp");
-	PageManyPac = LedTexture("media/ai_many_pacs_small.bmp");
-	PageCredits = LedTexture("media/Credits_small.bmp");
+	PageEyedBall = LedTexture("media/ai_eyed_ball_4x3_small.bmp");
+	PageManyPacs = LedTexture("media/ai_many_pacs_4x3_small.bmp");
+	PageInfo = LedTexture("media/ai_pac_comic_4x3_HKA_small.bmp");
+	PageTechMan = LedTexture("media/ai_tech_man_4x3_small.bmp");
+	PageRainbow = LedTexture("media/ai_pac_rainbow_4x3_small.bmp");
+	PageCredits = LedTexture("media/Credits_4x3_small.bmp");
 
 	// first sequence of animations
 	AddWelcomeAnimations();
@@ -49,11 +49,11 @@ int CreditsData_StartStop[] = {
 
 const char* CreditsData_Texts[] = {
 	"PIX:CHATGPT",
+	"+PERCENTAGE",
 	"SOUNDS:PIXABAY",
-	"LUCA DI ",
-	"ALESSANDRO + ",
-	"SOUNDREALITY +",
-	"SERGEQUADRADO",
+	"+LUCA DI ALESSANDRO",
+	"+SOUNDREALITY",
+	"+SERGEQUADRADO",
 	"COPYRIGHT:",
 	"M.HOFFMEISTER"
 };
@@ -82,15 +82,17 @@ int CreditsSlideIn(void* vp, int frame)
 	{
 		int startI = data->StartStop[2 * i + 0];
 		int stopI = data->StartStop[2 * i + 1];
-		int xpos = 96 + 4;
+		int xpos = WALL_Xdim + 4;
 		if (data->FrameNo < startI)
-			xpos = 96 + 4;
+			xpos = WALL_Xdim + 4;
 		else if (data->FrameNo > stopI)
-			xpos = 5;
+			xpos = 10;
 		else
-			xpos = 5 + (int)((1.0 - (1.0 * data->FrameNo - startI) / abs(stopI - startI)) * (1.0 * (96 + 4) - 5));
+			xpos = 10 + (int)((1.0 - (1.0 * data->FrameNo - startI) / abs(stopI - startI)) * (1.0 * (WALL_Xdim + 4) - 5));
 
-		data->Env->TrPt.DrawTextTo(data->Env->Screen, Vec2(xpos, 68 + 7 * i), data->Texts[i], 1, 0);
+		data->Env->TrPt.DrawTextTo(
+			data->Env->Screen, Vec2(xpos, 32 + 7 * i), data->Texts[i], 
+			1, 0, 50);
 	}
 	data->FrameNo++;
 	return 0;
@@ -101,31 +103,31 @@ void IntroGame::AddWelcomeAnimations()
 	if (rand() % 1000 < 800)
 	{
 		AnimationQueue.enqueue(LedAnimation(
-			PageInfo2, 1.0, LedTexture::GetRandomGradient(), LedTexture::GetRandomBlendEffect(), 2 * GAME_FrameRate));
+			PageInfo, 1.0, LedTexture::GetRandomGradient(), LedTexture::GetRandomBlendEffect(), 2 * GAME_FrameRate));
 	}
 
 	if (rand() % 1000 < 300)
 	{
 		AnimationQueue.enqueue(LedAnimation(
-			PageFunnyCar, 1.0, LedTexture::GetRandomGradient(), LedTexture::GetRandomBlendEffect(), 2 * GAME_FrameRate));
+			PageManyPacs, 1.0, LedTexture::GetRandomGradient(), LedTexture::GetRandomBlendEffect(), 2 * GAME_FrameRate));
 	}
 
 	if (rand() % 1000 < 600)
 	{
 		AnimationQueue.enqueue(LedAnimation(
-			PageOnePac, 2.0, LedTexture::GetRandomGradient(), LedTexture::GetRandomBlendEffect(), 2 * GAME_FrameRate));
+			PageTechMan, 2.0, LedTexture::GetRandomGradient(), LedTexture::GetRandomBlendEffect(), 2 * GAME_FrameRate));
 	}
 
 	if (rand() % 1000 < 500)
 	{
 		AnimationQueue.enqueue(LedAnimation(
-			PageManyPac, 2.0, LedTexture::GetRandomGradient(), LedTexture::GetRandomBlendEffect(), 2 * GAME_FrameRate));
+			PageRainbow, 2.0, LedTexture::GetRandomGradient(), LedTexture::GetRandomBlendEffect(), 2 * GAME_FrameRate));
 	}
 
 	if (rand() % 1000 < 200)
 	{
 		AnimationQueue.enqueue(LedAnimation(
-			PageBallons, 2.0, LedTexture::GetRandomGradient(), LedTexture::GetRandomBlendEffect(), 2 * GAME_FrameRate));
+			PageEyedBall, 2.0, LedTexture::GetRandomGradient(), LedTexture::GetRandomBlendEffect(), 2 * GAME_FrameRate));
 	}
 
 	if (rand() % 1000 < 700)

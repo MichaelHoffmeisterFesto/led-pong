@@ -7,10 +7,14 @@
 
 #include "LevelInit.h"
 
-PacManGame::PacManGame(GameEnvironment* env) : GameBase(env)
+PacManGame::PacManGame(GameEnvironment* env, int players, int difficulty) : GameBase(env)
 {
 	// level presets (outsourced for clarity)
 	LevelInit::InitPresetLevels(LevelNum, Levels);
+
+	// remember
+	Run.NumPlayer = players;
+	Run.Difficulty = difficulty;
 
 	// load level
 	LoadLevel(0, 1);
@@ -40,7 +44,8 @@ void PacManGame::RestartLevel()
 	}
 }
 
-void PacManGame::LoadLevel(int tileMapIndex, int levelNo)
+void PacManGame::LoadLevel(
+	int tileMapIndex, int levelNo)
 {
 	// remember
 	if (tileMapIndex >= 0 && tileMapIndex < LevelNum)
@@ -92,6 +97,28 @@ void PacManGame::LoadLevel(int tileMapIndex, int levelNo)
 			break;
 	}
 
+	// modify according the modes
+	if (Run.Difficulty == 1)
+	{
+		// rooky
+		phaseStepGhostNorm *= 0.8;
+		phaseStepGhostFright *= 0.8;
+		Run.EnergizerDutyCycle = 50;
+	}
+	else
+	if (Run.Difficulty == 3)
+	{
+		// expert
+		phaseStepGhostNorm *= 1.15;
+		phaseStepGhostFright *= 1.15;
+		Run.EnergizerDutyCycle = 20;
+	}
+	else
+	{
+		Run.EnergizerDutyCycle = 30;
+	}
+
+	// write into actors
 	for (int i = 0; i < SIZE_OF_ARR(Players); i++)
 	{
 		if (Players[i] == nullptr)
@@ -138,21 +165,21 @@ void PacManGame::Loop()
 		// blink player
 		for (int pni = 0; pni < std::max(1, std::min(2, Run.NumPlayer)); pni++)
 		{
-			char xx[] = { Players[pni]->GetDeadPlayerAvatar(Run.SpecialAnimPhase), '\0'};
+			char buf2[] = { Players[pni]->GetDeadPlayerAvatar(Run.SpecialAnimPhase), '\0'};
 			Env->TrFs.DrawTextTo(
 				Env->Screen, Players[pni]->GetCurrentPixelPos(Vec2(5, 5)),
-				xx
+				buf2
 			);
 		}
 
 		// animate ghosts (if directional vector is not 0/0)
 		for (int gni = 0; gni < std::max(1, std::min(4, Run.NumGhost)); gni++)
 		{
-			char xx[] = { Ghosts[gni]->GetGhostAvatarChar(Run, Ghosts[gni]->CurrentDirection), '\0'};
-			Vec2 xy = Run.SpecialAnimGhostDelta[gni] * (5.0 * Run.SpecialAnimPhase);
+			char buf2[] = { Ghosts[gni]->GetGhostAvatarChar(Run, Ghosts[gni]->CurrentDirection), '\0'};
+			Vec2 phaseg = Run.SpecialAnimGhostDelta[gni] * (5.0 * Run.SpecialAnimPhase);
 			Env->TrFs.DrawTextTo(
-				Env->Screen, Ghosts[gni]->GetCurrentPixelPos(Vec2(5, 5)) + xy,
-				xx
+				Env->Screen, Ghosts[gni]->GetCurrentPixelPos(Vec2(5, 5)) + phaseg,
+				buf2
 			);
 		}
 
@@ -211,8 +238,19 @@ void PacManGame::Loop()
 			Run.CountDownToChase = 5 * GAME_FrameRate;
 		}
 
-		// the basic map is drawn every frame!
+		// the basic map is drawn every frame!		
 		LevelCurr->DrawMap(Run, Env->Screen, Vec2(0, 0), Env->TrFs, 5, 5);
+
+		// (optimized) black boundaries
+		Env->Screen.FillRect(LedColors.Black,
+			LevelCurr->GetWidth() * 5, 0,
+			Env->Screen.GetWidth() - LevelCurr->GetWidth() * 5, LevelCurr->GetHeight() * 5);
+
+		Env->Screen.FillRect(LedColors.Black,
+			0, LevelCurr->GetHeight() * 5,
+			Env->Screen.GetWidth(),
+			Env->Screen.GetHeight() - LevelCurr->GetHeight() * 5);
+
 
 		// some events?
 		int playerDead = -1;
@@ -232,7 +270,7 @@ void PacManGame::Loop()
 			if (Env->GameKey[KEY_GOD_MODE] && !Env->WasGameKey[KEY_GOD_MODE])
 			{
 				Env->GodMode = !Env->GodMode;
-				sprintf_s(buffer, "GOD %01d", Env->GodMode);
+				sprintf(buffer, "GOD %01d", Env->GodMode);
 				Run.SetMessage(buffer);
 				Env->SoundSampleToPlay = GameSoundSampleEnum::SMP_Fruit;
 			}
@@ -248,10 +286,10 @@ void PacManGame::Loop()
 			Player* pptr = Players[pni];
 
 			// draw player itself
-			char xx[] = { pptr->GetPlayerAvatarChar(Run, pptr->CurrentDirection), '\0' };
+			char buf2[] = { pptr->GetPlayerAvatarChar(Run, pptr->CurrentDirection), '\0' };
 			Env->TrFs.DrawTextTo(
 				Env->Screen, pptr->GetCurrentPixelPos(Vec2(5, 5)),
-				xx
+				buf2
 			);
 
 			pptr->Animate(Run);
@@ -333,6 +371,13 @@ void PacManGame::Loop()
 								Env->SoundSampleToPlay = GameSoundSampleEnum::SMP_TurnToGhosts;
 								// see: https://pacman.holenet.info/#LvlSpecs
 								Run.FrightenedCounter = std::max(2, (7 - Run.LevelNo)) * GAME_FrameRate;
+
+								// modify according mode
+								if (mDifficulty == 1)
+									Run.FrightenedCounter = 1.5 * Run.FrightenedCounter;
+								if (mDifficulty == 3)
+									Run.FrightenedCounter = 1.7 * Run.FrightenedCounter;
+
 								Run.SetMessage("SCARE");
 							}
 							else
@@ -379,6 +424,23 @@ void PacManGame::Loop()
 						// also count as consumed pill in any case
 						if (Run.PillsAvailable > 0)
 							Run.PillsAvailable--;
+
+						// finished the game?
+						if (false)
+						{
+							// more elegant .. not working fully correct
+							if (Run.PillsAvailable < 1)
+							{
+								advanceNextLevel = true;
+							}
+						}
+						else
+						{
+							// brute force
+							LevelCurr->UpdatePillsAvailable();
+							if (LevelCurr->PillsTotal < 1)
+								advanceNextLevel = true;
+						}
 					}
 					else
 					{
@@ -409,20 +471,20 @@ void PacManGame::Loop()
 			if (LevelCurr->PlayerTextScorePos[pni].IsValid)
 			{
 				if (pptr->Score <= 9999)
-					sprintf_s(buffer, "%04d", pptr->Score);
+					sprintf(buffer, "%04d", pptr->Score);
 				else
 				{
 					if (Run.TextSwitch == 0)
-						sprintf_s(buffer, "%03dK", pptr->Score / 1000);
+						sprintf(buffer, "%03dK", pptr->Score / 1000);
 					else
-						sprintf_s(buffer, "K%03d", pptr->Score % 1000);
+						sprintf(buffer, "K%03d", pptr->Score % 1000);
 				}
 				Env->TrPt.DrawTextTo(Env->Screen, LevelCurr->PlayerTextScorePos[pni] * 5, buffer, 1, 0);
 			}
 
 			if (LevelCurr->PlayerTextExtraPos[pni].IsValid)
 			{
-				sprintf_s(buffer, "%1d", 1 + pni);
+				sprintf(buffer, "%1d", 1 + pni);
 				Env->TrPt.DrawTextTo(Env->Screen, LevelCurr->PlayerTextExtraPos[pni] * 5, buffer, 0, 0);
 
 				strcpy(buffer, "\0\0\0\0");
@@ -685,10 +747,12 @@ void PacManGame::Loop()
 			// Start new level
 			Run.LevelNo++;
 			int tileMapNdx = (Run.LevelNo + 0) % 2;
+			Players[0]->Lives = 3;
+			Players[1]->Lives = 3;
 			LoadLevel(tileMapNdx, Run.LevelNo);
 
 			// Indicate
-			sprintf_s(buffer, "LEV%02d", Run.LevelNo);
+			sprintf(buffer, "LEV%02d", Run.LevelNo);
 			Run.SetMessage(buffer);
 			Env->SoundSampleToPlay = GameSoundSampleEnum::SMP_LevelWin;
 		}

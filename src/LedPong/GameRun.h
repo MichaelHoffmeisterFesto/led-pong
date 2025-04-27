@@ -1,6 +1,8 @@
 #pragma once
 
 #include <algorithm>
+#include <string.h>
+#include "basic.h"
 #include "VectorArith.h"
 #include "GameConst.h"
 
@@ -123,4 +125,10 @@ public:
 
 	// Number of ghosts (typically 4)
 	int NumGhost = 4;
+
+	// Difficulty level (1=rookie, 2=normal, 3=expert)
+	int Difficulty = 2;
+
+	// mode dependent
+	int EnergizerDutyCycle = 30;
 };

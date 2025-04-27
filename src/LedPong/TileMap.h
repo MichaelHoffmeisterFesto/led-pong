@@ -120,6 +120,8 @@ public:
 	Vec2 PlayerTextScorePos[2];
 	Vec2 PlayerTextExtraPos[2];
 	Vec2 MessagePos;
+	
+	void UpdatePillsAvailable();
 
 	// Total number of pills on the map
 	int PillsTotal = 0;
@@ -130,6 +132,5 @@ private:
 	TileBase** mTiles = nullptr;
 
 	// Will count and update the current number (not points!) of energy pills in the map.
-	void UpdatePillsAvailable();
 };
 

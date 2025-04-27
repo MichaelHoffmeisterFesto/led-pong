@@ -129,6 +129,7 @@ TileMap* TileMap::Clone()
 	__FULL_COPY(PlayerTextScorePos);
 	__FULL_COPY(PlayerTextExtraPos);
 	res->MessagePos = MessagePos;
+	res->PillsTotal = PillsTotal;
 #undef __FULL_COPY
 
 	return res;
