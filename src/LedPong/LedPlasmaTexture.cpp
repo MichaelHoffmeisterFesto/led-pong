@@ -20,8 +20,8 @@ void LedPlasmaTexture::Init()
 	d1 = sqrt(std::max(mWidth, mHeight)) * 1.5;
 	d2 = d1 / 2.0;
 
-	int dx = rand() % 1024;
-	int dy = rand() % 1024;
+	dx = rand() % 1024;
+	dy = rand() % 1024;
 }
 
 struct HSVColor {
