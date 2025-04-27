@@ -2,9 +2,12 @@
 
 #ifdef Use_SDL_Grafix
 
+#ifdef WIN32
 #include <SDL.h>
 #include <SDL_ttf.h>
 #include <SDL_mixer.h>
+#else
+#endif
 
 class SDL_Application
 {

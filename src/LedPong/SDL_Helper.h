@@ -3,11 +3,14 @@
 #ifdef Use_SDL_Grafix
 
 #include <iostream>
+
+#ifdef WIN32
 #include <SDL.h>
 #include <SDL_ttf.h>
-
-// #include <SDL2/SDL.h>
-// #include <SDL2/SDL_ttf.h>
+#else
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
+#endif
 
 #include "LedColor.h"
 

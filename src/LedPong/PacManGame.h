@@ -11,8 +11,13 @@ using namespace std;
 #include <cstdlib> // for srand() and rand()
 #include <ctime>   // for time()
 
+#ifdef WIN32
 #include <SDL.h>
 #include <SDL_ttf.h>
+#else
+#include <SDL2/SDL.h>
+#endif
+
 #include "SDL_Helper.h"
 #include "SDL_Application.h"
 
