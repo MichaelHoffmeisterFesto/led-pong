@@ -218,6 +218,11 @@ bool loop() {
 
 		TheEnv.SoundIsPlaying = SoundIsSomePlaying();
 	}
+	else
+	{
+		SoundDoAllStop();
+		TheEnv.SoundAllStop = false;
+	}
 
 	TheEnv.Animate();
 

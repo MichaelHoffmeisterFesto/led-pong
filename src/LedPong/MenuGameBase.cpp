@@ -1,32 +1,14 @@
 #include <algorithm> // max, min
 #include "basic.h"
 #include "LedAnimation.h"
+#include "LedColors.h"
 #include "CQueueDynGeneric.h"
 
 #include "GameConst.h"
 #include "GameBase.h"
-#include "MenuGame.h"
+#include "MenuGameBase.h"
 
-#include "IntroGame.h"
-#include "PacManGame.h"
-
-MenuItem NullMenu[]{
-	/* 00 */ { MI_TextOnly, "", 0,  0, false, ' ', ' ', 0, {} },
-};
-
-MenuItem GlobalMenu[] =
-{
-	/* 00 */ { MI_TextOnly, "MAIN MENU",  0,  0, false, ' ', ' ', 0, {} },
-	/* 01 */ { MI_Button  , "START"    ,  0,  2, false, '+', ' ', 0, {} },
-	/* 02 */ { MI_Switch  , "1 PLAYER" , 11,  1, true , '+', ' ', 1, { 3 } },
-	/* 03 */ { MI_Switch  , "2 PLAYER" , 11,  2, false, '+', ' ', 1, { 2 } },
-	/* 04 */ { MI_Switch  , "ROOKIE"   , 14,  6, true, '+', ' ', 2, { 5, 6 } },
-	/* 05 */ { MI_Switch  , "NORMAL"   , 14,  7, false,  '+', ' ', 2, { 4, 6 } },
-	/* 06 */ { MI_Switch  , "EXPERT"   , 14,  8, false, '+', ' ', 2, { 4, 5 } },
-	/* 07 */ { MI_Button  , "SETUP"    , 14,  9, false, '+', ' ', 0, {} },
-};
-
-void MenuGame::LoadMenu(int menuIndex)
+void MenuGameBase::LoadMenu(MenuItem* menu, int numItem, int startItem, string backgroundFn, Vec2 menuBasePos)
 {
 	// delete old menu structure?
 	if (mCurrMenu != nullptr)
@@ -34,34 +16,32 @@ void MenuGame::LoadMenu(int menuIndex)
 		delete mCurrMenu;
 		mCurrMenu = nullptr;
 	}
+	mNumItem = 0;
+
+	// invalid
+	if (numItem <= 0)
+		return;
 
 	// load new
-	mLoadIndex = menuIndex;
-	int len = 0;
-	switch (menuIndex)
-	{
-		case 0:
-			len = sizeof(GlobalMenu);
-			mCurrMenu = (MenuItem*) malloc(len);
-			if (mCurrMenu != nullptr)
-				memcpy(mCurrMenu, GlobalMenu, sizeof(GlobalMenu));
-			mNumItem = SIZE_OF_ARR(GlobalMenu);
-			mSelectedItem = 1;
-			break;
-		
-		default:
-			break;
-	}
+	int len = sizeof(MenuItem) * numItem;
+	mCurrMenu = (MenuItem*) malloc(len);
+	if (mCurrMenu != nullptr)
+		memcpy(mCurrMenu, menu, len);
+	mNumItem = numItem;
+	mSelectedItem = startItem;
+
+	// load background
+	if (backgroundFn != "")
+		mPageBackground = LedTexture(backgroundFn);
+	else
+		mPageBackground = LedTexture();
+
+	// base position (pixel fine)
+	mMenuBasePos = menuBasePos;
 }
 
-MenuGame::MenuGame(GameEnvironment* env, int menuIndex) : GameBase(env)
+MenuGameBase::MenuGameBase(GameEnvironment* env) : GameBase(env)
 {
-	// Ressources
-	PageMainMenu = LedTexture("media/ai_tech_pac_4x3_small.bmp");
-
-	// load
-	if (menuIndex >= 0)
-		LoadMenu(menuIndex);
 }
 
 void RenderMenu(GameEnvironment* env, Vec2 startPos, MenuItem* menu, int numItem, int selectedItem, int extraRenderSpacingX)
@@ -85,8 +65,9 @@ void RenderMenu(GameEnvironment* env, Vec2 startPos, MenuItem* menu, int numItem
 		}
 
 		// draw text
-		Vec2 pos = startPos + Vec2(mi->X * 5, mi->Y * 9);
-		env->TrPt.DrawTextTo(env->Screen, pos, buffer, 1 + extraRenderSpacingX, 1, 128);
+		Vec2 pos = startPos + Vec2(mi->X * 6, mi->Y * 9);
+		env->TrPt.DrawTextTo(env->Screen, pos, buffer, 1 + extraRenderSpacingX, 1, 128,
+			mi->NonPropText ? 5 : -1);
 
 		// selected?
 		if (i == selectedItem)
@@ -96,7 +77,7 @@ void RenderMenu(GameEnvironment* env, Vec2 startPos, MenuItem* menu, int numItem
 	}
 }
 
-MenuGame::~MenuGame()
+MenuGameBase::~MenuGameBase()
 {
 	// delete old menu structure?
 	if (mCurrMenu != nullptr)
@@ -107,7 +88,7 @@ MenuGame::~MenuGame()
 }
 
 
-bool MenuGame::MoveSelectedItem(int dir)
+bool MenuGameBase::MoveSelectedItem(int dir)
 {
 	int i = mSelectedItem;
 	if (dir == -1)
@@ -131,17 +112,29 @@ bool MenuGame::MoveSelectedItem(int dir)
 	return false;
 }
 
-void MenuGame::Loop()
+// overload this in derived classes!
+GameBase* MenuGameBase::ButtonSelectLeft(int selectedItem)
+{
+	return nullptr;
+}
+
+// overload this in derived classes!
+GameBase* MenuGameBase::ButtonSelectRight(int selectedItem)
+{
+	return nullptr;
+}
+
+void MenuGameBase::Loop()
 {
 	// background
-	Env->Screen.BlitFrom(0, 0, PageMainMenu);
+	Env->Screen.BlitFrom(0, 0, mPageBackground);
 
 	// valid menu
 	if (mCurrMenu != nullptr && mNumItem > 0)
 	{
 
 		// draw menu
-		RenderMenu(Env, Vec2(6, 7), mCurrMenu, mNumItem, mSelectedItem,
+		RenderMenu(Env, mMenuBasePos, mCurrMenu, mNumItem, mSelectedItem,
 			mFirstFrames / 4);
 
 		// saturate first frames
@@ -165,7 +158,7 @@ void MenuGame::Loop()
 		if ((Env->GameKey[KEY_P1_LEFT] && !Env->WasGameKey[KEY_P1_LEFT])
 			|| (Env->GameKey[KEY_P2_LEFT] && !Env->WasGameKey[KEY_P2_LEFT]))
 		{
-			mChargeNextGame = new IntroGame(Env);
+			mChargeNextGame = ButtonSelectLeft(mSelectedItem);
 		}
 
 		// right = enter?
@@ -188,19 +181,7 @@ void MenuGame::Loop()
 
 			if (mi->Kind == MI_Button)
 			{
-				if (mLoadIndex == 0 && mSelectedItem == 1)
-				{
-					// get the mode
-					int players = (mCurrMenu[3].State == true) ? 2 : 1;
-					int diffic = 1;
-					if (mCurrMenu[5].State == true)
-						diffic = 2;
-					if (mCurrMenu[6].State == true)
-						diffic = 3;
-
-					// start game!!
-					mChargeNextGame = new PacManGame(Env, players, diffic);
-				}
+				mChargeNextGame = ButtonSelectRight(mSelectedItem);
 			}
 		}
 	}
@@ -214,7 +195,7 @@ void MenuGame::Loop()
 		mLastFrameIndexWithKey = Env->FrameCounter;
 	if (Env->FrameCounter - mLastFrameIndexWithKey > GAME_FrameRate * 30)
 	{
-		mChargeNextGame = new IntroGame(Env);
+		mChargeNextGame = ButtonSelectLeft(mSelectedItem);
 	}
 
 	// charged game?

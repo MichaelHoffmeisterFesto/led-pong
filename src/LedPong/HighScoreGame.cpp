@@ -7,7 +7,7 @@
 
 #include "GameBase.h"
 #include "HighScoreGame.h"
-#include "MenuGame.h"
+#include "MenuGameBase.h"
 
 //
 // The following lines are an example of a handcrafted (HC_) data structure
@@ -99,6 +99,6 @@ void HighScoreGame::Loop()
 	{
 		// this pointer will be passed ..
 		Env->SoundAllStop = true;
-		NextGame = new MenuGame(Env);
+		NextGame = new MenuGameBase(Env);
 	}
 }

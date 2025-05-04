@@ -3,7 +3,7 @@
 #include "GameBase.h"
 #include "PacManGame.h"
 
-#include "MenuGame.h"
+#include "MenuGameMain.h"
 
 #include "LevelInit.h"
 
@@ -739,7 +739,7 @@ void PacManGame::Loop()
 		{
 			// return to menu
 			Env->SoundAllStop = true;
-			NextGame = new MenuGame(Env, 0);
+			NextGame = new MenuGameMain(Env);
 		}
 
 		if (advanceNextLevel)
