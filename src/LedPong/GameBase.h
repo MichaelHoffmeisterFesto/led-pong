@@ -15,6 +15,7 @@ class GameBase
 public:
 	// There MUST an environment provided!
 	GameBase(GameEnvironment* env) : Env(env) {}
+    virtual ~GameBase() {}
 
 	// Repeatedly called by the main application
 	virtual void Loop() {}

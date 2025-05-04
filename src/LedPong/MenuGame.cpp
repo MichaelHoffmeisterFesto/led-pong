@@ -101,7 +101,7 @@ MenuGame::~MenuGame()
 	// delete old menu structure?
 	if (mCurrMenu != nullptr)
 	{
-		delete mCurrMenu;
+		// delete mCurrMenu;
 		mCurrMenu = nullptr;
 	}
 }

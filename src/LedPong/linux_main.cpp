@@ -1,7 +1,6 @@
-// HSKA - Technische Informatik 2
-// Projekt Planetensimulation
-// Setup: https://thenumb.at/cpp-course/sdl2/01/vsSetup.html
-// Vorlage: https://www.youtube.com/watch?v=WTLPmUHTPqo
+// HKA - Technische Informatik 2
+// LedPong - Linux Hauptprogramm
+// (c) Michael Hoffmeister
 
 #include <algorithm> // max, min
 #include <iostream>
@@ -23,6 +22,9 @@
 #include "GameBase.h"
 #include "IntroGame.h"
 #include "PacManGame.h"
+
+#include <termios.h>
+#include <fcntl.h>
 
 using namespace std;
 
@@ -77,7 +79,7 @@ SDL_SoundSample* SoundSamples[GameSoundSampleEnum::SMP_MAX_NUM] = { nullptr };
 
 void LoadSoundSamples()
 {
-	SoundSamples[GameSoundSampleEnum::SMP_EmptyTile] = new SDL_SoundSample("media/pop-268648-shortened-fade-out.wav", MIX_MAX_VOLUME / 4);
+	SoundSamples[GameSoundSampleEnum::SMP_EmptyTile] = new SDL_SoundSample("/home/pi/newpi3/led-pong/src/LedPong/media/pop-268648-shortened-fade-out.wav", MIX_MAX_VOLUME / 4);
 	SoundSamples[GameSoundSampleEnum::SMP_EnergyPill] = new SDL_SoundSample("media/arcade-fx-288597_shorted_fade_out.wav", MIX_MAX_VOLUME / 2);
 	SoundSamples[GameSoundSampleEnum::SMP_TurnToGhosts] = new SDL_SoundSample("media/arcade-arped-145549-shortened.wav", MIX_MAX_VOLUME);
 	SoundSamples[GameSoundSampleEnum::SMP_TurnFromGhosts] = new SDL_SoundSample("media/arcade-ui-18-229517-shortened.wav", MIX_MAX_VOLUME);
@@ -111,6 +113,12 @@ void DeleteSoundSamples()
 	for (int i = 0; i < GameSoundSampleEnum::SMP_MAX_NUM; i++)
 		if (SoundSamples[i] != nullptr)
 			delete SoundSamples[i];
+}
+
+void DebugSound0()
+{
+	printf("Music Error %s", SDL_GetError());
+
 }
 
 void DebugSound()
@@ -157,6 +165,7 @@ bool loop() {
 
 		if (e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_E)
 		{
+            cout << "E" << endl;
 		}
 
 		if (e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_I)
@@ -172,13 +181,17 @@ bool loop() {
 	// call technology neutral game core
 	//
 
-	bool keyAny = false;
-	for (int i = 1; i < SIZE_OF_ARR(SdlScanToMap); i++)
-	{
-		TheEnv.GameKey[i] = keys[SdlScanToMap[i]];
-		keyAny = keyAny || TheEnv.GameKey[i];
-	}
-	TheEnv.GameKey[KEY_ANY] = keyAny;
+    // this currently interferes with arduino!
+    if (false)
+    {
+        bool keyAny = false;
+        for (int i = 1; i < (int) SIZE_OF_ARR(SdlScanToMap); i++)
+        {
+            TheEnv.GameKey[i] = keys[SdlScanToMap[i]];
+            keyAny = keyAny || TheEnv.GameKey[i];
+        }
+        TheEnv.GameKey[KEY_ANY] = keyAny;
+    }
 
 	// TheGame.Loop();
 	// TheIntro.Loop();
@@ -219,7 +232,7 @@ bool loop() {
 		for (int y = 0; y < WALL_Ydim; y++)
 		{
 			LedColor* lp = &TheEnv.Screen[y][x];
-    			OffScreenCanvas->SetPixel(y, 3 * 32 - x, lp->R, lp->G, lp->B );
+   			OffScreenCanvas->SetPixel(2 * 64 - 1 - x, 3*32 - 1 - y, lp->R, lp->G, lp->B );
 		}
 	}
 
@@ -230,8 +243,133 @@ bool loop() {
 	return true;
 }
 
+int fd_serialport;
+struct termios options;
+
+int init_arduino()
+{
+    fd_serialport = open("/dev/ttyACM0", O_RDWR | O_NOCTTY | O_NDELAY);
+
+    if(fd_serialport == -1){
+        perror("Unable to open /dev/ttyACM0");
+    }
+
+    tcgetattr(fd_serialport, &options);
+    cfsetispeed(&options, B115200);
+    cfsetospeed(&options, B115200);
+    options.c_cflag |= (CLOCAL | CREAD);
+    // options.c_cflag |= PARENB;
+    // options.c_cflag |= PARODD;
+    options.c_cflag &= ~CSTOPB;
+    options.c_cflag &= ~CSIZE;
+    options.c_cflag |= CS8;
+    options.c_iflag |= (INPCK | ISTRIP);
+    tcsetattr(fd_serialport, TCSANOW, &options);
+
+    fcntl(fd_serialport, F_SETFL, FNDELAY);
+
+    return 0;
+}
+
+char data_in[256] = "\0";
+string line_buffer = "";
+string line_ready = "";
+
+int hexchars_to_int(const char* chs)
+{
+    int sum = 0 ;
+    for (int i=0; i<4; i++)
+    {
+        char c = tolower(chs[i]);
+        if (c >= '0' && c <= '9')
+        {
+            sum = 16 * sum + c - '0';
+        }
+        else
+        if (c >= 'a' && c <= 'f')
+        {
+            sum = 16 * sum + (10 + c - 'a');
+        }
+        else
+            return -1;
+    }
+    return sum;
+}
+
+bool process_arduino_keys(int keybits)
+{
+
+    TheEnv.GameKey[KEY_P1_LEFT]  = (keybits & 0x0040) > 0;
+    TheEnv.GameKey[KEY_P1_UP]    = (keybits & 0x0004) > 0;
+    TheEnv.GameKey[KEY_P1_DOWN]  = (keybits & 0x0020) > 0;
+    TheEnv.GameKey[KEY_P1_RIGHT] = (keybits & 0x0010) > 0;
+    
+    TheEnv.GameKey[KEY_P2_LEFT]  = (keybits & 0x0001) > 0;
+    TheEnv.GameKey[KEY_P2_UP]    = (keybits & 0x0200) > 0;
+    TheEnv.GameKey[KEY_P2_DOWN]  = (keybits & 0x0080) > 0;
+    TheEnv.GameKey[KEY_P2_RIGHT] = (keybits & 0x0100) > 0;
+    
+    TheEnv.GameKey[KEY_ANY]      = (keybits & 0x7fff) > 0;
+
+    return true;
+}
+
+bool check_arduino()
+{
+    int rdnum = read(fd_serialport, &data_in[0], sizeof(data_in) - 2);
+    if (rdnum > 0)
+    {
+        // printf("%d\n", rdnum);
+        // data_in[rdnum] = '\0';
+        // printf("%s\n",&data_in[0]);
+        for (int i=0; i<rdnum; i++)
+        {
+            // just add chars?
+            char c = data_in[i];
+            if (c != '\r' && c != '\n')
+            {
+                line_buffer += c;
+                continue;
+            }
+
+            // buffered line ready
+            line_ready = line_buffer;
+            line_buffer = "";
+
+            // only process well-formed lines
+            if (line_ready.length() != 14)
+                continue;
+            // cout << "|" << line_ready << "|" << endl;
+
+            // apply "hex to int" manually
+            const char *cs1 = line_ready.c_str();
+            for (int k=0; k<3; k++)
+            {
+                int n = hexchars_to_int(cs1 + k*5);
+                if (n < 0)
+                    break;
+                // cout << n << endl;
+                if (k == 0)
+                {
+                    // successfully found keys!
+                    process_arduino_keys(n);
+                }
+            }
+        }
+    }
+    return true;
+}
+
 int main(int argc, char** args)
 {
+    // init SLD
+    if (SDL_Init(SDL_INIT_AUDIO) < 0) {
+        std::cerr << "Could not init SDL:" << SDL_GetError() << '\n';
+    }
+    if (Mix_OpenAudio(48000, MIX_DEFAULT_FORMAT, 2, 4096) < 0) {
+        std::cerr << "Could not init SDL:" << SDL_GetError() << '\n';
+    }
+
 	// initialize LED
 	RGBMatrix::Options defaults;
 	defaults.hardware_mapping = "regular";  // or e.g. "adafruit-hat"
@@ -253,8 +391,7 @@ int main(int argc, char** args)
 	OffScreenCanvas = TheLedCanvas->CreateFrameCanvas();
 
 	// It is always good to set up a signal handler to cleanly exit when we
-	// receive a CTRL-C for instance. The DrawOnCanvas() routine is looking
-	// for that.
+	// receive a CTRL-C for instance. 
 	signal(SIGTERM, InterruptHandler);
 	signal(SIGINT, InterruptHandler);
 
@@ -276,7 +413,8 @@ int main(int argc, char** args)
 	}
 
 	// main loop
-	while (!interrupt_received)
+    init_arduino();
+	while (!interrupt_received && check_arduino())
 	{
 		loop();
 		OffScreenCanvas = TheLedCanvas->SwapOnVSync(OffScreenCanvas);
@@ -289,37 +427,4 @@ int main(int argc, char** args)
 	// Animation finished. Shut down the RGB matrix.
 	TheLedCanvas->Clear();
 	delete TheLedCanvas;
-
-	// real end
-	return 0;
-
 }
-
-//
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-
-
-
-static void DrawOnCanvas(Canvas *canvas) {
-  /*
-   * Let's create a simple animation. We use the canvas to draw
-   * pixels. We wait between each step to have a slower animation.
-   */
-  canvas->Fill(0, 0, 255);
-
-  int center_x = canvas->width() / 2;
-  int center_y = canvas->height() / 2;
-  float radius_max = canvas->width() / 2;
-  float angle_step = 1.0 / 360;
-  for (float a = 0, r = 0; r < radius_max; a += angle_step, r += angle_step) {
-    if (interrupt_received)
-      return;
-    float dot_x = cos(a * 2 * M_PI) * r;
-    float dot_y = sin(a * 2 * M_PI) * r;
-    canvas->SetPixel(center_x + dot_x, center_y + dot_y, 255, 255, 255);
-    usleep(1 * 1000); // wait a little to slow down things.
-  }
-}
-
-
