@@ -6,7 +6,8 @@
 
 #include "GameBase.h"
 #include "IntroGame.h"
-#include "MenuGame.h"
+#include "MenuGameMain.h"
+#include "MenuGameHighscores.h"
 
 IntroGame::IntroGame(GameEnvironment* env) : GameBase(env)
 {
@@ -200,6 +201,7 @@ void IntroGame::Loop()
 	{
 		// this pointer will be passed ..
 		Env->SoundAllStop = true;
-		NextGame = new MenuGame(Env, 0);
+		// NextGame = new MenuGameMain(Env);
+		NextGame = new MenuGameHighscores(Env);
 	}
 }

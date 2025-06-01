@@ -221,6 +221,11 @@ bool loop() {
 
 		TheEnv.SoundIsPlaying = SoundIsSomePlaying();
 	}
+	else
+	{
+		SoundDoAllStop();
+		TheEnv.SoundAllStop = false;
+	}
 
 	TheEnv.Animate();
 
@@ -304,16 +309,30 @@ int hexchars_to_int(const char* chs)
 
 bool process_arduino_keys(int keybits)
 {
+	if (TheEnv.KeySwap)
+	{
+		TheEnv.GameKey[KEY_P1_LEFT] = (keybits & 0x0040) > 0;
+		TheEnv.GameKey[KEY_P1_UP] = (keybits & 0x0004) > 0;
+		TheEnv.GameKey[KEY_P1_DOWN] = (keybits & 0x0020) > 0;
+		TheEnv.GameKey[KEY_P1_RIGHT] = (keybits & 0x0010) > 0;
 
-    TheEnv.GameKey[KEY_P1_LEFT]  = (keybits & 0x0040) > 0;
-    TheEnv.GameKey[KEY_P1_UP]    = (keybits & 0x0004) > 0;
-    TheEnv.GameKey[KEY_P1_DOWN]  = (keybits & 0x0020) > 0;
-    TheEnv.GameKey[KEY_P1_RIGHT] = (keybits & 0x0010) > 0;
-    
-    TheEnv.GameKey[KEY_P2_LEFT]  = (keybits & 0x0001) > 0;
-    TheEnv.GameKey[KEY_P2_UP]    = (keybits & 0x0200) > 0;
-    TheEnv.GameKey[KEY_P2_DOWN]  = (keybits & 0x0080) > 0;
-    TheEnv.GameKey[KEY_P2_RIGHT] = (keybits & 0x0100) > 0;
+		TheEnv.GameKey[KEY_P2_LEFT] = (keybits & 0x0001) > 0;
+		TheEnv.GameKey[KEY_P2_UP] = (keybits & 0x0200) > 0;
+		TheEnv.GameKey[KEY_P2_DOWN] = (keybits & 0x0080) > 0;
+		TheEnv.GameKey[KEY_P2_RIGHT] = (keybits & 0x0100) > 0;
+	}
+	else
+	{
+		TheEnv.GameKey[KEY_P2_LEFT] = (keybits & 0x0040) > 0;
+		TheEnv.GameKey[KEY_P2_UP] = (keybits & 0x0004) > 0;
+		TheEnv.GameKey[KEY_P2_DOWN] = (keybits & 0x0020) > 0;
+		TheEnv.GameKey[KEY_P2_RIGHT] = (keybits & 0x0010) > 0;
+
+		TheEnv.GameKey[KEY_P1_LEFT] = (keybits & 0x0001) > 0;
+		TheEnv.GameKey[KEY_P1_UP] = (keybits & 0x0200) > 0;
+		TheEnv.GameKey[KEY_P1_DOWN] = (keybits & 0x0080) > 0;
+		TheEnv.GameKey[KEY_P1_RIGHT] = (keybits & 0x0100) > 0;
+	}
     
     TheEnv.GameKey[KEY_ANY]      = (keybits & 0x7fff) > 0;
 

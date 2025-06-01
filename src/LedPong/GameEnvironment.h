@@ -63,6 +63,9 @@ public:
 	// Sound turned on or off
 	bool Mute = false;
 
+	// Keys swapped
+	bool KeySwap = false;
+
 	// immortal
 	bool GodMode = false;
 

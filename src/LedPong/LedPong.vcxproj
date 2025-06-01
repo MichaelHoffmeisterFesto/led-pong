@@ -164,7 +164,10 @@
     <ClCompile Include="HighScoreGame.cpp" />
     <ClCompile Include="IntroGame.cpp" />
     <ClCompile Include="LedPlasmaTexture.cpp" />
-    <ClCompile Include="MenuGame.cpp" />
+    <ClCompile Include="MenuGameBase.cpp" />
+    <ClCompile Include="MenuGameHighscores.cpp" />
+    <ClCompile Include="MenuGameMain.cpp" />
+    <ClCompile Include="MenuGameSetup.cpp" />
     <ClCompile Include="PacManGame.cpp" />
     <ClCompile Include="GameBase.cpp" />
     <ClCompile Include="GameRun.cpp" />
@@ -194,7 +197,10 @@
     <ClInclude Include="HighScoreGame.h" />
     <ClInclude Include="IntroGame.h" />
     <ClInclude Include="LedPlasmaTexture.h" />
-    <ClInclude Include="MenuGame.h" />
+    <ClInclude Include="MenuGameBase.h" />
+    <ClInclude Include="MenuGameHighscores.h" />
+    <ClInclude Include="MenuGameMain.h" />
+    <ClInclude Include="MenuGameSetup.h" />
     <ClInclude Include="PacManGame.h" />
     <ClInclude Include="GameBase.h" />
     <ClInclude Include="GameConst.h" />

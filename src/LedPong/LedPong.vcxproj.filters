@@ -87,13 +87,22 @@
     <ClCompile Include="IntroGame.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="MenuGame.cpp">
+    <ClCompile Include="MenuGameBase.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="HighScoreGame.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="LedPlasmaTexture.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuGameMain.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuGameSetup.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuGameHighscores.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
@@ -173,13 +182,22 @@
     <ClInclude Include="IntroGame.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="MenuGame.h">
+    <ClInclude Include="MenuGameBase.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="HighScoreGame.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="LedPlasmaTexture.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuGameMain.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuGameSetup.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuGameHighscores.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>

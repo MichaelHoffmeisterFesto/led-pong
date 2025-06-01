@@ -26,7 +26,8 @@ void TextRendererProportionalText::DrawTextTo(
 	Vec2 pixelPos,
 	const char nullTerminatedText[],
 	int renderSpacingX, int renderSpacingY,
-	int thresholdIntensity)
+	int thresholdIntensity, 
+	int fixedSpacingX)
 {
 	// check, if all required definitions are present
 	if (!mCharDefs.HasContent()
@@ -69,14 +70,24 @@ void TextRendererProportionalText::DrawTextTo(
 		// glyph
 		ProportionalTextGlyph glyph = mGlyphDefs[fi];
 
+		// width?
+		int width = glyph.Width;
+		int o2 = 0;
+		if (fixedSpacingX >= 0)
+		{
+			width = fixedSpacingX;
+			if (fixedSpacingX - glyph.Width >= 2)
+				o2 = 1;
+		}
+
 		// blit
-		texture.BlitFrom(workPos.X, workPos.Y,			// to X/Y
+		texture.BlitFrom(workPos.X + o2, workPos.Y,		// to X/Y
 			mCharDefs,									// source texture
 			glyph.OfsX, 0,								// srcX/Y
-			glyph.Width, -1,							// srcWidth/heigh
+			glyph.Width, -1,							// srcWidth/height
 			thresholdIntensity);						// make it "transparent"?
 
 		// advance
-		workPos.X += glyph.Width + renderSpacingX;
+		workPos.X += width + renderSpacingX;
 	}
 }

@@ -10,7 +10,7 @@
 #include "GameBase.h"
 
 // some data structure
-enum MenuItemKind { MI_TextOnly, MI_Switch, MI_Button };
+enum MenuItemKind { MI_TextOnly, MI_Switch, MI_Button, MI_EntryChar };
 
 struct MenuItem
 {
@@ -21,31 +21,31 @@ struct MenuItem
 	char OnChar = 'X', OffChar = ' ';
 	int NumBrother = 0;
 	int Brothers[3];
+	bool NonPropText = false;
 };
 
 // This class implements a game menu
-class MenuGame : public GameBase
+class MenuGameBase : public GameBase
 {
 public:
-	MenuGame(GameEnvironment* env, int menuIndex = -1);
-	~MenuGame();
-
-	// select menue
-	void LoadMenu(int menuIndex);
+	MenuGameBase(GameEnvironment* env);
+	~MenuGameBase();
 
 	// Repeatedly called by the main application
 	virtual void Loop();
 
 protected:
+	void LoadMenu(MenuItem* menu, int numItem, int startItem, string backgroundFn, Vec2 menuBasePos);
 	bool MoveSelectedItem(int dir = 0);
+	virtual GameBase* ButtonSelectLeft(int selectedItem);
+	virtual GameBase* ButtonSelectRight(int selectedItem);
 
-private:
 	// Ressources
-	LedTexture PageMainMenu;
+	LedTexture mPageBackground;
 
 	// other variables
+	Vec2 mMenuBasePos;
 	int mFirstFrames = GAME_FrameRate / 3;
-	int mLoadIndex = 0;
 	MenuItem* mCurrMenu = nullptr;
 	int mNumItem = 0;
 	int mSelectedItem = 0;
