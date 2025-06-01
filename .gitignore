@@ -5,6 +5,10 @@
 # VIM
 *.swp
 
+# Linux compiling
+*.o
+*.bin
+
 # No SDL files
 **/SDL2/**
 

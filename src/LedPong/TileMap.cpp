@@ -109,6 +109,7 @@ TileMap::~TileMap()
 			if (mTiles[i] != nullptr)
 				delete mTiles[i];
 		delete[] mTiles;
+        mTiles = nullptr;
 	}
 }
 

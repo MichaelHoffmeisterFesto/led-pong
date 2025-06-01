@@ -23,6 +23,7 @@
 #include "IntroGame.h"
 #include "PacManGame.h"
 
+// #include <termios.h>
 #include <termios.h>
 #include <fcntl.h>
 
@@ -244,18 +245,22 @@ bool loop() {
 }
 
 int fd_serialport;
-struct termios options;
 
 int init_arduino()
 {
+    // open port
     fd_serialport = open("/dev/ttyACM0", O_RDWR | O_NOCTTY | O_NDELAY);
 
     if(fd_serialport == -1){
         perror("Unable to open /dev/ttyACM0");
+        return -1;
     }
 
+    // set baudrate etc
+    struct termios options;
+
     tcgetattr(fd_serialport, &options);
-    cfsetispeed(&options, B115200);
+    cout << cfsetispeed(&options, B115200) << endl;
     cfsetospeed(&options, B115200);
     options.c_cflag |= (CLOCAL | CREAD);
     // options.c_cflag |= PARENB;
@@ -264,8 +269,9 @@ int init_arduino()
     options.c_cflag &= ~CSIZE;
     options.c_cflag |= CS8;
     options.c_iflag |= (INPCK | ISTRIP);
-    tcsetattr(fd_serialport, TCSANOW, &options);
-
+    cout << tcsetattr(fd_serialport, TCSANOW, &options)<<endl;
+    
+    // be swift
     fcntl(fd_serialport, F_SETFL, FNDELAY);
 
     return 0;
