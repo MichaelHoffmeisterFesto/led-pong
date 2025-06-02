@@ -43,7 +43,7 @@ void TextRendererProportionalText::DrawTextTo(
 	Vec2 workPos = pixelPos;
 
 	// over all chars
-	for (int ci = 0; ci < strlen(nullTerminatedText); ci++)
+	for (int ci = 0; ci < (int) strlen(nullTerminatedText); ci++)
 	{
 		// char to search
 		char cSearch = nullTerminatedText[ci];

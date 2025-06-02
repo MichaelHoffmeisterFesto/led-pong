@@ -42,6 +42,8 @@ bool HC_AddHighScore(const char* name, int score)
 	{
 		HC_HighScores[i + 1] = HC_HighScores[i];
 	}
+
+    return false;
 }
 
 //

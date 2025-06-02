@@ -20,7 +20,7 @@ char Player::GetPlayerAvatarChar(GameRun& run, Vec2 direction)
 	if (OpenMouthTime > 0 && openMouth)
 		index++;
 
-	if (index >= 0 && index < SIZE_OF_ARR(PlayerPhases))
+	if (index >= 0 && index < (int) SIZE_OF_ARR(PlayerPhases))
 		return PlayerPhases[index];
 	else
 		return 'Q';

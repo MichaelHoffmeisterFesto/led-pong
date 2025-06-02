@@ -11,6 +11,9 @@ public:
 	{
 	};
 
+    // required by Linux G++
+    virtual ~TileBase() { }
+
 	TileBase(TileBase& other)
 	{
 	};

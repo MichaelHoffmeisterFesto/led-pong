@@ -233,7 +233,7 @@ PossibleMove* TileMap::GetPossibleMovesFor(Actor* actor, Vec2 checkPos, int& num
 	{
 		// before even checking for moves, could we do a jump because of a gate position?
 		bool jumpTaken = false;
-		for (int gi = 0; gi < SIZE_OF_ARR(tmpGates); gi++)
+		for (int gi = 0; gi < (int) (int) (int) (int) (int) (int) (int) (int) SIZE_OF_ARR(tmpGates); gi++)
 		{
 			if (!tmpGates[gi].IsValid || !(checkPos == tmpGates[gi]) || !(basicDirs[di] == tmpDirs[gi]))
 				continue;
