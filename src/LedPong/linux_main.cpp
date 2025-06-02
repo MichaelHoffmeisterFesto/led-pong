@@ -80,7 +80,10 @@ SDL_SoundSample* SoundSamples[GameSoundSampleEnum::SMP_MAX_NUM] = { nullptr };
 
 void LoadSoundSamples()
 {
-	SoundSamples[GameSoundSampleEnum::SMP_EmptyTile] = new SDL_SoundSample("/home/pi/newpi3/led-pong/src/LedPong/media/pop-268648-shortened-fade-out.wav", MIX_MAX_VOLUME / 4);
+    if (!TheEnv.SoundEnable)
+        return;
+    
+    SoundSamples[GameSoundSampleEnum::SMP_EmptyTile] = new SDL_SoundSample("media/pop-268648-shortened-fade-out.wav", MIX_MAX_VOLUME / 4);
 	SoundSamples[GameSoundSampleEnum::SMP_EnergyPill] = new SDL_SoundSample("media/arcade-fx-288597_shorted_fade_out.wav", MIX_MAX_VOLUME / 2);
 	SoundSamples[GameSoundSampleEnum::SMP_TurnToGhosts] = new SDL_SoundSample("media/arcade-arped-145549-shortened.wav", MIX_MAX_VOLUME);
 	SoundSamples[GameSoundSampleEnum::SMP_TurnFromGhosts] = new SDL_SoundSample("media/arcade-ui-18-229517-shortened.wav", MIX_MAX_VOLUME);
@@ -94,18 +97,27 @@ void LoadSoundSamples()
 
 void PlaySoundSample(GameSoundSampleEnum ss)
 {
-	if (SoundSamples[ss] != nullptr)
+    if (!TheEnv.SoundEnable)
+        return;
+    
+    if (SoundSamples[ss] != nullptr)
 		SoundSamples[ss]->play();
 }
 
 void SoundDoAllStop()
 {
-	Mix_HaltChannel(-1);
+    if (!TheEnv.SoundEnable)
+        return;
+    
+    Mix_HaltChannel(-1);
 }
 
 bool SoundIsSomePlaying()
 {
-	int playing_chans = Mix_Playing(-1);
+    if (!TheEnv.SoundEnable)
+        return false;
+    
+    int playing_chans = Mix_Playing(-1);
 	return playing_chans > 0;
 }
 
@@ -265,17 +277,26 @@ int init_arduino()
     struct termios options;
 
     tcgetattr(fd_serialport, &options);
-    cout << cfsetispeed(&options, B115200) << endl;
+    cfsetispeed(&options, B115200);
     cfsetospeed(&options, B115200);
     options.c_cflag |= (CLOCAL | CREAD);
-    // options.c_cflag |= PARENB;
-    // options.c_cflag |= PARODD;
     options.c_cflag &= ~CSTOPB;
     options.c_cflag &= ~CSIZE;
     options.c_cflag |= CS8;
-    options.c_iflag |= (INPCK | ISTRIP);
-    cout << tcsetattr(fd_serialport, TCSANOW, &options)<<endl;
+
+    options.c_cflag &= ~PARENB;
+    options.c_cflag &= ~CRTSCTS;
+    options.c_lflag &= ~ICANON;
+    options.c_lflag &= ~ECHO;
+    options.c_lflag &= ~ISIG;
+    options.c_iflag &= ~(IXON | IXOFF | IXANY); // Turn off s/w flow ctrl
+    options.c_iflag &= ~(IGNBRK|BRKINT|PARMRK|ISTRIP|INLCR|IGNCR|ICRNL); // Disable any special handling of received bytes
     
+    options.c_oflag &= ~OPOST; // Prevent special interpretation of output bytes (e.g. newline chars)
+    options.c_oflag &= ~ONLCR; // Prevent conversion of newline to carriage return/line feed
+
+    tcsetattr(fd_serialport, TCSANOW, &options);
+
     // be swift
     fcntl(fd_serialport, F_SETFL, FNDELAY);
 
@@ -390,10 +411,26 @@ int main(int argc, char** args)
     // init SLD
     if (SDL_Init(SDL_INIT_AUDIO) < 0) {
         std::cerr << "Could not init SDL:" << SDL_GetError() << '\n';
+        TheEnv.SoundEnable = false;
     }
     if (Mix_OpenAudio(48000, MIX_DEFAULT_FORMAT, 2, 4096) < 0) {
         std::cerr << "Could not init SDL:" << SDL_GetError() << '\n';
+        TheEnv.SoundEnable = false;
     }
+
+	// primitive command line parsing
+	for (int i = 1; i < argc; i++)
+	{
+		if (strcmp(args[i], "-swap") == 0)
+			TheEnv.KeySwap = !TheEnv.KeySwap;
+		if (strcmp(args[i], "-mute") == 0)
+			TheEnv.Mute = !TheEnv.Mute;
+		if (strcmp(args[i], "-god") == 0)
+			TheEnv.GodMode = !TheEnv.GodMode;
+		if (strcmp(args[i], "-debug") == 0)
+			TheEnv.AllowDebug = !TheEnv.AllowDebug;
+	}
+
 
 	// initialize LED
 	RGBMatrix::Options defaults;
@@ -425,17 +462,6 @@ int main(int argc, char** args)
 
 	// init sound
 	LoadSoundSamples();
-
-	// primitive command line parsing
-	for (int i = 1; i < argc; i++)
-	{
-		if (strcmp(args[i], "-mute") == 0)
-			TheEnv.Mute = !TheEnv.Mute;
-		if (strcmp(args[i], "-god") == 0)
-			TheEnv.GodMode = !TheEnv.GodMode;
-		if (strcmp(args[i], "-debug") == 0)
-			TheEnv.AllowDebug = !TheEnv.AllowDebug;
-	}
 
 	// main loop
     init_arduino();

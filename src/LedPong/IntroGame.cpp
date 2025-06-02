@@ -201,7 +201,7 @@ void IntroGame::Loop()
 	{
 		// this pointer will be passed ..
 		Env->SoundAllStop = true;
-		// NextGame = new MenuGameMain(Env);
-		NextGame = new MenuGameHighscores(Env);
+		NextGame = new MenuGameMain(Env);
+		// NextGame = new MenuGameHighscores(Env);
 	}
 }

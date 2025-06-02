@@ -25,7 +25,7 @@ MenuItem HighscoreMenu[] =
 MenuGameHighscores::MenuGameHighscores(GameEnvironment* env)
 	: MenuGameBase(env)
 {
-	LoadMenu(HighscoreMenu, SIZE_OF_ARR(HighscoreMenu), 6, "media/highscores_4x3_small.bmp", Vec2(6, 12));
+	LoadMenu(HighscoreMenu, SIZE_OF_ARR(HighscoreMenu), 4, "media/highscores_4x3_small.bmp", Vec2(6, 12));
 }
 
 GameBase* MenuGameHighscores::ButtonSelectLeft(int selectedItem)

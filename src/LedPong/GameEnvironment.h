@@ -60,6 +60,9 @@ public:
 	// How many frames in this run?
 	int FrameCounter = 0;
 
+    // Sound enables
+    bool SoundEnable = true;
+
 	// Sound turned on or off
 	bool Mute = false;
 

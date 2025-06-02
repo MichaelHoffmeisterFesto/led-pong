@@ -4,6 +4,7 @@
 #include "PacManGame.h"
 
 #include "MenuGameMain.h"
+#include "MenuGameHighscores.h"
 
 #include "LevelInit.h"
 
@@ -36,7 +37,7 @@ void PacManGame::RestartLevel()
 		SpawnedItems.dequeue(dummy);
 
 	// reset ghosts
-	for (int i = 0; i < SIZE_OF_ARR(Ghosts); i++)
+	for (int i = 0; i < (int) SIZE_OF_ARR(Ghosts); i++)
 	{
 		if (Ghosts[i] == nullptr)
 			continue;
@@ -119,7 +120,7 @@ void PacManGame::LoadLevel(
 	}
 
 	// write into actors
-	for (int i = 0; i < SIZE_OF_ARR(Players); i++)
+	for (int i = 0; i < (int) SIZE_OF_ARR(Players); i++)
 	{
 		if (Players[i] == nullptr)
 			continue;
@@ -128,7 +129,7 @@ void PacManGame::LoadLevel(
 		Players[i]->PhaseStepFright = phaseStepPacFright;
 	}	
 
-	for (int i = 0; i < SIZE_OF_ARR(Ghosts); i++)
+	for (int i = 0; i < (int) SIZE_OF_ARR(Ghosts); i++)
 	{
 		if (Ghosts[i] == nullptr)
 			continue;
@@ -306,7 +307,7 @@ void PacManGame::Loop()
 				KEY_P2_LEFT, KEY_P2_RIGHT, KEY_P2_UP, KEY_P2_DOWN 
 			};
 
-			for (int di = 0; di < SIZE_OF_ARR(tmpDirs); di++)
+			for (int di = 0; di < (int) SIZE_OF_ARR(tmpDirs); di++)
 			{
 				PossibleMove pm;
 				if (LevelCurr->FindPossibleMoveInDir(&Player1, pptr->CurrentTilePosition, tmpDirs[di], pm)
@@ -628,7 +629,6 @@ void PacManGame::Loop()
 				if (gptr->StandStill())
 				{
 					// check new position
-					Player* foundPlayer = nullptr;
 					for (int pni = 0; pni < std::max(1, std::min(2, Run.NumPlayer)); pni++)
 						if (Players[pni]->CurrentTilePosition == gptr->CurrentTilePosition
 							&& !Env->GodMode)
@@ -712,7 +712,7 @@ void PacManGame::Loop()
 				Run.SpecialAnimPhase = 0.0;
 				Run.SpecialAnimStep = 1.0 / GAME_Frames_of_death;
 
-				for (int i = 0; i < SIZE_OF_ARR(Ghosts); i++)
+				for (int i = 0; i < (int) SIZE_OF_ARR(Ghosts); i++)
 					Run.SpecialAnimGhostDelta[i] = LevelCurr->GhostStartPos[i] - Ghosts[i]->CurrentTilePosition;
 
 				Run.SetMessage("DEAD");
@@ -727,7 +727,7 @@ void PacManGame::Loop()
 			Run.SpecialAnimPhase = 0.0;
 			Run.SpecialAnimStep = 1.0 / GAME_Frames_of_death;
 
-			for (int i = 0; i < SIZE_OF_ARR(Ghosts); i++)
+			for (int i = 0; i < (int) SIZE_OF_ARR(Ghosts); i++)
 				Run.SpecialAnimGhostDelta[i] = (ghostDead != i) ? Vec2(0, 0)
 				: LevelCurr->GhostStartPos[i] - Ghosts[i]->CurrentTilePosition;
 
@@ -739,7 +739,8 @@ void PacManGame::Loop()
 		{
 			// return to menu
 			Env->SoundAllStop = true;
-			NextGame = new MenuGameMain(Env);
+			// NextGame = new MenuGameMain(Env);
+			NextGame = new MenuGameHighscores(Env);
 		}
 
 		if (advanceNextLevel)
