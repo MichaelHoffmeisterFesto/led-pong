@@ -23,10 +23,10 @@ void MenuGameBase::LoadMenu(MenuItem* menu, int numItem, int startItem, string b
 		return;
 
 	// load new
-	int len = sizeof(MenuItem) * numItem;
-	mCurrMenu = (MenuItem*) malloc(len);
-	if (mCurrMenu != nullptr)
-		memcpy(mCurrMenu, menu, len);
+	mCurrMenu = new MenuItem[numItem];
+	for (int i = 0; i < numItem; i++)
+		mCurrMenu[i] = menu[i];
+
 	mNumItem = numItem;
 	mSelectedItem = startItem;
 
