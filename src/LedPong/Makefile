@@ -16,13 +16,13 @@ RGB_LIBRARY_NAME=rgbmatrix
 RGB_LIBRARY=$(RGB_LIBDIR)/lib$(RGB_LIBRARY_NAME).a
 LDFLAGS+=-L$(RGB_LIBDIR) -l$(RGB_LIBRARY_NAME) -lrt -lm -lpthread
 
-all: program
+all: program.bin
 
-program: $(OBJECTS)
-	g++ $(OBJECTS) $(LDFLAGS) -o program
+program.bin: $(OBJECTS)
+	g++ $(OBJECTS) $(LDFLAGS) -o program.bin
 
 %.o : %.cpp
 	$(CXX) -I$(RGB_INCDIR) $(CXX_FLAGS) $< -c -o $@
 
 clean:
-	rm -rf *.o program
+	rm -rf *.o program.bin

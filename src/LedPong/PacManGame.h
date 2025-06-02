@@ -64,7 +64,7 @@ public:
 	// levels
 	TileMap* Levels[LEVEL_Max] = { 0 };
 	int LevelNum = 0;
-	TileMap* LevelCurr;
+	TileMap* LevelCurr = nullptr;
 
 	// modes
 	int mPlayers = 1;
