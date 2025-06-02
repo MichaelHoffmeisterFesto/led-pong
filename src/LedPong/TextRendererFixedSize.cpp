@@ -21,7 +21,7 @@ void TextRendererFixedSize::DrawTextTo(
 	Vec2 pixelPos,
 	const char nullTerminatedText[],
 	int renderSpacingX, int renderSpacingY,
-	int thresholdIntensity, int fixedSpacingX)
+	int thresholdIntensity, int fixedSpacingX, LedColor* colorMultiply)
 {
 	// check, if all required definitions are present
 	if (mCharWidth < 1

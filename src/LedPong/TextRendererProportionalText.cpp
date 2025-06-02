@@ -27,7 +27,7 @@ void TextRendererProportionalText::DrawTextTo(
 	const char nullTerminatedText[],
 	int renderSpacingX, int renderSpacingY,
 	int thresholdIntensity, 
-	int fixedSpacingX)
+	int fixedSpacingX, LedColor* colorMultiply)
 {
 	// check, if all required definitions are present
 	if (!mCharDefs.HasContent()
@@ -85,7 +85,8 @@ void TextRendererProportionalText::DrawTextTo(
 			mCharDefs,									// source texture
 			glyph.OfsX, 0,								// srcX/Y
 			glyph.Width, -1,							// srcWidth/height
-			thresholdIntensity);						// make it "transparent"?
+			thresholdIntensity,							// make it "transparent"?
+			colorMultiply);								// colorize
 
 		// advance
 		workPos.X += width + renderSpacingX;

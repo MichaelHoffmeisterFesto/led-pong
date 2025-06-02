@@ -1,6 +1,7 @@
 #pragma once
 
 #include "basic.h"
+#include "GameConst.h"
 
 #include "LedTexture.h"
 
@@ -21,6 +22,13 @@ enum GameSoundSampleEnum {
 	SMP_None, SMP_EmptyTile, SMP_EnergyPill, SMP_TurnToGhosts, SMP_TurnFromGhosts,
 	SMP_Fruit, SMP_PacManDead, SMP_GhostDead, SMP_LevelWin, SMP_IntroMusic, SMP_MenuMusic,
 	SMP_MAX_NUM
+};
+
+struct HighScoreEntry
+{
+	// 3 digit name
+	char Name[4] = "---";
+	int Score = 0;
 };
 
 // This class implement variables, states, ressources shared by ALL game class instances
@@ -83,5 +91,19 @@ public:
 
 	// Sound sample played by main application at end of the loop cycle.
 	GameSoundSampleEnum SoundSampleToPlay = GameSoundSampleEnum::SMP_None;
+
+	// High scores
+	HighScoreEntry HighScore[GAME_Max_Highscore] = {
+		{ "MXL", 5200 },
+		{ "KWG", 4700 },
+		{ "GHU", 3850 },
+		{ "ZFJ", 1960 },
+		{ "XRY", 0500 }
+	};
+	int HighScoreNum = 5;
+
+	// In order to remeber last game
+	int LastGamePlayers = 1;
+	int LastGameDiffi = 1;
 };
 

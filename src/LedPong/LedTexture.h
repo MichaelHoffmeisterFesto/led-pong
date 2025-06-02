@@ -68,7 +68,8 @@ public:
 		LedTexture& src,
 		int srcX = 0, int srcY = 0,
 		int srcWidth = -1, int srcHeight = -1,
-		int thresholdIntensity = -1);
+		int thresholdIntensity = -1,
+		LedColor* colorMultiply = nullptr);
 
 	// Blending means, that source1 and source2 are blended pixel by pixel
 	// depending on the respective pixel of the gradient.

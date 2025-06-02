@@ -33,3 +33,5 @@ const int GAME_Message_Life_time_frames = 45;
 const double GAME_PacMan_Phase_per_Frame = 0.14; // Google Pac Man -> 0.16
 
 const int GAME_Frames_of_death = 1.6 * GAME_FrameRate;
+
+const int GAME_Max_Highscore = 100;

@@ -22,6 +22,7 @@ struct MenuItem
 	int NumBrother = 0;
 	int Brothers[3];
 	bool NonPropText = false;
+	LedColor Color = LedColor(0xff, 0xff, 0xff);
 };
 
 // This class implements a game menu

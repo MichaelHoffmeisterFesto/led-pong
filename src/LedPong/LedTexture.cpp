@@ -267,7 +267,8 @@ bool LedTexture::BlitFrom(
 	LedTexture& src,
 	int srcX, int srcY,
 	int srcWidth, int srcHeight,
-	int thresholdIntensity)
+	int thresholdIntensity, 
+	LedColor* colorMultiply)
 {
 	// first check
 	if (destX < 0 || destX >= mWidth || destY < 0 || destY >= mHeight)
@@ -306,7 +307,11 @@ bool LedTexture::BlitFrom(
 				// unsafe is most efficient and ok in these guards
 				LedColor col = src[sy][sx];
 				if (thresholdIntensity <= 0 || (thresholdIntensity < col.PercievedIntensity()))
-					(*this)[dy][dx] = src[sy][sx];
+				{
+					if (colorMultiply != nullptr)
+						col = col * (*colorMultiply);
+					(*this)[dy][dx] = col;
+				}
 			}
 		}
 	}

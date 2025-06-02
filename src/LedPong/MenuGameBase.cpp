@@ -67,7 +67,7 @@ void RenderMenu(GameEnvironment* env, Vec2 startPos, MenuItem* menu, int numItem
 		// draw text
 		Vec2 pos = startPos + Vec2(mi->X * 6, mi->Y * 9);
 		env->TrPt.DrawTextTo(env->Screen, pos, buffer, 1 + extraRenderSpacingX, 1, 128,
-			mi->NonPropText ? 5 : -1);
+			mi->NonPropText ? 5 : -1, &mi->Color);
 
 		// selected?
 		if (i == selectedItem)
@@ -154,34 +154,48 @@ void MenuGameBase::Loop()
 			MoveSelectedItem(+1);
 		}
 
-		// left = back?
-		if ((Env->GameKey[KEY_P1_LEFT] && !Env->WasGameKey[KEY_P1_LEFT])
-			|| (Env->GameKey[KEY_P2_LEFT] && !Env->WasGameKey[KEY_P2_LEFT]))
+		// special left/right handling for entry char
+		bool trigLeft = (Env->GameKey[KEY_P1_LEFT] && !Env->WasGameKey[KEY_P1_LEFT])
+			|| (Env->GameKey[KEY_P2_LEFT] && !Env->WasGameKey[KEY_P2_LEFT]);
+		bool trigRight = (Env->GameKey[KEY_P1_RIGHT] && !Env->WasGameKey[KEY_P1_RIGHT])
+			|| (Env->GameKey[KEY_P2_RIGHT] && !Env->WasGameKey[KEY_P2_RIGHT]);
+		MenuItem* mi = &mCurrMenu[mSelectedItem];
+
+		if (mi->Kind == MI_EntryChar)
 		{
-			mChargeNextGame = ButtonSelectLeft(mSelectedItem);
+			if (mi->Text.length() == 1 && mi->Text.at(0) > 'A' && trigLeft)
+				mi->Text[0] = mi->Text.at(0) - 1;
+			if (mi->Text.length() == 1 && mi->Text.at(0) < 'Z' && trigRight)
+				mi->Text[0] = mi->Text.at(0) + 1;
 		}
-
-		// right = enter?
-		if ((Env->GameKey[KEY_P1_RIGHT] && !Env->WasGameKey[KEY_P1_RIGHT])
-			|| (Env->GameKey[KEY_P2_RIGHT] && !Env->WasGameKey[KEY_P2_RIGHT]))
+		else
 		{
-			MenuItem* mi = &mCurrMenu[mSelectedItem];
-			if (mi->Kind == MI_Switch)
+			// left = back?
+			if (trigLeft)
 			{
-				if (mi->State == false)
-				{
-					// switch all brothers off
-					for (int i = 0; i < mi->NumBrother; i++)
-						mCurrMenu[mi->Brothers[i]].State = false;
-
-					// switch this on
-					mi->State = true;
-				}
+				mChargeNextGame = ButtonSelectLeft(mSelectedItem);
 			}
 
-			if (mi->Kind == MI_Button)
+			// right = enter?
+			if (trigRight)
 			{
-				mChargeNextGame = ButtonSelectRight(mSelectedItem);
+				if (mi->Kind == MI_Switch)
+				{
+					if (mi->State == false)
+					{
+						// switch all brothers off
+						for (int i = 0; i < mi->NumBrother; i++)
+							mCurrMenu[mi->Brothers[i]].State = false;
+
+						// switch this on
+						mi->State = true;
+					}
+				}
+
+				if (mi->Kind == MI_Button)
+				{
+					mChargeNextGame = ButtonSelectRight(mSelectedItem);
+				}
 			}
 		}
 	}
