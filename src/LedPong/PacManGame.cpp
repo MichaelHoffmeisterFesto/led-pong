@@ -739,8 +739,18 @@ void PacManGame::Loop()
 		{
 			// return to menu
 			Env->SoundAllStop = true;
+
+			// which player won
+			int playerWon = 0;
+			int playerScore = Player1.Score;
+			if (Run.NumPlayer > 1 && Player2.Score > Player1.Score)
+			{
+				playerWon = 1;
+				playerScore = Player2.Score;
+			}
+
 			// NextGame = new MenuGameMain(Env);
-			NextGame = new MenuGameHighscores(Env);
+			NextGame = new MenuGameHighscores(Env, playerWon, playerScore);
 		}
 
 		if (advanceNextLevel)

@@ -42,10 +42,13 @@ MenuGameHighscores::MenuGameHighscores(GameEnvironment* env, int playerNum, int 
 	LoadMenu(HighscoreMenu, SIZE_OF_ARR(HighscoreMenu), 6, "media/highscores_4x3_small.bmp", Vec2(6, 14));
 
 	// overwrite the (copied, loaded) lines from above
+	char buffer[100];
+	sprintf(buffer, "++ PLAYER %1d WON ++", 1 + playerNum);
+	mCurrMenu[0].Text = buffer;
+
 	// Note: the following code completely relies on the fact, that
 	// the menu items are already created properly by the global array!
 	int midx = 1; int hidx = 0; int hnum = 0;
-	char buffer[100];
 	while (hidx < mNewScoreIndex && hnum < 4)
 	{
 		sprintf(buffer, "%3d  %3s  %07d", 1 + hidx, Env->HighScore[hidx].Name, Env->HighScore[hidx].Score);
