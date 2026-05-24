@@ -1,0 +1,22 @@
+@startuml ActOrderOfGames
+mainframe Order of GameBase derivatives
+
+[*] --> IntroGame
+
+IntroGame --> MenuGameMain
+
+MenuGameMain --> MenuGameSetup
+
+MenuGameMain --> PacManGame
+
+PacManGame --> MenuGameHighScores
+
+if "" then
+    --> PacManGame
+else    
+    --> MenuGameMain
+endif
+
+MenuGameSetup --> [*]
+
+@enduml

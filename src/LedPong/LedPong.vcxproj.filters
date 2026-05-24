@@ -90,9 +90,6 @@
     <ClCompile Include="MenuGameBase.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="HighScoreGame.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
     <ClCompile Include="LedPlasmaTexture.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
@@ -183,9 +180,6 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="MenuGameBase.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="HighScoreGame.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="LedPlasmaTexture.h">

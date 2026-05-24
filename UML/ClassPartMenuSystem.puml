@@ -1,0 +1,80 @@
+@startuml ClassPartMenuSystem
+mainframe Menu System
+
+hide empty members
+skinparam linetype polyline
+
+
+class Main {
+}
+
+class GameBase {
+	+Loop() : void
+}
+
+Main --> "use" GameBase
+
+enum MenuItemKind {
+	MI_TextOnly
+	MI_Switch
+	MI_Button
+	MI_EntryChar
+}
+
+class MenuItem {
+	+Kind : MenuItemKind
+	+Text : string
+	+X : int
+	+Y : int
+	+State : bool
+	+OnChar : char
+	+OffChar : char
+	+NumBrothers : int
+	+Brothers : int[3]
+	+NonPropText : bool
+	+Color : LedColor
+}
+
+MenuItem --> "use" MenuItemKind
+
+class MenuGameBase {
+	+Loop() : void
+	-mPageBackground : LedTexture
+	-mCurrMenu : MenuItem[]
+	-LoadMenu() : void
+	-MoveSelectedItem() : bool
+	-ButtonSelectLeft() : GameBase*
+	-ButtonSelectRight() : GameBase*
+}
+
+MenuGameBase --> "use" MenuItem
+
+MenuGameBase -up-|> GameBase
+
+class MenuGameMain {
+	-ButtonSelectLeft() : GameBase*
+	-ButtonSelectRight() : GameBase*
+}
+
+MenuGameMain -up-|> MenuGameBase
+
+class MenuGameSetup {
+	-ButtonSelectLeft() : GameBase*
+	-ButtonSelectRight() : GameBase*
+}
+
+MenuGameSetup -up--|> MenuGameBase
+
+class MenuGameHighScores {
+	-ButtonSelectLeft() : GameBase*
+	-ButtonSelectRight() : GameBase*
+}
+
+MenuGameHighScores -up-|> MenuGameBase
+
+legend right
+  Note: For giving an overview, only selected classes and only selected members are shown.
+  Argument-lists and result types are shortened or skipped.
+endlegend
+
+@enduml

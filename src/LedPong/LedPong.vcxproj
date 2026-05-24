@@ -161,7 +161,6 @@
     <ClCompile Include="Actor.cpp" />
     <ClCompile Include="CQueueDynGeneric.cpp" />
     <ClCompile Include="GameEnvironment.cpp" />
-    <ClCompile Include="HighScoreGame.cpp" />
     <ClCompile Include="IntroGame.cpp" />
     <ClCompile Include="LedPlasmaTexture.cpp" />
     <ClCompile Include="MenuGameBase.cpp" />
@@ -194,7 +193,6 @@
     <ClInclude Include="basic.h" />
     <ClInclude Include="CQueueDynGeneric.h" />
     <ClInclude Include="GameEnvironment.h" />
-    <ClInclude Include="HighScoreGame.h" />
     <ClInclude Include="IntroGame.h" />
     <ClInclude Include="LedPlasmaTexture.h" />
     <ClInclude Include="MenuGameBase.h" />
