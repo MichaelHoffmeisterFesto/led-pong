@@ -66,6 +66,9 @@ public:
 	int LevelNum = 0;
 	TileMap* LevelCurr = nullptr;
 
+	// some state
+	int allKeyPressed = 0;
+
 	// modes
 	int mPlayers = 1;
 	int mDifficulty = 2;

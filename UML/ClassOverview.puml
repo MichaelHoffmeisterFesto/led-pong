@@ -1,268 +1,273 @@
-@startuml
+@startuml Class overview
 
 hide empty members
 skinparam linetype polyline
 
-class SDL_Application {
-	+Renderer : SDL_Renderer*
-	+Window : SDL_Window*
-	+Height : int
-	+Width : int
-	+kill() : void
+frame "Class overview" {
+
+	class SDL_Application {
+		+Renderer : SDL_Renderer*
+		+Window : SDL_Window*
+		+Height : int
+		+Width : int
+		+kill() : void
+	}
+
+	class Main {
+		+ main()
+	}
+
+	Main -right-> "use" SDL_Application
+
+	class GameEnvironment {
+		+Screen : LedTexture
+		+AllowDebug : bool
+		+GodMode : bool
+		+Mute : bool
+		+GameKey : bool[]
+		+WasGameKey : bool[]
+		+FrameCounter : int
+	}
+
+	' Main --> "use" GameEnvironment
+
+	class GameBase {
+		+GameBase(GameEnvironment* env)
+		+Env : GameEnvironment*
+		+Loop() : void
+	}
+
+	Main --> "use" GameBase
+
+	GameBase -right-> "use" GameEnvironment
+
+	enum GhostMode {
+		Chase
+		Freightened
+		Scatter
+		SuperFreightened
+	}
+
+	class GameRun {
+		+GhostsMode : GhostMode
+		+LevelNo : int
+		+NumGhost : int
+		+NumPlayer : int
+		+PillsAvailable : int
+	}
+
+	GameRun --> GhostMode
+
+	class LevelInit {
+		+InitPresetLevels()
+	}
+
+	class PacManGame {
+		+Run : GameRun
+		+Ghosts : Ghost*[]
+		+Players : Player*[]
+		+LevelCurr : TileMap*
+		+Levels : TileMap*[]
+		+Loop() : void
+	}
+
+	PacManGame --> "use" LevelInit
+
+	PacManGame --> "use" GameRun
+
+	PacManGame --> "use" Ghost
+
+	PacManGame --> "use" Player
+
+	PacManGame -up-|> GameBase
+
+	class IntroGame {
+		+PageBallons : LedTexture
+		+PageFunnyCar : LedTexture
+		+PageInfo2 : LedTexture
+		+Loop() : void
+	}
+
+	IntroGame -up-|> GameBase
+
+	IntroGame --> LedTexture
+
+	enum MenuItemKind {
+		MI_TextOnly
+		MI_Switch
+		MI_Button
+		MI_EntryChar
+	}
+
+	class MenuItem {
+		+Kind : MenuItemKind
+		+Text : string
+		+X : int
+		+Y : int
+		+State : bool
+		+OnChar : char
+		+OffChar : char
+		+NumBrothers : int
+		+Brothers : int[3]
+		+NonPropText : bool
+		+Color : LedColor
+	}
+
+	MenuItem --> "use" MenuItemKind
+
+	class MenuGameBase {
+		+Loop() : void
+		-mPageBackground : LedTexture
+		-mCurrMenu : MenuItem[]
+		-LoadMenu() : void
+		-MoveSelectedItem() : bool
+		-ButtonSelectLeft() : GameBase*
+		-ButtonSelectRight() : GameBase*
+	}
+
+	MenuGameBase --> "use" MenuItem
+
+	MenuGameBase -up-|> GameBase
+
+	class MenuGameMain {
+		-ButtonSelectLeft() : GameBase*
+		-ButtonSelectRight() : GameBase*
+	}
+
+	MenuGameMain -up-|> MenuGameBase
+
+	class MenuGameSetup {
+		-ButtonSelectLeft() : GameBase*
+		-ButtonSelectRight() : GameBase*
+	}
+
+	MenuGameSetup -up--|> MenuGameBase
+
+	class MenuGameHighScores {
+		-ButtonSelectLeft() : GameBase*
+		-ButtonSelectRight() : GameBase*
+	}
+
+	MenuGameHighScores -up-|> MenuGameBase
+
+	class Vec2 {
+		+operator+() : Vec2
+		+operator-() : Vec2
+		+operator*() : Vec2
+		+IsValid : bool
+		+operator!=() : bool
+		+operator!=() : bool
+		+operator==() : bool
+		+Length() : double
+		+X : int
+		+X : int
+		+X : int
+	}
+
+	class Actor {
+		+CurrentDirection : Vec2
+		+CurrentTilePosition : Vec2
+	}
+
+	Actor -up-> "use" Vec2
+
+	abstract class Ghost {
+		+HomeZone : Vec2
+		+GetCurrentTargetPos() : Vec2
+	}
+
+	Ghost -up-|> Actor
+
+	class Blinky {
+		+GetCurrentTargetPos()
+	}
+
+	class Pinky {
+		+GetCurrentTargetPos()
+	}
+
+	class Inky {
+		+GetCurrentTargetPos()
+	}
+
+	class Clyde {
+		+GetCurrentTargetPos()
+	}
+
+	Blinky -up-|> Ghost
+	Pinky --up--|> Ghost
+	Inky -up-|> Ghost
+	Clyde --up--|> Ghost
+
+	class Player {
+		+Player()
+		+Player(Player& other)
+		+Lives : int
+		+Score : int
+	}
+
+	Player -up-|> Actor
+
+	class TileMap {
+		+Get(int x, int y) : TileBase*
+		+GetAsTile(Vec2 pos) : Tile*
+		+GateToBottom : Vec2
+		+GateToLeft : Vec2
+		+GateToRight : Vec2
+		+GateToTop : Vec2
+		+MessagePos : Vec2
+		+GhostHomeZone : Vec2[]
+		+GhostStartPos : Vec2[]
+		+PlayerStartPos : Vec2[]
+		+PlayerTextExtraPos : Vec2[]
+		+PlayerTextScorePos : Vec2[]
+		+GetHeight() : int
+		+GetWidth() : int
+		+PillsTotal : int
+		-mTiles : TileBase**
+		-mHeight : int
+		-mWidth : int
+	}
+
+	' TileMap -up-> "use" Vec2
+
+	PacManGame --> "use" TileMap
+
+	class TileBase {
+	}
+
+	class Tile {
+		+mTileCode : char
+	}
+
+	Tile -up-|> TileBase
+
+	TileMap --> "use" TileBase
+
+	class LedColor {
+		+B : uint8_t
+		+G : uint8_t
+		+R : uint8_t
+	}
+
+	class LedTexture {
+		+LedTexture(width, height)
+		+LedTexture(fn)
+		-mPixels : LedColor*
+		-mHeight : int
+		-mWidth : int
+	}
+
+	LedTexture --> "use" LedColor
+
+	GameEnvironment --> "use" LedTexture
+
 }
-
-class Main {
-    + main()
-}
-
-Main -right-> "use" SDL_Application
-
-class GameEnvironment {
-	+Screen : LedTexture
-	+AllowDebug : bool
-	+GodMode : bool
-	+Mute : bool
-	+GameKey : bool[]
-	+WasGameKey : bool[]
-	+FrameCounter : int
-}
-
-' Main --> "use" GameEnvironment
-
-class GameBase {
-	+GameBase(GameEnvironment* env)
-	+Env : GameEnvironment*
-	+Loop() : void
-}
-
-Main --> "use" GameBase
-
-GameBase -right-> "use" GameEnvironment
-
-enum GhostMode {
-	Chase
-	Freightened
-	Scatter
-	SuperFreightened
-}
-
-class GameRun {
-	+GhostsMode : GhostMode
-	+LevelNo : int
-	+NumGhost : int
-	+NumPlayer : int
-	+PillsAvailable : int
-}
-
-GameRun --> GhostMode
-
-class LevelInit {
-	+InitPresetLevels()
-}
-
-class PacManGame {
-	+Run : GameRun
-	+Ghosts : Ghost*[]
-	+Players : Player*[]
-	+LevelCurr : TileMap*
-	+Levels : TileMap*[]
-	+Loop() : void
-}
-
-PacManGame --> "use" LevelInit
-
-PacManGame --> "use" GameRun
-
-PacManGame --> "use" Ghost
-
-PacManGame --> "use" Player
-
-PacManGame -up-|> GameBase
-
-class IntroGame {
-	+PageBallons : LedTexture
-	+PageFunnyCar : LedTexture
-	+PageInfo2 : LedTexture
-	+Loop() : void
-}
-
-IntroGame -up-|> GameBase
-
-IntroGame --> LedTexture
-
-enum MenuItemKind {
-	MI_TextOnly
-	MI_Switch
-	MI_Button
-	MI_EntryChar
-}
-
-class MenuItem {
-	+Kind : MenuItemKind
-	+Text : string
-	+X : int
-	+Y : int
-	+State : bool
-	+OnChar : char
-	+OffChar : char
-	+NumBrothers : int
-	+Brothers : int[3]
-	+NonPropText : bool
-	+Color : LedColor
-}
-
-MenuItem --> "use" MenuItemKind
-
-class MenuGameBase {
-	+Loop() : void
-	-mPageBackground : LedTexture
-	-mCurrMenu : MenuItem[]
-	-LoadMenu() : void
-	-MoveSelectedItem() : bool
-	-ButtonSelectLeft() : GameBase*
-	-ButtonSelectRight() : GameBase*
-}
-
-MenuGameBase --> "use" MenuItem
-
-MenuGameBase -up-|> GameBase
-
-class MenuGameMain {
-	-ButtonSelectLeft() : GameBase*
-	-ButtonSelectRight() : GameBase*
-}
-
-MenuGameMain -up-|> MenuGameBase
-
-class MenuGameSetup {
-	-ButtonSelectLeft() : GameBase*
-	-ButtonSelectRight() : GameBase*
-}
-
-MenuGameSetup -up--|> MenuGameBase
-
-class MenuGameHighScores {
-	-ButtonSelectLeft() : GameBase*
-	-ButtonSelectRight() : GameBase*
-}
-
-MenuGameHighScores -up-|> MenuGameBase
-
-class Vec2 {
-	+operator+() : Vec2
-	+operator-() : Vec2
-	+operator*() : Vec2
-	+IsValid : bool
-	+operator!=() : bool
-	+operator!=() : bool
-	+operator==() : bool
-	+Length() : double
-	+X : int
-	+X : int
-	+X : int
-}
-
-class Actor {
-	+CurrentDirection : Vec2
-	+CurrentTilePosition : Vec2
-}
-
-Actor -up-> "use" Vec2
-
-abstract class Ghost {
-	+HomeZone : Vec2
-	+GetCurrentTargetPos() : Vec2
-}
-
-Ghost -up-|> Actor
-
-class Blinky {
-	+GetCurrentTargetPos()
-}
-
-class Pinky {
-	+GetCurrentTargetPos()
-}
-
-class Inky {
-	+GetCurrentTargetPos()
-}
-
-class Clyde {
-	+GetCurrentTargetPos()
-}
-
-Blinky -up-|> Ghost
-Pinky --up--|> Ghost
-Inky -up-|> Ghost
-Clyde --up--|> Ghost
-
-class Player {
-	+Player()
-	+Player(Player& other)
-	+Lives : int
-	+Score : int
-}
-
-Player -up-|> Actor
-
-class TileMap {
-	+Get(int x, int y) : TileBase*
-	+GetAsTile(Vec2 pos) : Tile*
-	+GateToBottom : Vec2
-	+GateToLeft : Vec2
-	+GateToRight : Vec2
-	+GateToTop : Vec2
-	+MessagePos : Vec2
-	+GhostHomeZone : Vec2[]
-	+GhostStartPos : Vec2[]
-	+PlayerStartPos : Vec2[]
-	+PlayerTextExtraPos : Vec2[]
-	+PlayerTextScorePos : Vec2[]
-	+GetHeight() : int
-	+GetWidth() : int
-	+PillsTotal : int
-	-mTiles : TileBase**
-	-mHeight : int
-	-mWidth : int
-}
-
-' TileMap -up-> "use" Vec2
-
-PacManGame --> "use" TileMap
-
-class TileBase {
-}
-
-class Tile {
-	+mTileCode : char
-}
-
-Tile -up-|> TileBase
-
-TileMap --> "use" TileBase
-
-class LedColor {
-	+B : uint8_t
-	+G : uint8_t
-	+R : uint8_t
-}
-
-class LedTexture {
-	+LedTexture(width, height)
-	+LedTexture(fn)
-	-mPixels : LedColor*
-	-mHeight : int
-	-mWidth : int
-}
-
-LedTexture --> "use" LedColor
-
-GameEnvironment --> "use" LedTexture
 
 legend right
   Note: For giving an overview, only selected classes and only selected members are shown.
   Argument-lists and result types are shortened or skipped.
 endlegend
+
 
 @enduml

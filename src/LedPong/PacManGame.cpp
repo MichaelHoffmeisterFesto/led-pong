@@ -259,6 +259,22 @@ void PacManGame::Loop()
 		bool quitGame = false;
 		bool advanceNextLevel = false;
 
+		// break
+		if (true)
+		{
+			if ((Env->GameKey[KEY_P1_UP] && Env->GameKey[KEY_P1_LEFT])
+				|| (Env->GameKey[KEY_P2_UP] && Env->GameKey[KEY_P2_LEFT]))
+			{
+				allKeyPressed++;
+				if (allKeyPressed > 100)
+				{
+					quitGame = true;
+				}
+			}
+			else
+				allKeyPressed = 0;
+		}
+
 		// keys pressed for some options
 		if (Env->AllowDebug)
 		{

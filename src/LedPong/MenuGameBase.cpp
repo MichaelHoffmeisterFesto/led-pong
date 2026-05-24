@@ -8,6 +8,7 @@
 #include "GameBase.h"
 #include "MenuGameBase.h"
 
+
 void MenuGameBase::LoadMenu(MenuItem* menu, int numItem, int startItem, string backgroundFn, Vec2 menuBasePos)
 {
 	// delete old menu structure?
