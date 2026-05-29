@@ -105,6 +105,12 @@
     <ClCompile Include="MenuGameHighscores.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="MenuGameMsgBox.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="Networking.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SDL_Helper.h">
@@ -195,6 +201,12 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="MenuGameHighscores.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuGameMsgBox.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="Networking.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>

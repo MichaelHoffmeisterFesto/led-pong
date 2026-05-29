@@ -1,7 +1,14 @@
 #include "MenuGameSetup.h"
 #include "MenuGameMain.h"
+#include "MenuGameMsgBox.h"
 #include "IntroGame.h"
+#include "Networking.h"
+
+// for linux diag
+#ifdef WIN32
+#else
 #include <unistd.h>
+#endif
 
 MenuItem SetupMenu[] =
 {
@@ -55,11 +62,48 @@ GameBase* MenuGameSetup::ButtonSelectRight(int selectedItem)
 		return x;
 	}
 
-	if (selectedItem >= 6 && selectedItem <= 9)
+	if (selectedItem == 6)
 	{
-		string names[] = { "wifi-srv", "wifi-hka", "wifi-lhe", "halt" };
-		ExecScript(names[selectedItem - 6]);
+		ExecScript("wifi-srv");
+
+		// gather info
+		Networking nw;
+		nw.ReadAdapterInfo();
+
+		// start game by having a new object on the heap
+		string lines[] = {
+				"AP   : LEDPONG",
+				"PW   : HKA",
+				"ETH0: 222.222.222.222",
+				"WIFI: 188.245.234.234",
+				"U    : STUDENT",
+				"PW   : HKA",
+		};
+		MenuGameMsgBox* x = new MenuGameMsgBox(Env, "WIFI SERVER +++++++++++", lines, SIZE_OF_ARR(lines));
+		return x;
 	}
+
+	if (selectedItem == 9)
+	{
+		ExecScript("halt");
+
+		// start game by having a new object on the heap
+		string lines[] = {
+				"THE SYSTEM WILL HALT",
+				"AS SOON AS POSSIBLE.",
+				"",
+				"THIS PROCESS CANT BE",
+				"CANCELLED."
+		};
+		MenuGameMsgBox* x = new MenuGameMsgBox(Env, "SYSTEM ++++++++++++++++", lines, SIZE_OF_ARR(lines));
+		return x;
+	}
+
+	//if (selectedItem >= 6 && selectedItem <= 9)
+	//{
+	//	string names[] = { "wifi-srv", "wifi-hka", "wifi-lhe", "halt" };
+	//	ExecScript(names[selectedItem - 6]);
+	//}
 
 	return nullptr;
 }
@@ -77,9 +121,12 @@ void MenuGameSetup::ExecScript(string name)
 #endif
 }
 
+// Helps diagnosing if process is running with root privileges (0) or not
 void MenuGameSetup::GidDiag()
 {
-    std::cout << "getuid()  = " << getuid()  << std::endl;
+#ifdef WIN32
+#else
+	std::cout << "getuid()  = " << getuid()  << std::endl;
     std::cout << "geteuid() = " << geteuid() << std::endl;
     std::cout << "id output:" << std::endl;
     system("id");
@@ -88,4 +135,5 @@ void MenuGameSetup::GidDiag()
     system("id");                 // zur Kontrolle
     int ret = system("/bin/bash /home/pi/led-pong/led-pong/src/LedPong/scripts/util_wifi_ap.sh");
     std::cout << "system() returned " << ret << std::endl;
+#endif
 }

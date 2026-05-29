@@ -17,8 +17,8 @@ LedPlasmaTexture::~LedPlasmaTexture()
 
 void LedPlasmaTexture::Init()
 {
-	d1 = sqrt(std::max(mWidth, mHeight)) * 1.5;
-	d2 = d1 / 2.0;
+	d1 = (float)(sqrt(std::max(mWidth, mHeight)) * 1.5);
+	d2 = d1 / 2.0f;
 
 	dx = rand() % 1024;
 	dy = rand() % 1024;
@@ -76,7 +76,7 @@ void LedPlasmaTexture::Loop()
         for (int x = 0; x < mWidth; x++) {
             unsigned int x1 = x + dx;
             unsigned int y1 = y + dy;
-            float value = sin(x1 / d1);
+            double value = sin(x1 / d1);
             value += sin(y1 / d2);
             value += sin((x1 + y1) / d1);
             value += sin(sqrt(x1 * x1 + y1 * y1) / d2);
@@ -84,17 +84,17 @@ void LedPlasmaTexture::Loop()
             value /= 8; // bring range down to 0 .. 1
 
             // value >= 0 && value =< 1.0
-            float hue = hueShift + value;
+            double hue = hueShift + value;
             if (hue >= 1.0) hue -= 1.0;
 
             // set
-            LedColor c = HsvToRGB(HSVColor(hue * 255, 255, 128));
+            LedColor c = HsvToRGB(HSVColor((uint8_t)(hue * 255), 255, 128));
             Put(x, y, c);
 
             // finally
             dx = (dx + 1) % 1024;
             dy = (dy + 1) % 1024;
-            hueShift += 0.02; if (hueShift >= 1.0) hueShift -= 1.0;
+            hueShift += 0.02f; if (hueShift >= 1.0) hueShift -= 1.0;
         }
     }
 }

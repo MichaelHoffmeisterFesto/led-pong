@@ -391,9 +391,9 @@ void PacManGame::Loop()
 
 								// modify according mode
 								if (mDifficulty == 1)
-									Run.FrightenedCounter = 1.5 * Run.FrightenedCounter;
+									Run.FrightenedCounter = (int) (1.5 * Run.FrightenedCounter);
 								if (mDifficulty == 3)
-									Run.FrightenedCounter = 1.7 * Run.FrightenedCounter;
+									Run.FrightenedCounter = (int) (1.7 * Run.FrightenedCounter);
 
 								Run.SetMessage("SCARE");
 							}

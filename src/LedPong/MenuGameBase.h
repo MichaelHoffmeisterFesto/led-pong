@@ -14,13 +14,13 @@ enum MenuItemKind { MI_TextOnly, MI_Switch, MI_Button, MI_EntryChar };
 
 struct MenuItem
 {
-	MenuItemKind Kind;
-	string Text;
-	int X, Y;
-	bool State;
+	MenuItemKind Kind = MI_TextOnly;
+	string Text = "";
+	int X = 0, Y = 0;
+	bool State = false;
 	char OnChar = 'X', OffChar = ' ';
 	int NumBrother = 0;
-	int Brothers[3];
+	int Brothers[3] = { 0 };
 	bool NonPropText = false;
 	LedColor Color = LedColor(0xff, 0xff, 0xff);
 };

@@ -166,7 +166,9 @@
     <ClCompile Include="MenuGameBase.cpp" />
     <ClCompile Include="MenuGameHighscores.cpp" />
     <ClCompile Include="MenuGameMain.cpp" />
+    <ClCompile Include="MenuGameMsgBox.cpp" />
     <ClCompile Include="MenuGameSetup.cpp" />
+    <ClCompile Include="Networking.cpp" />
     <ClCompile Include="PacManGame.cpp" />
     <ClCompile Include="GameBase.cpp" />
     <ClCompile Include="GameRun.cpp" />
@@ -198,7 +200,9 @@
     <ClInclude Include="MenuGameBase.h" />
     <ClInclude Include="MenuGameHighscores.h" />
     <ClInclude Include="MenuGameMain.h" />
+    <ClInclude Include="MenuGameMsgBox.h" />
     <ClInclude Include="MenuGameSetup.h" />
+    <ClInclude Include="Networking.h" />
     <ClInclude Include="PacManGame.h" />
     <ClInclude Include="GameBase.h" />
     <ClInclude Include="GameConst.h" />
