@@ -24,7 +24,9 @@ MenuGameMain::MenuGameMain(GameEnvironment* env)
 
 GameBase* MenuGameMain::ButtonSelectLeft(int selectedItem)
 {
-	return new IntroGame(Env);
+	// start game by having a new object on the heap
+	IntroGame* x  = new IntroGame(Env);
+	return x;
 }
 
 GameBase* MenuGameMain::ButtonSelectRight(int selectedItem)
@@ -39,13 +41,16 @@ GameBase* MenuGameMain::ButtonSelectRight(int selectedItem)
 		if (mCurrMenu[6].State == true)
 			Env->LastGameDiffi = 3;
 
-		// start game!!
-		return new PacManGame(Env, Env->LastGamePlayers, Env->LastGameDiffi);
+		// start game by having a new object on the heap
+        PacManGame* x  = new PacManGame(Env, Env->LastGamePlayers, Env->LastGameDiffi);
+		return x;
 	}
 
 	if (selectedItem == 7)
 	{
-		return new MenuGameSetup(Env);
+        // start game by having a new object on the heap
+        MenuGameSetup* x  = new MenuGameSetup(Env) ;
+		return x;
 	}
 
 	return nullptr;
