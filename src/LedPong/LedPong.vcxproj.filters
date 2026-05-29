@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="scripts">
+      <UniqueIdentifier>{f4d74562-9e55-4ee0-9519-a2677de1229b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SDL_Helper.cpp">
@@ -194,5 +197,31 @@
     <ClInclude Include="MenuGameHighscores.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="scripts\halt.bat">
+      <Filter>scripts</Filter>
+    </None>
+    <None Include="scripts\halt.sh">
+      <Filter>scripts</Filter>
+    </None>
+    <None Include="scripts\wifi-hka.bat">
+      <Filter>scripts</Filter>
+    </None>
+    <None Include="scripts\wifi-hka.sh">
+      <Filter>scripts</Filter>
+    </None>
+    <None Include="scripts\wifi-lhe.bat">
+      <Filter>scripts</Filter>
+    </None>
+    <None Include="scripts\wifi-lhe.sh">
+      <Filter>scripts</Filter>
+    </None>
+    <None Include="scripts\wifi-srv.bat">
+      <Filter>scripts</Filter>
+    </None>
+    <None Include="scripts\wifi-srv.sh">
+      <Filter>scripts</Filter>
+    </None>
   </ItemGroup>
 </Project>

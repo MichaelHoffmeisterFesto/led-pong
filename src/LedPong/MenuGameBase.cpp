@@ -43,6 +43,10 @@ void MenuGameBase::LoadMenu(MenuItem* menu, int numItem, int startItem, string b
 
 MenuGameBase::MenuGameBase(GameEnvironment* env) : GameBase(env)
 {
+	if (env != nullptr)
+	{
+		mLastFrameIndexWithKey = env->FrameCounter;
+	}
 }
 
 void RenderMenu(GameEnvironment* env, Vec2 startPos, MenuItem* menu, int numItem, int selectedItem, int extraRenderSpacingX)
