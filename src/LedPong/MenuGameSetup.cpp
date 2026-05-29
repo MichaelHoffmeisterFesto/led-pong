@@ -27,10 +27,10 @@ MenuItem SetupMenu[] =
 	/* 07 */ { MI_Button  ,      "DOWN" , 16,  3, false, '+', ' ', 0, {} },
 
 
-	/* 08 */ { MI_TextOnly, "WIFI"     , 11,  4, false, '+', ' ', 0, {} },
-	/* 09 */ { MI_Button  ,      "SRV" , 16,  4, false, '+', ' ', 0, {} },
-	/* 10 */ { MI_Button  ,      "HKA" , 16,  5, false, '+', ' ', 0, {} },
-	/* 11 */ { MI_Button  ,      "LHE" , 16,  6, false, '+', ' ', 0, {} },
+	/* 08 */ { MI_TextOnly, "WIFI"     , 11,  5, false, '+', ' ', 0, {} },
+	/* 09 */ { MI_Button  ,      "SRV" , 16,  5, false, '+', ' ', 0, {} },
+	/* 10 */ { MI_Button  ,      "HKA" , 16,  6, false, '+', ' ', 0, {} },
+	/* 11 */ { MI_Button  ,      "LHE" , 16,  7, false, '+', ' ', 0, {} },
 
 	/* 12 */ { MI_Button  , "SYS-HALT" ,  11,  8, false, '+', ' ', 0, {} },
 };
@@ -65,6 +65,16 @@ GameBase* MenuGameSetup::ButtonSelectRight(int selectedItem)
 		// start game by having a new object on the heap
 		MenuGameMain* x = new MenuGameMain(Env);
 		return x;
+	}
+
+	if (selectedItem >= 6 && selectedItem <= 7)
+	{
+		// the specific action
+		string names[] = { "vol-up", "vol-down" };
+		ExecScript(names[selectedItem - 6]);
+
+		// visual feedback .. stay in the menu
+		mSelectedItem = 4;
 	}
 
 	if (selectedItem == 9)
@@ -146,7 +156,6 @@ void MenuGameSetup::ExecScript(string name)
 #ifdef WIN32
 	string cmd = ".\\scripts\\" + name + ".bat";
 	system(cmd.c_str());
-	mSelectedItem = 4;
 #else
 	string cmd = "./scripts/" + name + ".sh";
 	system(cmd.c_str());
