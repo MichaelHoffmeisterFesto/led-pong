@@ -14,12 +14,17 @@
 #pragma comment(lib, "ws2_32.lib")
 #else
 // Linux
-#include <sys/types.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+
 #include <sys/socket.h>
 #include <sys/ioctl.h>
-#include <netinet/in.h>
+
 #include <net/if.h>
 #include <arpa/inet.h>
+#include <ifaddrs.h>
+
 #endif
 
 void Networking::ReadAdapterInfo()
@@ -106,23 +111,52 @@ void Networking::ReadAdapterInfo()
     // Linux
     //
 
-    int fd;
-    struct ifreq ifr;
+    // int fd;
+    // struct ifreq ifr;
 
-    fd = socket(AF_INET, SOCK_DGRAM, 0);
+    // fd = socket(AF_INET, SOCK_DGRAM, 0);
 
-    /* I want to get an IPv4 IP address */
-    ifr.ifr_addr.sa_family = AF_INET;
+    // /* I want to get an IPv4 IP address */
+    // ifr.ifr_addr.sa_family = AF_INET;
 
-    /* I want IP address attached to "eth0" */
-    strncpy(ifr.ifr_name, "eth0", IFNAMSIZ - 1);
+    // /* I want IP address attached to "eth0" */
+    // strncpy(ifr.ifr_name, "eth0", IFNAMSIZ - 1);
 
-    ioctl(fd, SIOCGIFADDR, &ifr);
+    // ioctl(fd, SIOCGIFADDR, &ifr);
 
-    close(fd);
+    // close(fd);
 
-    /* display result */
-    printf("%s\n", inet_ntoa(((struct sockaddr_in*)&ifr.ifr_addr)->sin_addr));
+    // /* display result */
+    // printf("%s\n", inet_ntoa(((struct sockaddr_in*)&ifr.ifr_addr)->sin_addr));
+
+    struct ifaddrs *ifap, *ifa;
+    struct sockaddr_in *sa;
+    char *addr;
+
+    getifaddrs (&ifap);
+    for (ifa = ifap; ifa; ifa = ifa->ifa_next) 
+    {
+        if (ifa->ifa_addr && ifa->ifa_addr->sa_family==AF_INET) {
+            sa = (struct sockaddr_in *) ifa->ifa_addr;
+            addr = inet_ntoa(sa->sin_addr);
+            printf("Interface: %s\tAddress: %s\n", ifa->ifa_name, addr);
+
+            // use interface names on Raspi as a good standard
+            if (strncmp(ifa->ifa_name, "wlan", 4) == 0)
+            {
+                printf("Connected WiFi\n");
+                WifiIp = addr;
+            }
+
+            if (strncmp(ifa->ifa_name, "eth", 3) == 0)
+            {
+                printf("Connected Ethernet\n");
+                EthIp = addr;
+            }
+        }
+    }
+
+    freeifaddrs(ifap);
 
 #endif
 

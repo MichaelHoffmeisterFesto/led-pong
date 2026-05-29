@@ -20,6 +20,7 @@
 #include "basic.h"
 
 #include "GameBase.h"
+#include "Networking.h"
 #include "IntroGame.h"
 #include "PacManGame.h"
 
