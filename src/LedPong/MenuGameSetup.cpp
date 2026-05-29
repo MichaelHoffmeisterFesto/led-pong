@@ -62,7 +62,6 @@ void MenuGameSetup::CommitChanges()
 
 void MenuGameSetup::StateChanged(int selectedItem)
 {
-	return;
 	if (selectedItem >= 0 && selectedItem <= 3)
 	{
 		// commit and continue
