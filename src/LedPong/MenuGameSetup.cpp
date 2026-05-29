@@ -74,8 +74,8 @@ GameBase* MenuGameSetup::ButtonSelectRight(int selectedItem)
 		string lines[] = {
 				"AP   : LEDPONG",
 				"PW   : HKA",
-				"ETH0: 222.222.222.222",
-				"WIFI: 188.245.234.234",
+				"ETH0: " + nw.EthIp,
+				"WIFI: " + nw.WifiIp,
 				"U    : STUDENT",
 				"PW   : HKA",
 		};
