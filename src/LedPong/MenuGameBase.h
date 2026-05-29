@@ -38,6 +38,7 @@ public:
 protected:
 	void LoadMenu(MenuItem* menu, int numItem, int startItem, string backgroundFn, Vec2 menuBasePos);
 	bool MoveSelectedItem(int dir = 0);
+	virtual void StateChanged(int selectedItem);
 	virtual GameBase* ButtonSelectLeft(int selectedItem);
 	virtual GameBase* ButtonSelectRight(int selectedItem);
 

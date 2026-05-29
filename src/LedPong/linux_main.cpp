@@ -207,8 +207,6 @@ bool loop() {
         TheEnv.GameKey[KEY_ANY] = keyAny;
     }
 
-	// TheGame.Loop();
-	// TheIntro.Loop();
 	if (CurrentGame != nullptr)
 	{
 		CurrentGame->Loop();

@@ -54,13 +54,28 @@ GameBase* MenuGameSetup::ButtonSelectLeft(int selectedItem)
 	return x;
 }
 
+void MenuGameSetup::CommitChanges()
+{
+	Env->Mute = mCurrMenu[1].State;
+	Env->KeySwap = mCurrMenu[3].State;
+}
+
+void MenuGameSetup::StateChanged(int selectedItem)
+{
+	return;
+	if (selectedItem >= 0 && selectedItem <= 3)
+	{
+		// commit and continue
+		CommitChanges();
+	}
+}
+
 GameBase* MenuGameSetup::ButtonSelectRight(int selectedItem)
 {
 	if (selectedItem == 4)
 	{
 		// commit
-		Env->Mute = mCurrMenu[1].State;
-		Env->KeySwap = mCurrMenu[3].State;
+		CommitChanges();
 
 		// start game by having a new object on the heap
 		MenuGameMain* x = new MenuGameMain(Env);
@@ -74,7 +89,8 @@ GameBase* MenuGameSetup::ButtonSelectRight(int selectedItem)
 		ExecScript(names[selectedItem - 6]);
 
 		// visual feedback .. stay in the menu
-		mSelectedItem = 4;
+		// no, actually not!
+		// mSelectedItem = 4;
 	}
 
 	if (selectedItem == 9)
@@ -142,12 +158,6 @@ GameBase* MenuGameSetup::ButtonSelectRight(int selectedItem)
 		return x;
 	}
 
-	//if (selectedItem >= 6 && selectedItem <= 9)
-	//{
-	//	string names[] = { "wifi-srv", "wifi-hka", "wifi-lhe", "halt" };
-	//	ExecScript(names[selectedItem - 6]);
-	//}
-
 	return nullptr;
 }
 
@@ -159,7 +169,6 @@ void MenuGameSetup::ExecScript(string name)
 #else
 	string cmd = "./scripts/" + name + ".sh";
 	system(cmd.c_str());
-	mSelectedItem = 4;
 #endif
 }
 

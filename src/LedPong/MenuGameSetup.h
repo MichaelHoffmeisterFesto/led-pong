@@ -15,6 +15,8 @@ class MenuGameSetup : public MenuGameBase
 public:
 	MenuGameSetup(GameEnvironment* env);
 protected:
+	void CommitChanges();
+	virtual void StateChanged(int selectedItem);
 	virtual GameBase* ButtonSelectLeft(int selectedItem);
 	virtual GameBase* ButtonSelectRight(int selectedItem);
 	void ExecScript(string name);

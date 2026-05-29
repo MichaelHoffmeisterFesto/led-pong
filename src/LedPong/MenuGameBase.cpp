@@ -118,6 +118,11 @@ bool MenuGameBase::MoveSelectedItem(int dir)
 }
 
 // overload this in derived classes!
+void MenuGameBase::StateChanged(int selectedItem)
+{
+}
+
+// overload this in derived classes!
 GameBase* MenuGameBase::ButtonSelectLeft(int selectedItem)
 {
 	return nullptr;
@@ -194,6 +199,9 @@ void MenuGameBase::Loop()
 
 						// switch this on
 						mi->State = true;
+
+						// send state change
+						StateChanged(mSelectedItem);
 					}
 				}
 
