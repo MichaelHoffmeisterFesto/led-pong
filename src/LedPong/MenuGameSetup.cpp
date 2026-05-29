@@ -1,6 +1,7 @@
 #include "MenuGameSetup.h"
 #include "MenuGameMain.h"
 #include "IntroGame.h"
+#include <unistd.h>
 
 MenuItem SetupMenu[] =
 {
@@ -19,7 +20,7 @@ MenuItem SetupMenu[] =
 	/* 07 */ { MI_Button  ,      "HKA" , 16,  3, false, '+', ' ', 0, {} },
 	/* 08 */ { MI_Button  ,      "LHE" , 16,  4, false, '+', ' ', 0, {} },
 
-	/* 09 */ { MI_Button  , "HALT"    ,  11,  8, false, '+', ' ', 0, {} },
+	/* 09 */ { MI_Button  , "SYS-HALT" ,  11,  8, false, '+', ' ', 0, {} },
 };
 
 MenuGameSetup::MenuGameSetup(GameEnvironment* env)
@@ -70,5 +71,21 @@ void MenuGameSetup::ExecScript(string name)
 	system(cmd.c_str());
 	mSelectedItem = 4;
 #else
+	string cmd = "./scripts/" + name + ".sh";
+	system(cmd.c_str());
+	mSelectedItem = 4;
 #endif
+}
+
+void MenuGameSetup::GidDiag()
+{
+    std::cout << "getuid()  = " << getuid()  << std::endl;
+    std::cout << "geteuid() = " << geteuid() << std::endl;
+    std::cout << "id output:" << std::endl;
+    system("id");
+
+    std::cout << "geteuid() = " << geteuid() << std::endl;
+    system("id");                 // zur Kontrolle
+    int ret = system("/bin/bash /home/pi/led-pong/led-pong/src/LedPong/scripts/util_wifi_ap.sh");
+    std::cout << "system() returned " << ret << std::endl;
 }

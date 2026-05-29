@@ -18,5 +18,6 @@ protected:
 	virtual GameBase* ButtonSelectLeft(int selectedItem);
 	virtual GameBase* ButtonSelectRight(int selectedItem);
 	void ExecScript(string name);
+    void GidDiag();
 };
 

@@ -444,6 +444,7 @@ int main(int argc, char** args)
 	defaults.pixel_mapper_config = "PiPong";
 
 	rgb_matrix::RuntimeOptions rtoptions;
+    rtoptions.drop_privileges = 0;          // important for system-ing sudo scripts
 	rtoptions.gpio_slowdown = 5;
 
 	TheLedCanvas = RGBMatrix::CreateFromFlags(&argc, &args, &defaults, &rtoptions);
