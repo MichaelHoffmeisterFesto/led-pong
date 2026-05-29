@@ -27,7 +27,9 @@ MenuGameSetup::MenuGameSetup(GameEnvironment* env)
 
 GameBase* MenuGameSetup::ButtonSelectLeft(int selectedItem)
 {
-	return new MenuGameMain(Env);
+	// start game by having a new object on the heap
+	MenuGameMain* x = new MenuGameMain(Env);
+	return x;
 }
 
 GameBase* MenuGameSetup::ButtonSelectRight(int selectedItem)
@@ -38,7 +40,9 @@ GameBase* MenuGameSetup::ButtonSelectRight(int selectedItem)
 		Env->Mute = mCurrMenu[1].State;
 		Env->KeySwap = mCurrMenu[3].State;
 
-		return new MenuGameMain(Env);
+		// start game by having a new object on the heap
+		MenuGameMain* x = new MenuGameMain(Env);
+		return x;
 	}
 
 	return nullptr;
