@@ -235,5 +235,17 @@
     <None Include="scripts\wifi-srv.sh">
       <Filter>scripts</Filter>
     </None>
+    <None Include="scripts\vol-down.bat">
+      <Filter>scripts</Filter>
+    </None>
+    <None Include="scripts\vol-down.sh">
+      <Filter>scripts</Filter>
+    </None>
+    <None Include="scripts\vol-up.bat">
+      <Filter>scripts</Filter>
+    </None>
+    <None Include="scripts\vol-up.sh">
+      <Filter>scripts</Filter>
+    </None>
   </ItemGroup>
 </Project>

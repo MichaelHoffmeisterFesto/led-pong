@@ -12,22 +12,27 @@
 
 MenuItem SetupMenu[] =
 {
-	/* 00 */ { MI_Switch  , "MUSIC ON" ,  0,  2, true , '+', ' ', 1, { 1 } },
-	/* 01 */ { MI_Switch  , "MUSIC OFF",  0,  3, false, '+', ' ', 1, { 0 } },
+	/* 00 */ { MI_Switch  , "MUSIC ON"  ,  0,  2, true , '+', ' ', 1, { 1 } },
+	/* 01 */ { MI_Switch  , "MUSIC OFF" ,  0,  3, false, '+', ' ', 1, { 0 } },
 
-	/* 02 */ { MI_Switch  , "NORM KEYS",  0,  5, true , '+', ' ', 1, { 3 } },
-	/* 03 */ { MI_Switch  , "SWAP KEYS",  0,  6, false, '+', ' ', 1, { 2 } },
+	/* 02 */ { MI_Switch  , "NORM KEYS" ,  0,  5, true , '+', ' ', 1, { 3 } },
+	/* 03 */ { MI_Switch  , "SWAP KEYS" ,  0,  6, false, '+', ' ', 1, { 2 } },
 
-	/* 04 */ { MI_Button  , "LEAVE"    ,  0,  8, false, '+', ' ', 0, {} },
+	/* 04 */ { MI_Button  , "LEAVE"     ,  0,  8, false, '+', ' ', 0, {} },
 
 	/* right column */
 
-	/* 05 */ { MI_TextOnly, "WIFI"     , 11,  2, false, '+', ' ', 0, {} },
-	/* 06 */ { MI_Button  ,      "SRV" , 16,  2, false, '+', ' ', 0, {} },
-	/* 07 */ { MI_Button  ,      "HKA" , 16,  3, false, '+', ' ', 0, {} },
-	/* 08 */ { MI_Button  ,      "LHE" , 16,  4, false, '+', ' ', 0, {} },
+	/* 05 */ { MI_TextOnly, "VOL "      , 11,  2, false, '+', ' ', 0, {} },
+	/* 06 */ { MI_Button  ,      "UP"   , 16,  2, false, '+', ' ', 0, {} },
+	/* 07 */ { MI_Button  ,      "DOWN" , 16,  3, false, '+', ' ', 0, {} },
 
-	/* 09 */ { MI_Button  , "SYS-HALT" ,  11,  8, false, '+', ' ', 0, {} },
+
+	/* 08 */ { MI_TextOnly, "WIFI"     , 11,  4, false, '+', ' ', 0, {} },
+	/* 09 */ { MI_Button  ,      "SRV" , 16,  4, false, '+', ' ', 0, {} },
+	/* 10 */ { MI_Button  ,      "HKA" , 16,  5, false, '+', ' ', 0, {} },
+	/* 11 */ { MI_Button  ,      "LHE" , 16,  6, false, '+', ' ', 0, {} },
+
+	/* 12 */ { MI_Button  , "SYS-HALT" ,  11,  8, false, '+', ' ', 0, {} },
 };
 
 MenuGameSetup::MenuGameSetup(GameEnvironment* env)
@@ -62,8 +67,9 @@ GameBase* MenuGameSetup::ButtonSelectRight(int selectedItem)
 		return x;
 	}
 
-	if (selectedItem == 6)
+	if (selectedItem == 9)
 	{
+		// the specific action
 		ExecScript("wifi-srv");
 
 		// gather info
@@ -83,8 +89,35 @@ GameBase* MenuGameSetup::ButtonSelectRight(int selectedItem)
 		return x;
 	}
 
-	if (selectedItem == 9)
+	if (selectedItem >= 10 && selectedItem <= 11)
 	{
+		// the specific action
+		string names[] = { "wifi-hka", "wifi-lhe" };
+		ExecScript(names[selectedItem - 10]);
+
+		// string to upper is not part of standard C++!
+		string upp = names[selectedItem - 10];
+		std::transform(upp.begin(), upp.end(), upp.begin(), ::toupper);
+
+		// gather info
+		Networking nw;
+		nw.ReadAdapterInfo();
+
+		// start game by having a new object on the heap
+		string lines[] = {
+				"AP   : " + upp,
+				"ETH0: " + nw.EthIp,
+				"WIFI: " + nw.WifiIp,
+				"U    : STUDENT",
+				"PW   : HKA",
+		};
+		MenuGameMsgBox* x = new MenuGameMsgBox(Env, "WIFI CLIENT +++++++++++", lines, SIZE_OF_ARR(lines));
+		return x;
+	}
+
+	if (selectedItem == 12)
+	{
+		// the specific action
 		ExecScript("halt");
 
 		// start game by having a new object on the heap

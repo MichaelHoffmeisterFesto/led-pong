@@ -227,6 +227,10 @@
   <ItemGroup>
     <None Include="scripts\halt.bat" />
     <None Include="scripts\halt.sh" />
+    <None Include="scripts\vol-down.bat" />
+    <None Include="scripts\vol-down.sh" />
+    <None Include="scripts\vol-up.bat" />
+    <None Include="scripts\vol-up.sh" />
     <None Include="scripts\wifi-hka.bat" />
     <None Include="scripts\wifi-hka.sh" />
     <None Include="scripts\wifi-lhe.bat" />
