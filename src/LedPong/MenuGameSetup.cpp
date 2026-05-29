@@ -11,6 +11,15 @@ MenuItem SetupMenu[] =
 	/* 03 */ { MI_Switch  , "SWAP KEYS",  0,  6, false, '+', ' ', 1, { 2 } },
 
 	/* 04 */ { MI_Button  , "LEAVE"    ,  0,  8, false, '+', ' ', 0, {} },
+
+	/* right column */
+
+	/* 05 */ { MI_TextOnly, "WIFI"     , 11,  2, false, '+', ' ', 0, {} },
+	/* 06 */ { MI_Button  ,      "SRV" , 16,  2, false, '+', ' ', 0, {} },
+	/* 07 */ { MI_Button  ,      "HKA" , 16,  3, false, '+', ' ', 0, {} },
+	/* 08 */ { MI_Button  ,      "LHE" , 16,  4, false, '+', ' ', 0, {} },
+
+	/* 09 */ { MI_Button  , "HALT"    ,  11,  8, false, '+', ' ', 0, {} },
 };
 
 MenuGameSetup::MenuGameSetup(GameEnvironment* env)
@@ -27,7 +36,9 @@ MenuGameSetup::MenuGameSetup(GameEnvironment* env)
 
 GameBase* MenuGameSetup::ButtonSelectLeft(int selectedItem)
 {
-	return new MenuGameMain(Env);
+	// start game by having a new object on the heap
+	MenuGameMain* x = new MenuGameMain(Env);
+	return x;
 }
 
 GameBase* MenuGameSetup::ButtonSelectRight(int selectedItem)
@@ -38,8 +49,26 @@ GameBase* MenuGameSetup::ButtonSelectRight(int selectedItem)
 		Env->Mute = mCurrMenu[1].State;
 		Env->KeySwap = mCurrMenu[3].State;
 
-		return new MenuGameMain(Env);
+		// start game by having a new object on the heap
+		MenuGameMain* x = new MenuGameMain(Env);
+		return x;
+	}
+
+	if (selectedItem >= 6 && selectedItem <= 9)
+	{
+		string names[] = { "wifi-srv", "wifi-hka", "wifi-lhe", "halt" };
+		ExecScript(names[selectedItem - 6]);
 	}
 
 	return nullptr;
+}
+
+void MenuGameSetup::ExecScript(string name)
+{
+#ifdef WIN32
+	string cmd = ".\\scripts\\" + name + ".bat";
+	system(cmd.c_str());
+	mSelectedItem = 4;
+#else
+#endif
 }

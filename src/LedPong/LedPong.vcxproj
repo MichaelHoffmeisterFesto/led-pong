@@ -220,6 +220,16 @@
     <ClInclude Include="TileFactory.h" />
     <ClInclude Include="TileMap.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="scripts\halt.bat" />
+    <None Include="scripts\halt.sh" />
+    <None Include="scripts\wifi-hka.bat" />
+    <None Include="scripts\wifi-hka.sh" />
+    <None Include="scripts\wifi-lhe.bat" />
+    <None Include="scripts\wifi-lhe.sh" />
+    <None Include="scripts\wifi-srv.bat" />
+    <None Include="scripts\wifi-srv.sh" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
