@@ -107,7 +107,8 @@ GameBase* MenuGameSetup::ButtonSelectRight(int selectedItem)
 				"U    : STUDENT",
 				"PW   : HKA",
 		};
-		return new MenuGameMsgBox(Env, "WIFI SERVER +++++++++++", lines, SIZE_OF_ARR(lines));
+		return new MenuGameMsgBox(Env, "WIFI SERVER +++++++++++", lines, SIZE_OF_ARR(lines),
+			MenuGameMsgBox::Buttons::OK);
 	}
 
 	if (selectedItem >= 10 && selectedItem <= 11)
@@ -132,23 +133,43 @@ GameBase* MenuGameSetup::ButtonSelectRight(int selectedItem)
 				"U    : STUDENT",
 				"PW   : HKA",
 		};
-		return new MenuGameMsgBox(Env, "WIFI CLIENT +++++++++++", lines, SIZE_OF_ARR(lines));
+		return new MenuGameMsgBox(Env, "WIFI CLIENT +++++++++++", lines, SIZE_OF_ARR(lines),
+			MenuGameMsgBox::Buttons::OK);
 	}
 
 	if (selectedItem == 12)
 	{
-		// the specific action
-		ExecScript("halt");
-
 		// start game by having a new object on the heap
 		string lines[] = {
-				"THE SYSTEM WILL HALT",
-				"AS SOON AS POSSIBLE.",
-				"",
-				"THIS PROCESS CANT BE",
-				"CANCELLED."
+			"THE SYSTEM WILL HALT",
+			"AND SHUT DOWN.",
+			"REQUIRED FOR SAFE", 
+			"POWER OFF."
 		};
-		return new MenuGameMsgBox(Env, "SYSTEM ++++++++++++++++", lines, SIZE_OF_ARR(lines));
+		MenuGameMsgBox* box = new MenuGameMsgBox(Env, "SYSTEM ++++++++++++++++", lines, SIZE_OF_ARR(lines),
+			MenuGameMsgBox::Buttons::YesNo);
+
+		// declare a lambda action, which acts upon the choose result and
+		// is returning the new screen
+		// Important: hold a copy of all important variables in the scope (e.g. thisEnv)
+		// a capture context by value [=] !!
+		GameEnvironment* thisEnv = Env;
+		box->LambdaAction = [=](MenuGameMsgBox::Result r) {
+
+			if (r == MenuGameMsgBox::Result::Yes)
+			{
+				ExecScript("halt");
+				return (GameBase*) new IntroGame(thisEnv);
+			}
+
+			if (r == MenuGameMsgBox::Result::No)
+			{
+				return (GameBase*) new MenuGameSetup(thisEnv);
+			}
+
+			return (GameBase*) nullptr;
+		};
+		return box;
 	}
 
 	return nullptr;

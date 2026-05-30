@@ -2,15 +2,32 @@
 #include "MenuGameMain.h"
 
 MenuGameMsgBox::MenuGameMsgBox(GameEnvironment* env, 
-	string caption, string lines[], int numLine) : MenuGameBase(env)
+	string caption, string lines[], int numLine, Buttons buttons) : MenuGameBase(env)
 {
 	// allocate items
+	mButtons = buttons;
 	numItems = 2 + numLine;
+	if (mButtons == Buttons::YesNo)
+		numItems++;
 	items = new MenuItem[numItems];
 
 	// fix items
 	items[0] = { MI_TextOnly  , "" + caption ,  0,  0, false , '+', ' ', 0, {} };
-	items[numItems - 1] = { MI_Button  , "OK"    ,  15,  8, false, '+', ' ', 0, {} };
+
+	int startItem = 0;
+	if (mButtons == Buttons::YesNo)
+	{
+		// YesNo
+		items[numItems - 2] = { MI_Button  , "NO"    ,   0,  8, false, '+', ' ', 0, {} };
+		items[numItems - 1] = { MI_Button  , "YES"   ,  15,  8, false, '+', ' ', 0, {} };
+		startItem = numItems - 2;
+	}
+	else
+	{
+		// default
+		items[numItems - 1] = { MI_Button  , "OK"    ,  15,  8, false, '+', ' ', 0, {} };
+		startItem = numItems - 1;
+	}
 
 	// variable items
 	for (int i=0; i<numLine; i++)
@@ -18,7 +35,7 @@ MenuGameMsgBox::MenuGameMsgBox(GameEnvironment* env,
 
 	// load
 	LoadMenu(items, numItems, 0, "media/msgbox_4x3_small.bmp", Vec2(6, 12));
-	mSelectedItem = numItems - 1;
+	mSelectedItem = startItem;
 }
 
 GameBase* MenuGameMsgBox::ButtonSelectLeft(int selectedItem)
@@ -28,9 +45,41 @@ GameBase* MenuGameMsgBox::ButtonSelectLeft(int selectedItem)
 
 GameBase* MenuGameMsgBox::ButtonSelectRight(int selectedItem)
 {
-	if (selectedItem == numItems - 1)
+	Result processResult = Result::None;
+
+	if (mButtons == Buttons::YesNo)
 	{
-		return new MenuGameMain(Env);
+		// YesNo
+		if (selectedItem == numItems - 1)
+		{
+			processResult = Result::Yes;
+		}
+		if (selectedItem == numItems - 2)
+		{
+			processResult = Result::No;
+		}
+	}
+	else
+	{
+		// default
+		if (selectedItem == numItems - 1)
+		{
+			processResult = Result::OK;
+		}
+	}
+
+	if (processResult != Result::None)
+	{
+		// either default action (main menu) or lambda action
+		if (LambdaAction == nullptr)
+		{
+			return new MenuGameMain(Env);
+		}
+		else
+		{
+			// evaluate lambda
+			return LambdaAction(processResult);
+		}
 	}
 
 	return nullptr;
