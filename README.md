@@ -13,8 +13,7 @@ There is a solution file provided for Visual Studio.
 When compiling, the "x86" platform needs to be selected
 
 In project properties/ debugging / environment
-* PATH=%PATH%;\$(ProjectDir)..\\SDL2\\lib\\x86
-$(LocalDebuggerEnvironment)
+* PATH=%PATH%;\$(ProjectDir)..\\SDL2\\lib\\x86$(LocalDebuggerEnvironment)
 
 In project properties/ configuration/ c/c++ / pre-processor
 * WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);Use_SDL_Grafix
@@ -23,6 +22,101 @@ In project properties/ configuration/ linker / input
 * SDL2.lib;SDL2main.lib;SDL2_ttf.lib;SDL2_mixer.lib;%(AdditionalDependencies)
 
 ### Compiling on RPi
+
+There is a different main file for linux (linux_main.cpp). 
+SDL is used for sound, but not for graphics at all.
+There is a makefile.
+
+```
+make
+```
+
+No make install used.
+
+This is the typical commandline to execute:
+
+```
+sudo ./program.bin --led-multiplexing=0 --led-pwm-bits=11 --led-gpio-mapping=adafruit-hat --led-pixel-mapper="PiPong"
+```
+
+This is the typical commandline to debug:
+
+```
+sudo gdb --args ./program.bin --led-multiplexing=0 --led-pwm-bits=11 --led-gpio-mapping=adafruit-hat --led-pixel-mapper="PiPong"
+```
+
+### Installing on RPi as a service
+
+Create a service file
+
+```
+sudo vim /etc/systemd/system/led-pong.service
+```
+
+INI contents:
+
+```
+[Unit]
+Description=LED Pong Game
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/home/pi/led-pong/led-pong/src/LedPong/linux_start.sh
+WorkingDirectory=/home/pi/led-pong/led-pong/src/LedPong
+Restart=always
+RestartSec=5
+
+# Run as root
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Prepare the (local) startup script:
+
+```
+sudo chmod +x /home/pi/led-pong/led-pong/src/LedPong/linux_start.sh
+```
+
+Fill it with contents (the script enables the serial port to be read the hard way). It would also be the right place to set some configuration options.
+
+```
+#! /bin/bash
+echo "Needs to run as sudo!"
+chmod 666 /dev/ttyACM0
+stty -F /dev/ttyACM0 115200
+SDL_AUDIODRIVER=alsa AUDIODEV=hw:2,0 ./program.bin --led-multiplexing=0 --led-pwm-bits=11 --led-gpio-mapping=adafruit-hat --led-pixel-mapper="PiPong"
+```
+
+Enable the service (once?):
+
+```
+sudo systemctl daemon-reload
+sudo systemctl enable led-pong.service
+```
+
+Start/ Stop:
+
+```
+sudo systemctl start led-pong.service
+```
+
+Check status:
+
+```
+sudo systemctl status led-pong.service
+```
+
+View logs:
+
+```
+sudo journalctl -u led-pong.service -f
+```
+
 
 ### History
 
