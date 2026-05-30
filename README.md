@@ -103,6 +103,7 @@ Start/ Stop:
 
 ```
 sudo systemctl start led-pong.service
+sudo systemctl stop led-pong.service
 ```
 
 Check status:

@@ -23,18 +23,14 @@ MenuGameMsgBox::MenuGameMsgBox(GameEnvironment* env,
 
 GameBase* MenuGameMsgBox::ButtonSelectLeft(int selectedItem)
 {
-	// start game by having a new object on the heap
-	MenuGameMain* x = new MenuGameMain(Env);
-	return x;
+	return new MenuGameMain(Env);
 }
 
 GameBase* MenuGameMsgBox::ButtonSelectRight(int selectedItem)
 {
 	if (selectedItem == numItems - 1)
 	{
-		// start game by having a new object on the heap
-		MenuGameMain* x = new MenuGameMain(Env);
-		return x;
+		return new MenuGameMain(Env);
 	}
 
 	return nullptr;

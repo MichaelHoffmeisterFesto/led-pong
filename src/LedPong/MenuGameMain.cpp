@@ -31,9 +31,7 @@ MenuGameMain::MenuGameMain(GameEnvironment* env)
 
 GameBase* MenuGameMain::ButtonSelectLeft(int selectedItem)
 {
-	// start game by having a new object on the heap
-	IntroGame* x  = new IntroGame(Env);
-	return x;
+	return new IntroGame(Env);
 }
 
 void MenuGameMain::CommitChanges()
@@ -63,15 +61,12 @@ GameBase* MenuGameMain::ButtonSelectRight(int selectedItem)
 		CommitChanges();
 
 		// start game by having a new object on the heap
-        PacManGame* x  = new PacManGame(Env, Env->LastGamePlayers, Env->LastGameDiffi);
-		return x;
+        return new PacManGame(Env, Env->LastGamePlayers, Env->LastGameDiffi);
 	}
 
 	if (selectedItem == 7)
 	{
-        // start game by having a new object on the heap
-        MenuGameSetup* x  = new MenuGameSetup(Env) ;
-		return x;
+        return new MenuGameSetup(Env) ;
 	}
 
 	return nullptr;

@@ -49,9 +49,7 @@ MenuGameSetup::MenuGameSetup(GameEnvironment* env)
 
 GameBase* MenuGameSetup::ButtonSelectLeft(int selectedItem)
 {
-	// start game by having a new object on the heap
-	MenuGameMain* x = new MenuGameMain(Env);
-	return x;
+	return new MenuGameMain(Env);
 }
 
 void MenuGameSetup::CommitChanges()
@@ -77,8 +75,7 @@ GameBase* MenuGameSetup::ButtonSelectRight(int selectedItem)
 		CommitChanges();
 
 		// start game by having a new object on the heap
-		MenuGameMain* x = new MenuGameMain(Env);
-		return x;
+		return new MenuGameMain(Env);
 	}
 
 	if (selectedItem >= 6 && selectedItem <= 7)
@@ -110,8 +107,7 @@ GameBase* MenuGameSetup::ButtonSelectRight(int selectedItem)
 				"U    : STUDENT",
 				"PW   : HKA",
 		};
-		MenuGameMsgBox* x = new MenuGameMsgBox(Env, "WIFI SERVER +++++++++++", lines, SIZE_OF_ARR(lines));
-		return x;
+		return new MenuGameMsgBox(Env, "WIFI SERVER +++++++++++", lines, SIZE_OF_ARR(lines));
 	}
 
 	if (selectedItem >= 10 && selectedItem <= 11)
@@ -136,8 +132,7 @@ GameBase* MenuGameSetup::ButtonSelectRight(int selectedItem)
 				"U    : STUDENT",
 				"PW   : HKA",
 		};
-		MenuGameMsgBox* x = new MenuGameMsgBox(Env, "WIFI CLIENT +++++++++++", lines, SIZE_OF_ARR(lines));
-		return x;
+		return new MenuGameMsgBox(Env, "WIFI CLIENT +++++++++++", lines, SIZE_OF_ARR(lines));
 	}
 
 	if (selectedItem == 12)
@@ -153,8 +148,7 @@ GameBase* MenuGameSetup::ButtonSelectRight(int selectedItem)
 				"THIS PROCESS CANT BE",
 				"CANCELLED."
 		};
-		MenuGameMsgBox* x = new MenuGameMsgBox(Env, "SYSTEM ++++++++++++++++", lines, SIZE_OF_ARR(lines));
-		return x;
+		return new MenuGameMsgBox(Env, "SYSTEM ++++++++++++++++", lines, SIZE_OF_ARR(lines));
 	}
 
 	return nullptr;
