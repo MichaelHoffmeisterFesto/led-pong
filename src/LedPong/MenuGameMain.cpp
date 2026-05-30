@@ -19,6 +19,13 @@ MenuItem GlobalMenu[] =
 MenuGameMain::MenuGameMain(GameEnvironment* env)
 	: MenuGameBase(env)
 {
+	GlobalMenu[2].State = (Env->LastGamePlayers != 2);
+	GlobalMenu[3].State = (Env->LastGamePlayers == 2);
+
+	GlobalMenu[4].State = (Env->LastGameDiffi == 1);
+	GlobalMenu[5].State = (Env->LastGameDiffi == 2);
+	GlobalMenu[6].State = (Env->LastGameDiffi == 3);
+
 	LoadMenu(GlobalMenu, SIZE_OF_ARR(GlobalMenu), 1, "media/ai_tech_pac_4x3_small.bmp", Vec2(6, 7));
 }
 
@@ -29,17 +36,31 @@ GameBase* MenuGameMain::ButtonSelectLeft(int selectedItem)
 	return x;
 }
 
+void MenuGameMain::CommitChanges()
+{
+	Env->LastGamePlayers = (mCurrMenu[3].State == true) ? 2 : 1;
+	Env->LastGameDiffi = 1;
+	if (mCurrMenu[5].State == true)
+		Env->LastGameDiffi = 2;
+	if (mCurrMenu[6].State == true)
+		Env->LastGameDiffi = 3;
+}
+
+void MenuGameMain::StateChanged(int selectedItem)
+{
+	if (selectedItem >= 2 && selectedItem <= 6)
+	{
+		// commit and continue
+		CommitChanges();
+	}
+}
+
 GameBase* MenuGameMain::ButtonSelectRight(int selectedItem)
 {
 	if (selectedItem == 1)
 	{
-		// get the mode
-		Env->LastGamePlayers = (mCurrMenu[3].State == true) ? 2 : 1;
-		Env->LastGameDiffi = 1;
-		if (mCurrMenu[5].State == true)
-			Env->LastGameDiffi = 2;
-		if (mCurrMenu[6].State == true)
-			Env->LastGameDiffi = 3;
+		// commit
+		CommitChanges();
 
 		// start game by having a new object on the heap
         PacManGame* x  = new PacManGame(Env, Env->LastGamePlayers, Env->LastGameDiffi);

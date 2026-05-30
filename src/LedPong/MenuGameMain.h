@@ -15,6 +15,8 @@ class MenuGameMain : public MenuGameBase
 public:
 	MenuGameMain(GameEnvironment* env);
 protected:
+	void CommitChanges();
+	virtual void StateChanged(int selectedItem);
 	virtual GameBase* ButtonSelectLeft(int selectedItem);
 	virtual GameBase* ButtonSelectRight(int selectedItem);
 };
