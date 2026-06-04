@@ -130,7 +130,7 @@ GameBase* MenuGameSetup::ButtonSelectRight(int selectedItem)
 				"AP   : " + upp,
 				"ETH0: " + nw.EthIp,
 				"WIFI: " + nw.WifiIp,
-				"U    : STUDENT",
+				"U    : STUDENT01-05",
 				"PW   : HKA",
 		};
 		return new MenuGameMsgBox(Env, "WIFI CLIENT +++++++++++", lines, SIZE_OF_ARR(lines),
