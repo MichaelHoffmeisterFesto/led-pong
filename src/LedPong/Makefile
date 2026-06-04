@@ -9,7 +9,8 @@ LDFLAGS+=`sdl2-config --cflags --libs` -L/usr/local/lib -lSDL2_mixer
 
 # Where our RGB library resides. You mostly only need to change the
 # RGB_LIB_DISTRIBUTION, this is where the library is checked out.
-RGB_LIB_DISTRIBUTION=../../../rpi-rgb-led-matrix
+RGB_LIB_DISTRIBUTION=/opt/course/rpi-rgb-led-matrix
+# RGB_LIB_DISTRIBUTION=../../../rpi-rgb-led-matrix
 RGB_INCDIR=$(RGB_LIB_DISTRIBUTION)/include
 RGB_LIBDIR=$(RGB_LIB_DISTRIBUTION)/lib
 RGB_LIBRARY_NAME=rgbmatrix
