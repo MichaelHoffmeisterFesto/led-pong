@@ -76,7 +76,7 @@ state Players as "Player 1/2 behavior (executed each Loop())" {
     choiceStandStill --> MakeStep2 : [!Player->StandStill()]
 
     state CheckTile as "ct = Level->GetAsTile(Player->CurrentTilePosition))"
-    choiceStandStill --> CheckTile
+    choiceStandStill --> CheckTile : [Player->StandStill()]
     MakeStep2 --> CheckTile
 
     CheckTile --> StateEnergizer : ct->IsEnergizer()\n&& Run->IsEnergizerActive()
