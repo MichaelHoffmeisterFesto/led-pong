@@ -8,6 +8,18 @@ The goal is to demonstrate a complex real world example with the capabilities if
 
 Idea is, to have most classes as pure as possible; only some portions of the code with the use of standard library/ template/ hardware details/ framework.
 
+## Bug report
+
+Please file any bug report [here](https://github.com/MichaelHoffmeisterFesto/led-pong/issues).
+
+Just click:
+- New issue
+- Bug report
+- Add a specific title, leave "[BUG]" intact
+- Fill out the form
+
+You need to have an account registered with Github (a "GitHub handle"). This make sense, anyway.
+
 ## UML
 
 The goal is also to train UML (Unified Modeling Language) on a complex real world example.
@@ -59,8 +71,6 @@ In the following diagram, the behaviours of the games main loop `PacManGame::Loo
 The behaviour sub-states will be executed from start to end every `PacManGame::Loop()`, which is a uncommon approach. Please check the use of state as a means to step-wise describe a complex behavoiur. What is better: An orthodox activity diagram, the state diagram or should this be left to source code only?
 
 [![State diagram](./out/UML/Behaviours_State_diagrams.svg)](./out/UML/Behaviours_State_diagrams.svg)
-
-
 
 ## Compiling
 
