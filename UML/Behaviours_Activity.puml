@@ -1,0 +1,66 @@
+@startuml Behaviours_Activity_diagrams
+
+hide empty members
+skinparam linetype polyline
+
+start
+
+while (Player = 1/2)
+    :draw player at coordinates on screen;
+    :Player->Animate();
+
+    while (Dir = left right up down)
+
+        if (Level->FindPossibleMoveInDir(Dir)\n&& Player->StandStill()\n&& KeyPressed(Dir))
+            if (JumpMovePossible()) then (yes)
+                :Player->CurrentTilePosition =\n<final position of jump>;
+                :newFinalPosition = true;
+            else (no)
+                :Player->CurrentDirection = Dir;
+                :Player->TriggerOpenMouth();
+                :Player->MakeStep();
+                :alreadyMoved = yes;
+            endif
+        endif
+
+    endwhile
+
+    if (!alreadyMoved && !Player->StandStill()) then (yes)
+        :Player->MakeStep();
+
+        if (Player->StandStill()) then (yes)
+            :newFinalPosition = true;
+        endif
+
+    endif
+
+    :ct = Level->GetAsTile(Player->CurrentTilePosition));
+
+    if (ct->IsEatablePosition()) then (yes)
+
+    if (ct->IsEnergizer() && Run->IsEnergizerActive()) then (yes)
+        :Play SoundSample(SMP_TurnToGhosts);
+        :Run->FrightenedMode = <some seconds>;
+    elseif (ct->IsFruit()) then (yes)
+        :Play SoundSample(SMP_Fruit);
+        :Player->Score += 100;
+    elseif (ct->IsEnergyPill()) then (yes)
+        :Play SoundSample(SMP_EnergyPill);
+        :Player->Score += 1;
+    endif
+
+    :ct->mTileCode = ' ';
+
+    :LevelCurr->UpdatePillsAvailable();
+
+    if (LevelCurr->PillsTotal < 1) then (yes)
+        :Advance next level;
+    endif
+
+    else (no)
+        :Play SoundSample(SMP_EmptyTile);
+    endif
+
+endwhile
+
+end

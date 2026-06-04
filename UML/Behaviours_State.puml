@@ -1,0 +1,185 @@
+@startuml Behaviours_State_diagrams
+
+hide empty members
+skinparam linetype polyline
+
+state PMG as "PacManGame::Loop()" {
+
+    [*] --> Normal
+    Normal: do / see: "Player 1/2 behavior"
+    Normal: do / see: "Ghost 1/2/3/4 behavior"
+
+    Normal --> DeadAnimation : Player died\t
+
+    DeadAnimation --> Normal : After 0.8 sec
+
+    DeadAnimation : do / Ghosts: Linear interpolation to\n\tghost gave (middle of screen)
+    DeadAnimation : exit / Restart level
+
+}
+
+
+state GhostsStates as "Ghost states"  {
+
+    [*] --> Waiting : At the beginning
+
+    Waiting --> Scatter : After 4 sec of level start
+    Waiting: Gives PacMan room to move\nbefore game starts
+    
+    Scatter --> Chase : After 7sec beginning,\t\n 5sec else
+
+    Scatter: do / Each ghost heads for home zone
+
+    Chase --> Scatter : Every 20sec
+
+    Chase: do / Each ghost performs its\n\tparticular chase behaviour
+
+    Chase --> Frightened : PacMan ate\n\tenergizer\t\t
+
+    Frightened --> SuperFrightened : Last 1 sec
+
+    SuperFrightened --> Chase : After\nmax(2, (7 - Run.LevelNo))\nseconds
+
+    Frightened : do / Ghost color blue
+    SuperFrightened : do / Ghost alternates blue / normal
+
+}
+
+state Players as "Player 1/2 behavior (executed each Loop())" {
+
+    [*] --> DrawPlayer
+    state DrawPlayer as "Draw Player"
+    DrawPlayer: Take coordinates and\ndraw on screen
+
+    state Animate as "Actor::Animate()"
+    Animate: Alternate open/ closed mouth
+    DrawPlayer --> Animate
+
+    state FindDir as "Level::FindPossibleDirection()"
+    FindDir: 4 possible directions\nand this key pressed\nand Player->StandStill()
+    Animate --> FindDir
+    
+    state MakeJump as "Make Jump"
+    MakeJump: Update Player->CurrentTilePosition
+    FindDir --> MakeJump : Found dir is jump
+
+    state MakeStep as "Make Step"
+    MakeStep: entry / Player->CurrentDirection = Dir\nentry / Player->TriggerOpenMouth()\nentry / Player->MakeStep()
+    FindDir --> MakeStep : No jump
+
+    state choiceStandStill <<choice>>
+    MakeJump --> choiceStandStill
+    MakeStep --> choiceStandStill
+
+    state MakeStep2 as "Make Step"
+    MakeStep2: entry / Player->MakeStep()
+    choiceStandStill --> MakeStep2 : [!Player->StandStill()]
+
+    state CheckTile as "ct = Level->GetAsTile(Player->CurrentTilePosition))"
+    choiceStandStill --> CheckTile
+    MakeStep2 --> CheckTile
+
+    CheckTile --> StateEnergizer : ct->IsEnergizer()\n&& Run->IsEnergizerActive()
+    state StateEnergizer as "Energizer (active)"
+    StateEnergizer: entry / PlaySoundSample(SMP_TurnToGhosts)\nRun->FrightenedMode = <some seconds>
+
+    state StateFruit as "Fruit"
+    StateFruit: entry / PlaySoundSample(SMP_Fruit)\nPlayer->Score += 100
+    CheckTile --> StateFruit : ct->IsFruit()
+
+    state StatePill as "Normal energy pill"
+    StatePill: entry / PlaySoundSample(SMP_EnergyPill)\nPlayer->Score += 1
+    CheckTile --> StatePill : ct->IsEnergyPill()
+
+    state ClearTile as "Clear current tile"
+    ClearTile: ct->mTileCode = ' '
+    StateEnergizer --> ClearTile
+    StateFruit --> ClearTile
+    StatePill --> ClearTile
+
+    state CheckPills as "Check remaining pills"
+    CheckPills: LevelCurr->UpdatePillsAvailable()
+    ClearTile --> CheckPills
+
+    state AdvanceNextLevel as "Advance next level"
+    AdvanceNextLevel: entry / Run->LevelNo++\nentry / Choose tile map out of 2\nentry / Players[0/1]->Lives = 3;\nentry / LoadLevel()\nentry / PlaySoundSample(SMP_LevleWin)
+    CheckPills --> AdvanceNextLevel : LevelCurr->PillsTotal < 1
+    CheckPills --> [*] : else
+
+    AdvanceNextLevel --> [*]
+
+    state StateEmpty as "Empty tile"
+    StateEmpty: entry / Play SoundSample(SMP_EmptyTile)
+    CheckTile --> StateEmpty : tile is empty
+
+    StateEmpty --> [*]
+}
+
+state Ghosts as "Ghosts 1/2/3/4 behavior (executed each Loop())" {
+
+    [*] --> DrawGhost
+    state DrawGhost as "Draw Ghost"
+    DrawGhost: Take coordinates and\ndraw on screen
+
+    state GhostAnimate as "Actor::Animate()"
+    GhostAnimate: Count down waiting time, if > 0
+    DrawGhost --> GhostAnimate
+
+    GhostAnimate --> decide1
+
+    state decide1 <<choice>>    
+    decide1 --> [*] : Ghost->IsWaiting()
+
+    decide1 --> StateIniNewStep : Ghost->StandStill()
+
+    state StateIniNewStep as "Initiate new step"
+    StateIniNewStep : entry / Ghost->GetBasicDirections()
+    StateIniNewStep : entry / Ghost->GetCurrentTargetPos()
+    StateIniNewStep : entry / Eval best direction towards target pos\n\t    or random direction if freightened
+    StateIniNewStep : entry / Set Ghost->CurrentDirection to this
+    StateIniNewStep : entry / Ghost->MakeStep()
+
+    decide1 --> GhostInStep : else
+
+    state GhostInStep as "Ghost already moving"
+    GhostInStep : entry / Ghost->MakeStep()
+
+    GhostInStep --> FindColl : Now is Ghost->StandStill()
+    GhostInStep --> [*] : else
+
+    state FindColl as "Find collision with Player 1/2 ??"
+    FindColl: entry / for Player = Player 1 / 2
+    FindColl: entry / if Player->CurrentTilePosition == gptr->CurrentTilePosition\n\t   and !Env->GodMode
+
+    FindColl --> [*] : no collision
+
+    FindColl --> GhostLoose : collision &&\nRun.GhostsMode == Freightened\n|| Run.GhostsMode == SuperFreightened
+
+    state GhostLoose as "Player succeeds, Ghost is dead"
+    GhostLoose: entry / Players[pni]->Score += 200;
+    GhostLoose: do / Move Ghost to home
+
+    FindColl --> GhostWin : collision, else
+
+    state GhostWin as "Ghost succeeds, Player is dead"
+    GhostWin: entry / Check lives
+
+    GhostWin --> PlayerDead : Player->Lives < 1
+
+    state PlayerDead as "Player finally dead"
+    PlayerDead: entry / Quit game !!
+
+    PlayerDead --> [*]
+
+    GhostWin --> PlayerStillAlive : else
+
+    state PlayerStillAlive as "Player still alive"
+    PlayerStillAlive: entry / Player->Lives--
+    PlayerStillAlive: do / Wait GAME_Frames_of_death
+    PlayerStillAlive: exit / Reset all Ghosts to home
+    PlayerStillAlive: exit / PlaySoundSample(SMP_PacManDead)
+
+    PlayerStillAlive --> [*]
+
+
+}

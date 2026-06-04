@@ -2,7 +2,65 @@
 
 ## About
 
-LedPong is an educational arcade game for LED walls
+LedPong is an educational arcade game for LED walls. Currently, it only implements PacMan.
+
+The goal is to demonstrate a complex real world example with the capabilities if computer science 101 + 102 C++ programming.
+
+Idea is, to have most classes as pure as possible; only some portions of the code with the use of standard library/ template/ hardware details/ framework.
+
+## UML
+
+The goal is also to train UML (Unified Modeling Language) on a complex real world example.
+
+### Class diagram
+
+The class diagram basically shows the main relationships in terms of data. 
+It answers questions like:
+* Which data sits where?
+* Which data is composed and which is aggregated (using pointers)?
+* Which methods exists and what do they likely?
+* Which base classes and which derived classes exist?
+* Which methods are virtual and imply polymorphism?
+
+Even if class diagrams are a structural (data) view, they are also often used to navigate the source code, which is partitioned into classes. 
+
+Class diagrams are the "go to" diagrams at the beginning.
+
+[![Class diagram](./out/UML/Class_overview.svg)](./out/UML/Class_overview.svg)
+
+### Behaviour diagram(s)
+
+#### General
+
+Games often include complex behaviour, often expressed by subtle changes of attributes, which might be split into different classes. UML knows behaviour diagrams, such as sequence, activity and state diagrams.
+
+Often, sequence diagrams are appropriate, when there is a step-wise and complex data processing. For PacMan, they make less sense.
+
+Activity diagrams, in Germany knows as DIN 40100 PAP (Programm-Ablauf-Plan) are frequently used. However, they tend to be quite low-level. For PacMan, they serve as an "bad example".
+
+State diagrams are often used to depict state machines. However, they could be also used to display step-wise behaviour and integrate and manage quite a level of intricate details. The diagram displayed here would be not "orthodox" in a UML way, but is may be helpful.
+
+#### Activity diagram as "bad example"
+
+Only a portion of the code in `PacManGame::Loop()`, which is responsible for the Player's behaviour, was tried to translate to an UML activity diagram. 
+
+One can see, that small if/then/else structures of the code get translated into quite large, nested structures. Make up your own opinion, if this is helpful.
+
+[![Activity diagram](./out/UML/Behaviours_Activity_diagrams.svg)](./out/UML/Behaviours_Activity_diagrams.svg)
+
+#### State diagram used with some "flexibility"
+
+In the following diagram, the behaviours of the games main loop `PacManGame::Loop()` has been decomposed into 4 parts:
+- Main loop itself, with a special condition for an animation, when the player died.
+- 5 different states of an `Actor`, namely the 4 Ghosts. 4 of these states are represented by the enum `GhostMode`, the fifth state `Waiting` is added only to the diagram. Not pretty formal, but helpful?
+- The behaviour of the Players 1/2.
+- The behaviour of the Ghosts 1/2/3/4.
+
+The behaviour sub-states will be executed from start to end every `PacManGame::Loop()`, which is a uncommon approach. Please check the use of state as a means to step-wise describe a complex behavoiur. What is better: An orthodox activity diagram, the state diagram or should this be left to source code only?
+
+[![State diagram](./out/UML/Behaviours_State_diagrams.svg)](./out/UML/Behaviours_State_diagrams.svg)
+
+
 
 ## Compiling
 

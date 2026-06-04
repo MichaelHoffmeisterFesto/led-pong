@@ -1,4 +1,4 @@
-@startuml Class overview
+@startuml Class_overview
 
 hide empty members
 skinparam linetype polyline
@@ -27,9 +27,19 @@ frame "Class overview" {
 		+GameKey : bool[]
 		+WasGameKey : bool[]
 		+FrameCounter : int
+		+LastGameDiffi : int = 1
+		+LastGamePlayers : int = 1
+		+HighScore : HighScoreEntry[5]
 	}
 
-	' Main --> "use" GameEnvironment
+	class HighScoreEntry {
+		+Name : char[4]
+		+Score : int
+	}
+
+	GameEnvironment -left-> "use" HighScoreEntry
+
+	Main -left-> "declare" GameEnvironment
 
 	class GameBase {
 		+GameBase(GameEnvironment* env)
@@ -43,8 +53,8 @@ frame "Class overview" {
 
 	enum GhostMode {
 		Chase
-		Freightened
 		Scatter
+		Freightened
 		SuperFreightened
 	}
 

@@ -293,7 +293,8 @@ bool TileMap::FindPossibleMoveInDir(Actor* actor, Vec2 checkPos, Vec2 dir, Possi
 
 int TileMap::CountTileCode(char code)
 {
-	int res = 0;for (int y = 0; y < mHeight; y++)
+	int res = 0;
+	for (int y = 0; y < mHeight; y++)
 		for (int x = 0; x < mWidth; x++)
 		{
 			// find
